@@ -10,6 +10,7 @@ import HeaderStrip from '@/components/dashboard/HeaderStrip';
 import Tiles from '@/components/dashboard/Tiles';
 import BigMovers from '@/components/dashboard/BigMovers';
 import Matrix from '@/components/dashboard/Matrix';
+import { scheduleJob } from '@/integrations/supabase/functions';
 import { printReport } from "@/lib/pdf";
 import { downloadCsv } from "@/lib/export";
 
@@ -23,6 +24,7 @@ const CleanDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [weekly, setWeekly] = useState<any | null>(null);
   const [role, setRole] = useState<'CEO'|'Marketing'|'SEO'>('CEO');
+  const [scheduledWeekly, setScheduledWeekly] = useState<boolean>(false);
 
   const loadDashboardData = useCallback(async () => {
     if (!user) {
@@ -78,6 +80,16 @@ const CleanDashboard = () => {
         } catch (e) {
           console.warn('weekly_snapshots read failed', e);
         }
+
+        // Load schedule state
+        try {
+          const { data: scheds } = await (supabase as any)
+            .from('schedules')
+            .select('weekly_health_check')
+            .eq('company_id', company.id)
+            .limit(1);
+          if (scheds && scheds[0]) setScheduledWeekly(!!scheds[0].weekly_health_check);
+        } catch {}
       }
     } catch (error) {
       console.error('Dashboard load error:', error);
@@ -172,10 +184,24 @@ const CleanDashboard = () => {
   const forecastVal = typeof weekly?.forecast === 'number' ? Math.round(weekly.forecast) : null;
 
   const rightToggle = (
-    <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
-      {(['CEO','Marketing','SEO'] as const).map((r) => (
-        <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
-      ))}
+    <div className="flex items-center gap-3">
+      <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
+        {(['CEO','Marketing','SEO'] as const).map((r) => (
+          <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
+        ))}
+      </div>
+      {company && (
+        <button
+          onClick={async () => {
+            const enabled = !scheduledWeekly;
+            setScheduledWeekly(enabled);
+            try { await scheduleJob({ type: 'weekly-health-check', enabled, companyId: company.id as any }); } catch {}
+          }}
+          className={`text-xs px-2 py-1 rounded border ${scheduledWeekly? 'bg-primary text-primary-foreground border-transparent' : 'bg-background border-input'}`}
+        >
+          {scheduledWeekly ? 'Scheduled ✓' : 'Schedule weekly'}
+        </button>
+      )}
     </div>
   );
 
