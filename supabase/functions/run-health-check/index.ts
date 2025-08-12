@@ -5,13 +5,14 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const url = Deno.env.get('SUPABASE_URL')!;
 const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-async function listCompaniesNeedingHealthCheck() {
-  const res = await fetch(`${url}/rest/v1/schedules?weekly_health_check=eq.true`, {
+// Process all companies (no schedules dependency)
+async function listCompaniesToProcess() {
+  const res = await fetch(`${url}/rest/v1/companies?select=id`, {
     headers: { 'apikey': key, 'Authorization': `Bearer ${key}` },
   });
-  if (!res.ok) throw new Error('Failed to read schedules');
-  const schedules = await res.json();
-  return schedules.map((s: any) => s.company_id as string);
+  if (!res.ok) throw new Error('Failed to read companies');
+  const companies = await res.json();
+  return companies.map((c: any) => c.id as string);
 }
 
 async function getCompany(companyId: string) {
@@ -174,7 +175,7 @@ async function upsertSnapshot(payload: any) {
 serve(async (req: Request) => {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
   try {
-    const companyIds = await listCompaniesNeedingHealthCheck();
+    const companyIds = await listCompaniesToProcess();
     for (const companyId of companyIds) {
       try {
         const company = await getCompany(companyId);
