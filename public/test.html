@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Test</title>
+</head>
+<body style="margin: 0; padding: 20px; background: red; color: white; font-size: 24px;">
+    <h1>🔴 BASIC HTML TEST</h1>
+    <p>If you can see this RED page, static HTML is working.</p>
+    <p>Time: <span id="time"></span></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        console.log('Basic HTML test loaded');
+    </script>
+</body>
+</html>
