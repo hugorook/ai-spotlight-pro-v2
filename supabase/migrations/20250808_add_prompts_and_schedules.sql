@@ -9,38 +9,65 @@ create table if not exists public.prompts (
 
 alter table public.prompts enable row level security;
 
--- Policies: owner (companies.user_id) can CRUD their prompts
-create policy if not exists prompts_select_own on public.prompts
-  for select using (
-    exists (
-      select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
-    )
-  );
+-- Policy: prompts_select_own (create only if missing)
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'prompts' and policyname = 'prompts_select_own'
+  ) then
+    create policy prompts_select_own on public.prompts
+      for select using (
+        exists (
+          select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
+        )
+      );
+  end if;
+end $$;
 
-create policy if not exists prompts_insert_own on public.prompts
-  for insert with check (
-    exists (
-      select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
-    )
-  );
+-- Policy: prompts_insert_own
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'prompts' and policyname = 'prompts_insert_own'
+  ) then
+    create policy prompts_insert_own on public.prompts
+      for insert with check (
+        exists (
+          select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
+        )
+      );
+  end if;
+end $$;
 
-create policy if not exists prompts_update_own on public.prompts
-  for update using (
-    exists (
-      select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
-    )
-  ) with check (
-    exists (
-      select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
-    )
-  );
+-- Policy: prompts_update_own
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'prompts' and policyname = 'prompts_update_own'
+  ) then
+    create policy prompts_update_own on public.prompts
+      for update using (
+        exists (
+          select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
+        )
+      ) with check (
+        exists (
+          select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
+        )
+      );
+  end if;
+end $$;
 
-create policy if not exists prompts_delete_own on public.prompts
-  for delete using (
-    exists (
-      select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
-    )
-  );
+-- Policy: prompts_delete_own
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'prompts' and policyname = 'prompts_delete_own'
+  ) then
+    create policy prompts_delete_own on public.prompts
+      for delete using (
+        exists (
+          select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
+        )
+      );
+  end if;
+end $$;
 
 -- Schedules table for job preferences
 create table if not exists public.schedules (
@@ -52,14 +79,21 @@ create table if not exists public.schedules (
 
 alter table public.schedules enable row level security;
 
-create policy if not exists schedules_crud_own on public.schedules
-  for all using (
-    exists (
-      select 1 from public.companies c where c.id = schedules.company_id and c.user_id = auth.uid()
-    )
-  ) with check (
-    exists (
-      select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
-    )
-  );
+-- Policy: schedules_crud_own
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'schedules' and policyname = 'schedules_crud_own'
+  ) then
+    create policy schedules_crud_own on public.schedules
+      for all using (
+        exists (
+          select 1 from public.companies c where c.id = schedules.company_id and c.user_id = auth.uid()
+        )
+      ) with check (
+        exists (
+          select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
+        )
+      );
+  end if;
+end $$;
 
