@@ -10,24 +10,21 @@ create table if not exists public.prompts (
 alter table public.prompts enable row level security;
 
 -- Policies: owner (companies.user_id) can CRUD their prompts
-drop policy if exists prompts_select_own on public.prompts;
-create policy prompts_select_own on public.prompts
+create policy if not exists prompts_select_own on public.prompts
   for select using (
     exists (
       select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
     )
   );
 
-drop policy if exists prompts_insert_own on public.prompts;
-create policy prompts_insert_own on public.prompts
+create policy if not exists prompts_insert_own on public.prompts
   for insert with check (
     exists (
       select 1 from public.companies c where c.id = company_id and c.user_id = auth.uid()
     )
   );
 
-drop policy if exists prompts_update_own on public.prompts;
-create policy prompts_update_own on public.prompts
+create policy if not exists prompts_update_own on public.prompts
   for update using (
     exists (
       select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
@@ -38,8 +35,7 @@ create policy prompts_update_own on public.prompts
     )
   );
 
-drop policy if exists prompts_delete_own on public.prompts;
-create policy prompts_delete_own on public.prompts
+create policy if not exists prompts_delete_own on public.prompts
   for delete using (
     exists (
       select 1 from public.companies c where c.id = prompts.company_id and c.user_id = auth.uid()
@@ -56,8 +52,7 @@ create table if not exists public.schedules (
 
 alter table public.schedules enable row level security;
 
-drop policy if exists schedules_crud_own on public.schedules;
-create policy schedules_crud_own on public.schedules
+create policy if not exists schedules_crud_own on public.schedules
   for all using (
     exists (
       select 1 from public.companies c where c.id = schedules.company_id and c.user_id = auth.uid()
