@@ -9,6 +9,7 @@ import CleanGeoPage from "./pages/CleanGeoPage";
 import MinimalContentPage from "./pages/MinimalContentPage";
 import StrategyPage from "./pages/StrategyPage";
 import SettingsPage from "./pages/SettingsPage";
+import PublicSnapshot from "./pages/PublicSnapshot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -22,6 +23,7 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<CleanAuthPage />} />
+            <Route path="/snapshot" element={<PublicSnapshot />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={

@@ -6,6 +6,10 @@ import AppShell from "@/components/layout/AppShell";
 import CommandPalette from "@/components/CommandPalette";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
+import HeaderStrip from '@/components/dashboard/HeaderStrip';
+import Tiles from '@/components/dashboard/Tiles';
+import BigMovers from '@/components/dashboard/BigMovers';
+import Matrix from '@/components/dashboard/Matrix';
 import { printReport } from "@/lib/pdf";
 import { downloadCsv } from "@/lib/export";
 
@@ -17,6 +21,8 @@ const CleanDashboard = () => {
   const [company, setCompany] = useState<Company | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [weekly, setWeekly] = useState<any | null>(null);
+  const [role, setRole] = useState<'CEO'|'Marketing'|'SEO'>('CEO');
 
   const loadDashboardData = useCallback(async () => {
     if (!user) {
@@ -58,6 +64,19 @@ const CleanDashboard = () => {
         } else {
           console.log('No tests found or error occurred');
           setTestResults([]);
+        }
+
+        // Load latest weekly snapshot
+        try {
+          const { data: snapshots, error: snapErr } = await (supabase as any)
+            .from('weekly_snapshots')
+            .select('*')
+            .eq('brand_id', company.id)
+            .order('week_start', { ascending: false })
+            .limit(1);
+          if (!snapErr) setWeekly((snapshots && snapshots[0]) || null);
+        } catch (e) {
+          console.warn('weekly_snapshots read failed', e);
         }
       }
     } catch (error) {
@@ -147,8 +166,34 @@ const CleanDashboard = () => {
   const visibilityScore = calculateVisibilityScore();
   const recentPerformance = getRecentPerformance();
 
+  const headerScore = typeof weekly?.visibility_score === 'number' ? Math.round(weekly.visibility_score) : visibilityScore;
+  const headerDelta = typeof weekly?.wow_delta === 'number' ? Math.round(weekly.wow_delta) : 0;
+  const momentum: 'up' | 'down' | 'flat' = headerDelta > 0 ? 'up' : headerDelta < 0 ? 'down' : 'flat';
+  const forecastVal = typeof weekly?.forecast === 'number' ? Math.round(weekly.forecast) : null;
+
+  const rightToggle = (
+    <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
+      {(['CEO','Marketing','SEO'] as const).map((r) => (
+        <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
+      ))}
+    </div>
+  );
+
   return (
-    <AppShell title="AI Visibility Hub" subtitle="Monitor your company's AI mentions and performance">
+    <AppShell title="AI Visibility Hub" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
+
+      {/* V2: Header strip and tiles */}
+      <div className="space-y-4 mb-6">
+        <HeaderStrip score={headerScore} delta={headerDelta} momentum={momentum} forecast={forecastVal ?? undefined} />
+        {role !== 'CEO' && (
+          <Tiles 
+            mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
+            avgPosition={weekly?.avg_position ?? null}
+            modelCoverage={weekly?.model_coverage ?? {}}
+            winStreak={weekly?.win_streak ?? 0}
+          />
+        )}
+      </div>
 
       {/* Main Content Grid */}
       <div style={{
@@ -455,6 +500,24 @@ const CleanDashboard = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Movers and Matrix */}
+      <div className="grid grid-cols-1 gap-4 mt-6">
+        <BigMovers wins={(weekly?.biggest_wins ?? []).slice(0, role==='CEO'?3:5)} losses={(weekly?.biggest_losses ?? []).slice(0, role==='CEO'?3:5)} />
+        {(() => {
+          const coverage = weekly?.model_coverage ?? {};
+          // Inflate to stage-mapped matrix (awareness/consideration/comparison) for current single-provider data
+          const matrixData: any = {};
+          Object.entries(coverage).forEach(([model, m]: any) => {
+            matrixData[model] = {
+              awareness: { mentionRate: m.mentionRate ?? 0, avgPosition: m.avgPosition ?? null, trend: 0 },
+              consideration: { mentionRate: m.mentionRate ?? 0, avgPosition: m.avgPosition ?? null, trend: 0 },
+              comparison: { mentionRate: m.mentionRate ?? 0, avgPosition: m.avgPosition ?? null, trend: 0 },
+            };
+          });
+          return <Matrix data={matrixData} />;
+        })()}
       </div>
 
         <CommandPalette />
