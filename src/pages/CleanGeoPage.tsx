@@ -1724,6 +1724,7 @@ export default function CleanGeoPage() {
                 </details>
               ))}
             </div>
+            </div>
             <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
               <h3 className="text-lg font-semibold mb-2">Strategy</h3>
               {strategyLoading && (<div className="animate-pulse">Generating strategy…</div>)}
