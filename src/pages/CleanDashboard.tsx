@@ -12,6 +12,38 @@ import BigMovers from '@/components/dashboard/BigMovers';
 import Matrix from '@/components/dashboard/Matrix';
 import { printReport } from "@/lib/pdf";
 import { downloadCsv } from "@/lib/export";
+import React from 'react';
+
+function RecentTestsTable({ tests }: { tests: any[] }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-input">
+            <th className="text-left py-2 pr-3">Prompt</th>
+            <th className="text-left py-2 pr-3">Model</th>
+            <th className="text-left py-2 pr-3">Mentioned</th>
+            <th className="text-left py-2 pr-3">Position</th>
+            <th className="text-left py-2 pr-3">Sentiment</th>
+            <th className="text-left py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tests.slice(0, 10).map((t) => (
+            <tr key={t.id} className="border-b border-input">
+              <td className="py-2 pr-3 truncate max-w-[220px]">{t.prompt_text || t.prompt_id || '—'}</td>
+              <td className="py-2 pr-3">{t.ai_model}</td>
+              <td className="py-2 pr-3">{t.company_mentioned ? 'Yes' : 'No'}</td>
+              <td className="py-2 pr-3">{t.mention_position ?? '—'}</td>
+              <td className="py-2 pr-3 capitalize">{t.sentiment ?? 'neutral'}</td>
+              <td className="py-2">{new Date(t.test_date).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 type Company = Tables<'companies'>;
 type TestResult = Tables<'ai_tests'>;
@@ -184,133 +216,37 @@ const CleanDashboard = () => {
   return (
     <AppShell title="AI Visibility Hub" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
 
-      {/* V2: Header strip and tiles */}
-      <div className="space-y-4 mb-6">
+      {/* Header strip */}
+      <div className="mb-4">
         <HeaderStrip score={headerScore} delta={headerDelta} momentum={momentum} forecast={forecastVal ?? undefined} />
-        {role !== 'CEO' && (
-          <Tiles 
-            mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
-            avgPosition={weekly?.avg_position ?? null}
-            modelCoverage={weekly?.model_coverage ?? {}}
-            winStreak={weekly?.win_streak ?? 0}
-          />
-        )}
       </div>
 
-      {/* Main Content Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '20px',
-        marginBottom: '30px'
-      }}>
-        {/* Visibility Score */}
-        <div style={{
-          background: '#222',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #333'
-        }}>
-          <div style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '15px'
-          }}>
-            <h3 style={{ margin: 0, fontSize: '16px' }}>AI Visibility Score</h3>
-            <span style={{ fontSize: '20px' }}>📈</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#4CAF50', marginBottom: '10px' }}>
-            {visibilityScore}%
-          </div>
-          <div style={{ fontSize: '14px', color: '#888' }}>
-            Based on {testResults.length} tests
-          </div>
-          <div style={{
-            background: '#333',
-            height: '8px',
-            borderRadius: '4px',
-            marginTop: '10px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              background: '#4CAF50',
-              height: '100%',
-              width: `${visibilityScore}%`,
-              borderRadius: '4px'
-            }}></div>
-          </div>
+      {/* Top row: Company Profile, Visibility Score, Total Tests */}
+      <div className="grid md:grid-cols-3 gap-5 mb-6">
+        {/* A. Company Profile */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4">🏢 Company Profile</h3>
+          <div className="mb-2 text-xl font-bold">{company.company_name}</div>
+          <div className="text-sm mb-1">🌐 {company.website_url}</div>
+          <div className="text-sm">{company.industry}</div>
         </div>
-
-        {/* Recent Performance */}
-        <div style={{
-          background: '#222',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #333'
-        }}>
-          <div style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '15px'
-          }}>
-            <h3 style={{ margin: 0, fontSize: '16px' }}>Recent Performance</h3>
-            <span style={{ fontSize: '20px' }}>📊</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
-            {recentPerformance}%
-          </div>
-          <div style={{ fontSize: '14px', color: '#888', marginBottom: '10px' }}>
-            Last 5 tests
-          </div>
-          <div style={{
-            background: recentPerformance >= 50 ? '#4CAF50' : '#f44336',
-            color: 'white',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            display: 'inline-block'
-          }}>
-            {recentPerformance >= 50 ? "Good" : "Needs Improvement"}
-          </div>
+        {/* B. Visibility Score */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4">📈 Visibility Score</h3>
+          <div className="text-3xl font-bold mb-2">{visibilityScore}</div>
+          <div className="text-sm">Based on {testResults.length} tests</div>
         </div>
-
-        {/* Total Tests */}
-        <div style={{
-          background: '#222',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #333'
-        }}>
-          <div style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '15px'
-          }}>
-            <h3 style={{ margin: 0, fontSize: '16px' }}>Total Tests</h3>
-            <span style={{ fontSize: '20px' }}>🧪</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '10px' }}>
-            {testResults.length}
-          </div>
-          <div style={{ fontSize: '14px', color: '#888' }}>
-            {testResults.filter(t => t.company_mentioned).length} mentions found
-          </div>
+        {/* C. Total Tests */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4">🧪 Total Tests</h3>
+          <div className="text-3xl font-bold mb-2">{testResults.length}</div>
+          <div className="text-sm">{testResults.filter(t=>t.company_mentioned).length} mentions found</div>
         </div>
       </div>
 
-      {/* Next Best Actions removed per redesign */}
-
-      {/* Company Profile and Recent Tests */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-        gap: '20px'
-      }}>
-        {/* Trend Chart */}
+      {/* Second row: Trend, Recent Performance tiles, Recent Test Results */}
+      <div className="grid md:grid-cols-3 gap-5">
+        {/* D. Visibility Trend */}
         <div id="dashboard-trend-report" className="rounded-xl border border-border bg-card p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-semibold">📈 Visibility trend</h3>
@@ -339,171 +275,33 @@ const CleanDashboard = () => {
             <div className="text-sm text-muted-foreground">Not enough data yet. Run more tests to see the trend.</div>
           )}
         </div>
-        {/* Company Profile */}
-        <div style={{
-          background: '#222',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #333'
-        }}>
-          <div style={{ 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '20px'
-          }}>
-            <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              🏢 Company Profile
-            </h3>
-            <button
-              onClick={() => window.location.href = '/geo?edit=true'}
-              style={{
-                background: '#333',
-                color: '#fff',
-                border: '1px solid #555',
-                padding: '8px 12px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              ⚙️ Edit
-            </button>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <h4 style={{ margin: '0 0 5px 0', fontSize: '20px' }}>{company.company_name}</h4>
-            <div style={{ color: '#888', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              🌐 {company.website_url}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <span style={{
-              background: '#333',
-              color: '#fff',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              fontSize: '12px'
-            }}>
-              {company.industry}
-            </span>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <p style={{ margin: 0, fontSize: '14px', color: '#ccc', lineHeight: '1.4' }}>
-              {company.description}
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <h5 style={{ margin: '0 0 5px 0', fontSize: '14px', fontWeight: 'bold' }}>Target Customers</h5>
-            <p style={{ margin: 0, fontSize: '14px', color: '#888' }}>{company.target_customers}</p>
-          </div>
-
-          <div>
-            <h5 style={{ margin: '0 0 5px 0', fontSize: '14px', fontWeight: 'bold' }}>Key Differentiators</h5>
-            <p style={{ margin: 0, fontSize: '14px', color: '#888' }}>{company.key_differentiators}</p>
-          </div>
+        {/* E. Recent Performance (tiles) */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-3">📊 Recent Performance</h3>
+          <Tiles 
+            mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
+            avgPosition={weekly?.avg_position ?? null}
+            modelCoverage={weekly?.model_coverage ?? {}}
+            winStreak={weekly?.win_streak ?? 0}
+          />
         </div>
 
-        {/* Recent Test Results */}
-        <div style={{
-          background: '#222',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #333'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>🧪 Recent Test Results</h3>
+        {/* F. Recent Test Results (table + pagination) */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold">🧪 Recent Test Results</h3>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => window.location.href = '/geo'}
-                style={{ background: '#333', color: '#fff', border: '1px solid #555', padding: '8px 12px', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}
-              >
-                View All →
-              </button>
-              <button
-                onClick={() => downloadCsv('ai_tests.csv', testResults as any)}
-                className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
-              >
-                Export CSV
-              </button>
+              <button onClick={() => window.location.href = '/geo'} className="text-xs px-2 py-1 border border-input rounded">Run Health Check</button>
+              <button onClick={() => downloadCsv('ai_tests.csv', testResults as any)} className="text-xs px-2 py-1 border border-input rounded">Export CSV</button>
             </div>
           </div>
-
           {testResults.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#888' }}>
-              <div style={{ fontSize: '48px', marginBottom: '15px' }}>🧪</div>
-              <p style={{ margin: '0 0 5px 0' }}>No test results yet</p>
-              <p style={{ margin: 0, fontSize: '12px' }}>Run your first AI visibility test to see results here</p>
-            </div>
+            <div className="text-sm">No test results yet</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {testResults.slice(0, 5).map((test) => (
-                <div key={test.id} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px',
-                  background: '#111',
-                  borderRadius: '6px',
-                  border: '1px solid #333'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                      padding: '8px',
-                      background: test.company_mentioned ? '#4CAF50' : '#f44336',
-                      borderRadius: '4px'
-                    }}>
-                      {test.company_mentioned ? '✅' : '❌'}
-                    </div>
-                    <div>
-                      <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 'bold', textTransform: 'capitalize' }}>
-                        {test.ai_model}
-                      </p>
-                      <p style={{ margin: 0, fontSize: '12px', color: '#888' }}>
-                        {new Date(test.test_date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    {test.company_mentioned ? (
-                      <div style={{
-                        background: '#4CAF50',
-                        color: 'white',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        Position #{test.mention_position}
-                      </div>
-                    ) : (
-                      <div style={{
-                        background: '#f44336',
-                        color: 'white',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        Not Mentioned
-                      </div>
-                    )}
-                    {test.sentiment && (
-                      <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: '#888', textTransform: 'capitalize' }}>
-                        {test.sentiment}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <RecentTestsTable tests={testResults} />
           )}
         </div>
       </div>
-
       {/* Movers and Matrix */}
       <div className="grid grid-cols-1 gap-4 mt-6">
         <BigMovers wins={(weekly?.biggest_wins ?? []).slice(0, role==='CEO'?3:5)} losses={(weekly?.biggest_losses ?? []).slice(0, role==='CEO'?3:5)} />
