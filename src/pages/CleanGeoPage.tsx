@@ -1445,16 +1445,16 @@ export default function CleanGeoPage() {
       </div>
     )}>
 
-        {/* Mode toggles */}
-        <div className="flex items-center gap-3 mb-4">
-          <button className={`text-sm px-3 py-1 rounded border ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('automated')}>Automated</button>
-          <button className={`text-sm px-3 py-1 rounded border ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('custom')}>Custom</button>
-        </div>
+        {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
+        <div className="grid lg:grid-cols-12 gap-8 mb-8">
+          {/* LEFT stacked toggles */}
+          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 flex flex-col gap-3">
+            <button className={`w-full text-sm px-3 py-2 rounded border ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('automated')}>Automated</button>
+            <button className={`w-full text-sm px-3 py-2 rounded border ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('custom')}>Custom</button>
+          </div>
 
-        {/* Main Content - Two Column Layout */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* LEFT: Automated Run + Results Accordion OR placeholder for Custom */}
-          <div className="rounded-2xl border border-border bg-card p-8">
+          {/* MIDDLE: Action box */}
+          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
               {mode==='automated' ? (
                 <>
@@ -1514,13 +1514,13 @@ export default function CleanGeoPage() {
             )}
           </div>
 
-          {/* RIGHT: Loading/Strategy for Automated OR Custom Prompt Tester */}
-          <div className="rounded-2xl border border-border bg-card p-8">
+          {/* RIGHT: Status loading only for Automated, Custom tester for Custom */}
+          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
               {mode==='automated' ? (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status & Strategy</h2>
-                  <p className="text-muted-foreground">Loading animations while health check runs; strategy appears below when complete.</p>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status</h2>
+                  <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
                 </>
               ) : (
                 <>
@@ -1533,27 +1533,16 @@ export default function CleanGeoPage() {
             {mode==='automated' ? (
               <div className="space-y-4">
                 {isRunningHealthCheck && (
-                  <div className="bg-[#E8E6DF] border border-black rounded p-4 text-center">
-                    <div className="animate-pulse">Running health check…</div>
-                  </div>
-                )}
-                {!isRunningHealthCheck && lastRunType==='health' && (
-                  <div className="space-y-3">
-                    {strategyLoading && (<div className="animate-pulse">Generating strategy…</div>)}
-                    {strategyError && (<div className="text-sm">{strategyError}</div>)}
-                    {!strategyLoading && !strategyError && autoStrategies.length>0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Strategy (auto-generated)</h3>
-                        <div className="space-y-2">
-                          {autoStrategies.map((r:any, idx:number)=> (
-                            <div key={idx} className="border border-black rounded p-3 bg-[#E8E6DF]">
-                              <div className="text-sm font-semibold">{r.title}</div>
-                              <div className="text-xs mt-1">{r.reason}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                  <div className="space-y-4">
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="bg-black h-2 rounded-full transition-all" style={{ width: `${(testProgress.current / Math.max(1, testProgress.total)) * 100}%` }} />
+                    </div>
+                    <div className="text-center space-y-2">
+                      <div className="bg-muted/50 rounded p-3 animate-pulse">{jokes[jokeIndex]}</div>
+                      {currentTestPrompt && (
+                        <div className="bg-background border border-border rounded p-3 text-sm">{currentTestPrompt}</div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1600,9 +1589,10 @@ export default function CleanGeoPage() {
           </div>
         </div>
 
-        {/* Results Display in LEFT column for Automated flow */}
+        {/* After run: left results accordion, right strategy panel */}
         {mode==='automated' && lastRunType==='health' && lastResults.length > 0 && (
-          <div id="geo-report" className="rounded-2xl border border-border bg-card p-8 lg:col-start-1 lg:col-end-2">
+          <div id="geo-report" className="grid lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -1668,7 +1658,7 @@ export default function CleanGeoPage() {
 
             
             {/* Detailed Results */}
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-3">
               {lastResults.map((result, index) => (
                 <details key={index} className="border border-border rounded-lg bg-background/50">
                   <summary className="flex items-center justify-between p-4 cursor-pointer">
@@ -1690,7 +1680,7 @@ export default function CleanGeoPage() {
                           (document.getElementById(`rec-${index}`) as HTMLButtonElement)?.click();
                         }}
                       >
-                        Generate a Strategy from this Result
+                        Generate strategy
                       </button>
                     </div>
                   </summary>
@@ -1733,6 +1723,21 @@ export default function CleanGeoPage() {
                   </div>
                 </details>
               ))}
+            </div>
+            <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
+              <h3 className="text-lg font-semibold mb-2">Strategy</h3>
+              {strategyLoading && (<div className="animate-pulse">Generating strategy…</div>)}
+              {strategyError && (<div className="text-sm">{strategyError}</div>)}
+              {!strategyLoading && !strategyError && autoStrategies.length>0 && (
+                <div className="space-y-2">
+                  {autoStrategies.map((r:any, idx:number)=> (
+                    <div key={idx} className="border border-black rounded p-3 bg-[#E8E6DF]">
+                      <div className="text-sm font-semibold">{r.title}</div>
+                      <div className="text-xs mt-1">{r.reason}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
