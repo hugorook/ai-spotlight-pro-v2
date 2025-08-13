@@ -1639,7 +1639,18 @@ export default function CleanGeoPage() {
                         const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
                         if (error) throw error;
                         (document.getElementById(`rec-box-${index}`) as HTMLDivElement).innerHTML = (data?.recommendations || [])
-                          .map((r: any) => `<div class=\"border border-black rounded p-3 bg-[#E8E6DF]\"><div class=\"text-sm font-semibold\">${r.title}</div><div class=\"text-xs mt-1\">${r.reason}</div><div class=\"mt-2\"><button class=\"text-xs px-2 py-1 border border-black rounded\" onclick=\"window.localStorage.setItem('strategy_queue', JSON.stringify([{id:'${r.id}', title:'${r.title}', reason:'${r.reason}'}].concat(JSON.parse(window.localStorage.getItem('strategy_queue')||'[]')))); alert('Sent to Content Assistant');\">Send to Content Assistant</button></div></div>`)
+                          .map((r: any) => {
+                            const payload = `{id:'${r.id}', title:'${r.title}', reason:'${r.reason}'}`;
+                            return `<div class=\"border border-black rounded p-3 bg-[#E8E6DF]\">
+                              <div class=\"text-sm font-semibold\">${r.title}</div>
+                              <div class=\"text-xs mt-1\">${r.reason}</div>
+                              <div class=\"mt-2 flex gap-2\">
+                                <button class=\"text-xs px-2 py-1 border border-black rounded\"
+                                  onclick=\"(function(){var q=JSON.parse(window.localStorage.getItem('strategy_queue')||'[]'); q.unshift(${payload}); window.localStorage.setItem('strategy_queue', JSON.stringify(q));})();\">Send to Content Assistant</button>
+                                <a href=\"/content\" class=\"text-xs px-2 py-1 border border-black rounded\">Open in Content Assistant →</a>
+                              </div>
+                            </div>`;
+                          })
                           .join('');
                       } catch (e) {
                         alert('Failed to generate strategy');
