@@ -12,51 +12,48 @@
 
 @layer base {
   :root {
-    /* Core brand colors - Purple/Blue AI theme */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    /* v1.1 Hard Theme: off-white, black, orange */
+    /* Off-white #E8E6DF ≈ hsl(46 20% 89%) */
+    --background: 46 20% 89%;
+    --foreground: 0 0% 0%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 46 20% 89%;
+    --card-foreground: 0 0% 0%;
 
-    --popover: 240 5% 6%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 46 20% 89%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Primary - AI Purple */
-    --primary: 263 83% 57%;
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 263 83% 70%;
+    /* Default buttons use off-white with black text; hover handled below */
+    --primary: 46 20% 89%;
+    --primary-foreground: 0 0% 0%;
+    --primary-glow: 46 20% 89%;
 
-    /* Secondary - Deep Blue */
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 46 20% 89%;
+    --secondary-foreground: 0 0% 0%;
 
-    /* Muted backgrounds */
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 46 14% 85%;
+    --muted-foreground: 0 0% 0%;
 
-    /* Accent - Success Green */
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 46 20% 89%;
+    --accent-foreground: 0 0% 0%;
 
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 0% 20%;
+    --destructive-foreground: 0 0% 100%;
 
     /* UI Elements */
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 263 83% 57%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
 
     --radius: 0.75rem;
     --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    /* AI-specific design tokens */
-    --gradient-ai: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
-    --shadow-ai: 0 10px 40px -10px hsl(var(--primary) / 0.3);
-    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.2);
+    /* Design tokens */
+    --gradient-ai: none;
+    --gradient-subtle: none;
+    --shadow-ai: none;
+    --shadow-glow: none;
     
     /* Performance indicators */
     --success: 142 76% 36%;
@@ -80,43 +77,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+  .dark { /* dark mode not used in v1.1 theme; mirror light */ }
 }
 
 @layer base {
@@ -126,5 +87,32 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Global button styling: default off-white with black text; orange hover */
+  button {
+    background-color: #E8E6DF;
+    color: #000000;
+    border: 1px solid rgba(0,0,0,0.9);
+  }
+  button:hover,
+  button:active,
+  button:focus {
+    background-color: #BF5700 !important;
+    color: #000000 !important;
+  }
+  /* Inputs/cards off-white with black borders */
+  input, select, textarea {
+    background-color: #E8E6DF;
+    color: #000000;
+    border: 1px solid rgba(0,0,0,0.9);
+  }
+  .bg-card, .bg-popover, .bg-background { background-color: #E8E6DF !important; }
+  .text-foreground, .text-muted-foreground { color: #000000 !important; }
+
+  /* Focus ring AA */
+  :focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
   }
 }
