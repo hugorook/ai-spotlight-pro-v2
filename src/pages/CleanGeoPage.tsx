@@ -1597,30 +1597,57 @@ export default function CleanGeoPage() {
             {/* Detailed Results */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {lastResults.map((result, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50">
-                  <div className="flex-1 min-w-0 mr-4">
-                    <p className="font-medium text-foreground text-sm mb-1 truncate">
-                      {result.prompt}
-                    </p>
-                    {result.context && (
-                      <p className="text-xs text-muted-foreground truncate">
-                        {result.context}
-                      </p>
-                    )}
+                <details key={index} className="border border-border rounded-lg bg-background/50">
+                  <summary className="flex items-center justify-between p-4 cursor-pointer">
+                    <div className="flex-1 min-w-0 mr-4">
+                      <p className="font-medium text-foreground text-sm mb-1 truncate">{result.prompt}</p>
+                      {result.context && (
+                        <p className="text-xs text-muted-foreground truncate">{result.context}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${result.mentioned ? 'border border-input' : 'bg-muted text-muted-foreground'}`}>
+                        {result.mentioned ? `#${result.position}` : 'Not Mentioned'}
+                      </span>
+                      <span className="px-2 py-1 rounded-full text-xs bg-muted/50 text-muted-foreground capitalize">{result.sentiment}</span>
+                      <button
+                        className="text-xs px-2 py-1 border border-input rounded"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          (document.getElementById(`rec-${index}`) as HTMLButtonElement)?.click();
+                        }}
+                      >
+                        Generate a Strategy from this Result
+                      </button>
+                    </div>
+                  </summary>
+                  <div className="px-4 pb-4 space-y-3">
+                    <button id={`rec-${index}`} className="hidden" onClick={async () => {
+                      try {
+                        const payload = {
+                          companyName: company?.company_name,
+                          results: [{
+                            prompt_text: result.prompt,
+                            company_mentioned: result.mentioned,
+                            mention_position: result.position,
+                            sentiment: result.sentiment,
+                            mention_context: result.context,
+                            ai_model: 'openai-gpt-4o-mini',
+                            test_date: new Date().toISOString()
+                          }]
+                        };
+                        const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
+                        if (error) throw error;
+                        (document.getElementById(`rec-box-${index}`) as HTMLDivElement).innerHTML = (data?.recommendations || [])
+                          .map((r: any) => `<div class=\"border border-black rounded p-3 bg-[#E8E6DF]\"><div class=\"text-sm font-semibold\">${r.title}</div><div class=\"text-xs mt-1\">${r.reason}</div><div class=\"mt-2\"><button class=\"text-xs px-2 py-1 border border-black rounded\" onclick=\"window.localStorage.setItem('strategy_queue', JSON.stringify([{id:'${r.id}', title:'${r.title}', reason:'${r.reason}'}].concat(JSON.parse(window.localStorage.getItem('strategy_queue')||'[]')))); alert('Sent to Content Assistant');\">Send to Content Assistant</button></div></div>`)
+                          .join('');
+                      } catch (e) {
+                        alert('Failed to generate strategy');
+                      }
+                    }} />
+                    <div id={`rec-box-${index}`} />
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      result.mentioned 
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {result.mentioned ? `#${result.position}` : 'Not Mentioned'}
-                    </span>
-                    <span className="px-2 py-1 rounded-full text-xs bg-muted/50 text-muted-foreground capitalize">
-                      {result.sentiment}
-                    </span>
-                  </div>
-                </div>
+                </details>
               ))}
             </div>
           </div>
