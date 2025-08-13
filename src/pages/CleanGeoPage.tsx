@@ -862,6 +862,10 @@ export default function CleanGeoPage() {
   const [jokeIndex, setJokeIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('health');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [mode, setMode] = useState<'automated'|'custom'>('automated');
+  const [autoStrategies, setAutoStrategies] = useState<any[]>([]);
+  const [strategyLoading, setStrategyLoading] = useState(false);
+  const [strategyError, setStrategyError] = useState<string | null>(null);
 
   const jokes = [
     'Optimizing your digital real estate…',
@@ -1229,6 +1233,32 @@ export default function CleanGeoPage() {
       
       console.log(`Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate).`);
       toast({ title: 'Health Check Complete', description: `${successRate}% mention rate across ${results.length} prompts.` });
+
+      // Auto-generate strategy for Automated flow (right column)
+      try {
+        setStrategyLoading(true);
+        setStrategyError(null);
+        setAutoStrategies([]);
+        const payload = {
+          companyName: company.company_name,
+          results: results.slice(0, 100).map(r => ({
+            prompt_text: r.prompt,
+            company_mentioned: r.mentioned,
+            mention_position: r.position,
+            sentiment: r.sentiment,
+            mention_context: r.context,
+            ai_model: 'openai-gpt-4o-mini',
+            test_date: new Date().toISOString()
+          }))
+        };
+        const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
+        if (error) throw error;
+        setAutoStrategies((data?.recommendations as any[]) || []);
+      } catch (e: any) {
+        setStrategyError(e?.message || 'Failed to generate strategy');
+      } finally {
+        setStrategyLoading(false);
+      }
       
     } catch (error) {
       console.error('❌ FATAL ERROR in health check:', error);
@@ -1415,38 +1445,49 @@ export default function CleanGeoPage() {
       </div>
     )}>
 
-        {/* Main Content - Side by Side Layout */}
+        {/* Mode toggles */}
+        <div className="flex items-center gap-3 mb-4">
+          <button className={`text-sm px-3 py-1 rounded border ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('automated')}>Automated</button>
+          <button className={`text-sm px-3 py-1 rounded border ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('custom')}>Custom</button>
+        </div>
+
+        {/* Main Content - Two Column Layout */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          
-          {/* LEFT SECTION: Health Check */}
+          {/* LEFT: Automated Run + Results Accordion OR placeholder for Custom */}
           <div className="rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
-                <span className="text-primary">🏥</span>
-                AI Health Check
-              </h2>
-              <p className="text-muted-foreground">
-                Test your company visibility across 25+ AI-generated responses
-              </p>
+              {mode==='automated' ? (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🏥 For Automate – Run Automated Health Check</h2>
+                  <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear inline.</p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Health Check</h2>
+                  <p className="text-muted-foreground">Use the existing custom flow exactly as before.</p>
+                </>
+              )}
             </div>
 
-            <button
-              onClick={runHealthCheck}
-              disabled={isRunningHealthCheck || !company}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors"
-            >
-              {isRunningHealthCheck ? (
-                <div className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">⟳</span>
-                  <span>Running Health Check...</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <span>▶️</span>
-                  <span>Run Automated Health Check</span>
-                </div>
-              )}
-            </button>
+            {mode==='automated' && (
+              <button
+                onClick={runHealthCheck}
+                disabled={isRunningHealthCheck || !company}
+                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors"
+              >
+                {isRunningHealthCheck ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">⟳</span>
+                    <span>Running Health Check...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <span>▶️</span>
+                    <span>Run Automated Health Check</span>
+                  </div>
+                )}
+              </button>
+            )}
             
             {/* Loading Animation */}
             {isRunningHealthCheck && (
@@ -1473,42 +1514,74 @@ export default function CleanGeoPage() {
             )}
           </div>
 
-          {/* RIGHT SECTION: Custom Prompt Tester */}
+          {/* RIGHT: Loading/Strategy for Automated OR Custom Prompt Tester */}
           <div className="rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
-                <span className="text-primary">🧪</span>
-                Custom Prompt Tester
-              </h2>
-              <p className="text-muted-foreground">
-                Test any custom prompt to see if your company gets mentioned
-              </p>
+              {mode==='automated' ? (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status & Strategy</h2>
+                  <p className="text-muted-foreground">Loading animations while health check runs; strategy appears below when complete.</p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Prompt Tester</h2>
+                  <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
+                </>
+              )}
             </div>
 
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Enter your custom prompt here..."
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                className="w-full px-4 py-3 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              
-              <button
-                onClick={testCustomPrompt}
-                disabled={!customPrompt || isTestingCustom}
-                className="w-full bg-secondary hover:bg-secondary/80 disabled:opacity-50 text-secondary-foreground font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                {isTestingCustom ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="animate-spin">⟳</span>
-                    <span>Testing...</span>
+            {mode==='automated' ? (
+              <div className="space-y-4">
+                {isRunningHealthCheck && (
+                  <div className="bg-[#E8E6DF] border border-black rounded p-4 text-center">
+                    <div className="animate-pulse">Running health check…</div>
                   </div>
-                ) : (
-                  'Test Prompt'
                 )}
-              </button>
-            </div>
+                {!isRunningHealthCheck && lastRunType==='health' && (
+                  <div className="space-y-3">
+                    {strategyLoading && (<div className="animate-pulse">Generating strategy…</div>)}
+                    {strategyError && (<div className="text-sm">{strategyError}</div>)}
+                    {!strategyLoading && !strategyError && autoStrategies.length>0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">Strategy (auto-generated)</h3>
+                        <div className="space-y-2">
+                          {autoStrategies.map((r:any, idx:number)=> (
+                            <div key={idx} className="border border-black rounded p-3 bg-[#E8E6DF]">
+                              <div className="text-sm font-semibold">{r.title}</div>
+                              <div className="text-xs mt-1">{r.reason}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Enter your custom prompt here..."
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none"
+                />
+                <button
+                  onClick={testCustomPrompt}
+                  disabled={!customPrompt || isTestingCustom}
+                  className="w-full disabled:opacity-50 font-semibold py-3 px-6 rounded-lg"
+                >
+                  {isTestingCustom ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="animate-spin">⟳</span>
+                      <span>Testing...</span>
+                    </div>
+                  ) : (
+                    'Test Prompt'
+                  )}
+                </button>
+              </div>
+            )}
             
             {/* Custom Prompt Loading Animation */}
             {isTestingCustom && (
@@ -1527,9 +1600,9 @@ export default function CleanGeoPage() {
           </div>
         </div>
 
-        {/* Results Display - Only show for the specific test that was just completed */}
-        {(lastRunType && lastResults.length > 0) && (
-          <div id="geo-report" className="rounded-2xl border border-border bg-card p-8">
+        {/* Results Display in LEFT column for Automated flow */}
+        {mode==='automated' && lastRunType==='health' && lastResults.length > 0 && (
+          <div id="geo-report" className="rounded-2xl border border-border bg-card p-8 lg:col-start-1 lg:col-end-2">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
