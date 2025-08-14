@@ -1475,43 +1475,15 @@ export default function CleanGeoPage() {
                 disabled={isRunningHealthCheck || !company}
                 className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors"
               >
-                {isRunningHealthCheck ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="animate-spin">⟳</span>
-                    <span>Running Health Check...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <span>▶️</span>
-                    <span>Run Automated Health Check</span>
-                  </div>
-                )}
+                <div className="flex items-center justify-center gap-2">
+                  <span>▶️</span>
+                  <span>Run Automated Health Check</span>
+                </div>
               </button>
             )}
             
             {/* Loading Animation */}
-            {isRunningHealthCheck && (
-              <div className="space-y-4 mb-6">
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${(testProgress.current / testProgress.total) * 100}%` }} 
-                  />
-                </div>
-                <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">Progress: {testProgress.current} of {testProgress.total} prompts</p>
-                  <div className="bg-muted/50 rounded-lg p-3">
-                    <p className="text-primary font-medium text-sm animate-pulse">{jokes[jokeIndex]}</p>
-                  </div>
-                  {currentTestPrompt && (
-                    <div className="bg-background border border-border rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground mb-1">Currently Testing:</p>
-                      <p className="text-sm font-medium">{currentTestPrompt}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* No inline animation here; all live status is in the right Status box */}
           </div>
 
           {/* RIGHT: Status box (loading for Automated, tester for Custom) */}
@@ -1531,23 +1503,10 @@ export default function CleanGeoPage() {
             </div>
 
             {mode==='automated' ? (
-              <div className="space-y-4">
-                {isRunningHealthCheck && (
-                  <div className="space-y-4">
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div className="bg-black h-2 rounded-full transition-all" style={{ width: `${(testProgress.current / Math.max(1, testProgress.total)) * 100}%` }} />
-                    </div>
-                    <div className="text-center space-y-2">
-                      <div className="bg-muted/50 rounded p-3 animate-pulse">{jokes[jokeIndex]}</div>
-                      {currentTestPrompt && (
-                        <div className="bg-background border border-border rounded p-3 text-sm">{currentTestPrompt}</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <div className="space-y-2 text-sm text-muted-foreground">Start an automated run using the button at left. Live progress will appear in Status.</div>
             ) : (
               <div className="space-y-4">
+                <h4 className="text-base font-semibold">Custom Prompt Tester</h4>
                 <input
                   type="text"
                   placeholder="Enter your custom prompt here..."
@@ -1560,27 +1519,20 @@ export default function CleanGeoPage() {
                   disabled={!customPrompt || isTestingCustom}
                   className="w-full disabled:opacity-50 font-semibold py-3 px-6 rounded-lg"
                 >
-                  {isTestingCustom ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">⟳</span>
-                      <span>Testing...</span>
-                    </div>
-                  ) : (
-                    'Test Prompt'
-                  )}
+                  Test Prompt
                 </button>
               </div>
             )}
             
-            {/* Custom Prompt Loading Animation */}
-            {isTestingCustom && (
+            {/* Status animations live here for both modes */}
+            {(isRunningHealthCheck || isTestingCustom) && (
               <div className="mt-4 space-y-3">
                 <div className="bg-muted/50 rounded-lg p-3">
                   <p className="text-primary font-medium text-sm animate-pulse text-center">{jokes[jokeIndex]}</p>
                 </div>
                 <div className="bg-background border border-border rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Testing Prompt:</p>
-                  <p className="text-sm font-medium">"{customPrompt}"</p>
+                  <p className="text-xs text-muted-foreground mb-1">{mode==='automated' ? 'Currently Testing:' : 'Testing Prompt:'}</p>
+                  <p className="text-sm font-medium">{mode==='automated' ? currentTestPrompt : `"${customPrompt}"`}</p>
                 </div>
               </div>
             )}

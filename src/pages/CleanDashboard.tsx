@@ -206,10 +206,20 @@ const CleanDashboard = () => {
   const forecastVal = typeof weekly?.forecast === 'number' ? Math.round(weekly.forecast) : null;
 
   const rightToggle = (
-    <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
-      {(['CEO','Marketing','SEO'] as const).map((r) => (
-        <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
-      ))}
+    <div className="flex items-center gap-2">
+      <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
+        {(['CEO','Marketing','SEO'] as const).map((r) => (
+          <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
+        ))}
+      </div>
+      {company && (
+        <button
+          onClick={() => (window.location.href = '/geo?edit=true')}
+          className="text-xs px-2 py-1 border border-input rounded"
+        >
+          Edit Company
+        </button>
+      )}
     </div>
   );
 
@@ -221,32 +231,9 @@ const CleanDashboard = () => {
         <HeaderStrip score={headerScore} delta={headerDelta} momentum={momentum} forecast={forecastVal ?? undefined} />
       </div>
 
-      {/* Top row: Company Profile, Visibility Score, Total Tests (v1.1 order) */}
-      <div className="grid md:grid-cols-3 gap-5 mb-6">
-        {/* A. Company Profile */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">🏢 Company Profile</h3>
-          <div className="mb-2 text-xl font-bold">{company.company_name}</div>
-          <div className="text-sm mb-1">🌐 {company.website_url}</div>
-          <div className="text-sm">{company.industry}</div>
-        </div>
-        {/* B. Visibility Score */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">📈 Visibility Score</h3>
-          <div className="text-3xl font-bold mb-2">{visibilityScore}</div>
-          <div className="text-sm">Based on {testResults.length} tests</div>
-        </div>
-        {/* C. Total Tests */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">🧪 Total Tests</h3>
-          <div className="text-3xl font-bold mb-2">{testResults.length}</div>
-          <div className="text-sm">{testResults.filter(t=>t.company_mentioned).length} mentions found</div>
-        </div>
-      </div>
-
-      {/* Second row: Trend, Recent Performance tiles, Recent Test Results (v1.1 order) */}
-      <div className="grid md:grid-cols-3 gap-5">
-        {/* D. Visibility Trend */}
+      {/* Row 1: Visibility Trend and Recent Performance */}
+      <div className="grid md:grid-cols-2 gap-5 mb-6">
+        {/* Visibility Trend */}
         <div id="dashboard-trend-report" className="rounded-xl border border-border bg-card p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-semibold">📈 Visibility trend</h3>
@@ -275,7 +262,7 @@ const CleanDashboard = () => {
             <div className="text-sm text-muted-foreground">Not enough data yet. Run more tests to see the trend.</div>
           )}
         </div>
-        {/* E. Recent Performance (tiles) */}
+        {/* Recent Performance (tiles) */}
         <div className="rounded-xl border border-border bg-card p-6">
           <h3 className="text-lg font-semibold mb-3">📊 Recent Performance</h3>
           <Tiles 
@@ -285,22 +272,22 @@ const CleanDashboard = () => {
             winStreak={weekly?.win_streak ?? 0}
           />
         </div>
+      </div>
 
-        {/* F. Recent Test Results (table + pagination) */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold">🧪 Recent Test Results</h3>
-            <div className="flex items-center gap-2">
-              <button onClick={() => window.location.href = '/geo'} className="text-xs px-2 py-1 border border-input rounded">Run Health Check</button>
-              <button onClick={() => downloadCsv('ai_tests.csv', testResults as any)} className="text-xs px-2 py-1 border border-input rounded">Export CSV</button>
-            </div>
+      {/* Row 2: Recent Test Results full width */}
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold">🧪 Recent Test Results</h3>
+          <div className="flex items-center gap-2">
+            <button onClick={() => window.location.href = '/geo'} className="text-xs px-2 py-1 border border-input rounded">Run Health Check</button>
+            <button onClick={() => downloadCsv('ai_tests.csv', testResults as any)} className="text-xs px-2 py-1 border border-input rounded">Export CSV</button>
           </div>
-          {testResults.length === 0 ? (
-            <div className="text-sm">No test results yet</div>
-          ) : (
-            <RecentTestsTable tests={testResults} />
-          )}
         </div>
+        {testResults.length === 0 ? (
+          <div className="text-sm">No test results yet</div>
+        ) : (
+          <RecentTestsTable tests={testResults} />
+        )}
       </div>
       {/* Movers and Matrix */}
       <div className="grid grid-cols-1 gap-4 mt-6">
