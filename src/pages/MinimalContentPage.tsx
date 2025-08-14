@@ -114,10 +114,10 @@ const MinimalContentPage = () => {
   }
 
   return (
-    <AppShell title="📝 Content Assistant" subtitle={`Generate AI-optimized content for ${company.company_name}`}>
+    <AppShell title="Content Assistant" subtitle={`Generate AI-optimized content for ${company.company_name}`}>
       <div className="grid gap-10 md:grid-cols-[260px_1fr_2fr]">
           {/* Strategy Sidebar */}
-          <div className="rounded-lg border border-border bg-card p-4 h-fit">
+          <div className="rounded-lg bg-card p-4 h-fit shadow-soft">
             <h4 className="text-sm font-semibold mb-2">Strategy Recommendations</h4>
             {strategyQueue.length === 0 ? (
               <p className="text-xs text-muted-foreground">No items yet. Add from Strategy page.</p>
@@ -136,8 +136,8 @@ const MinimalContentPage = () => {
             )}
           </div>
           {/* Generator */}
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">🚀 Generate Content</h3>
+          <div className="rounded-lg bg-card p-6 shadow-soft">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Generate Content</h3>
             
             <div className="mb-5">
               <label className="block text-sm font-medium text-foreground mb-1">Content Topic</label>
@@ -146,7 +146,7 @@ const MinimalContentPage = () => {
                 value={contentTopic}
                 onChange={(e) => setContentTopic(e.target.value)}
                 placeholder="What should the content be about?"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                 className="flex h-10 w-full rounded-md border border-transparent bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               />
             </div>
 
@@ -159,7 +159,7 @@ const MinimalContentPage = () => {
             </button>
 
             {/* Company Info */}
-            <div className="mt-6 rounded-md border border-border bg-background p-4 text-sm text-muted-foreground">
+            <div className="mt-6 rounded-md bg-card p-4 text-sm text-muted-foreground shadow-soft">
               <h4 className="text-sm font-semibold text-foreground mb-2">Company Profile</h4>
               <p><span className="font-medium text-foreground">Name:</span> {company.company_name}</p>
               <p><span className="font-medium text-foreground">Industry:</span> {company.industry}</p>
@@ -168,15 +168,15 @@ const MinimalContentPage = () => {
           </div>
 
           {/* Generated Content */}
-          <div className="rounded-lg border border-border bg-card p-6">
+          <div className="rounded-lg bg-card p-6 shadow-soft">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">📄 Generated Content</h3>
+              <h3 className="text-lg font-semibold text-foreground">Generated Content</h3>
               {generatedContent && (
                 <button
                   onClick={copyToClipboard}
-                  className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
+                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
                 >
-                  📋 Copy
+                  Copy
                 </button>
               )}
             </div>
@@ -185,12 +185,11 @@ const MinimalContentPage = () => {
               <textarea
                 value={generatedContent}
                 onChange={(e) => setGeneratedContent(e.target.value)}
-                className="w-full min-h-[400px] rounded-md border border-input bg-background p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-full min-h-[400px] rounded-md border border-transparent bg-background p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             ) : (
               <div className="min-h-[400px] flex items-center justify-center text-muted-foreground text-center">
                 <div>
-                  <div className="text-5xl mb-4">✨</div>
                   <p>Generated content will appear here</p>
                   <p className="text-sm">Enter a topic and click generate to start</p>
                 </div>

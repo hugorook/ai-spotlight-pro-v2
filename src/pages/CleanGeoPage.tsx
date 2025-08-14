@@ -1448,7 +1448,7 @@ export default function CleanGeoPage() {
         {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
         <div className="grid lg:grid-cols-12 gap-8 mb-8">
           {/* LEFT stacked toggles (Automated / Custom) */}
-          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between">
+          <div className="lg:col-span-2 rounded-2xl bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between shadow-soft">
             <button
               className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`}
               onClick={()=>setMode('automated')}
@@ -1464,7 +1464,7 @@ export default function CleanGeoPage() {
           </div>
 
           {/* MIDDLE: Action box (changes by mode) */}
-          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
+          <div className="lg:col-span-5 rounded-2xl bg-card p-8 shadow-soft">
             <div className="mb-6">
               {mode==='automated' ? (
                 <>
@@ -1512,7 +1512,7 @@ export default function CleanGeoPage() {
           </div>
 
           {/* RIGHT: Status box (always status; shows progress for both modes) */}
-          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
+          <div className="lg:col-span-5 rounded-2xl bg-card p-8 shadow-soft">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">Status</h2>
               <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
@@ -1542,7 +1542,7 @@ export default function CleanGeoPage() {
         {/* After run: left results accordion, right strategy panel */}
         {mode==='automated' && lastRunType==='health' && lastResults.length > 0 && (
           <div id="geo-report" className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 rounded-2xl border border-border bg-card p-8">
+            <div className="lg:col-span-7 rounded-2xl bg-card p-8 shadow-soft">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-foreground flex items-center gap-2">

@@ -95,11 +95,16 @@
   * { font-family: var(--font-sans), serif; }
 
   /* Card/box styling: white background + soft shadow */
-  .bg-card, .bg-popover, .bg-background, .card, .panel, .box {
+  .bg-card, .bg-popover, .card, .panel, .box {
     background-color: #ffffff !important;
   }
   .shadow-soft, .card, .panel, .box, .rounded-2xl, .rounded-xl {
     box-shadow: 0 20px 60px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  /* Hide borders on card-like containers */
+  .bg-card, .rounded-2xl, .rounded-xl, .rounded-lg {
+    border-color: transparent !important;
   }
 
   /* Global button styling: default off-white with black text; orange hover */
