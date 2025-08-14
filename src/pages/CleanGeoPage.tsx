@@ -1450,13 +1450,13 @@ export default function CleanGeoPage() {
           {/* LEFT stacked toggles (Automated / Custom) */}
           <div className="lg:col-span-2 rounded-2xl bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between shadow-soft">
             <button
-              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`}
+              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='automated'?'gradient-accent text-black':'bg-white text-black'}`}
               onClick={()=>setMode('automated')}
             >
               Automated
             </button>
             <button
-              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`}
+              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='custom'?'gradient-accent text-black':'bg-white text-black'}`}
               onClick={()=>setMode('custom')}
             >
               Custom
