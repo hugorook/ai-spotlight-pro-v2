@@ -1468,12 +1468,12 @@ export default function CleanGeoPage() {
             <div className="mb-6">
               {mode==='automated' ? (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🏥 For Automate – Run Automated Health Check</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Run Automated Health Check</h2>
                   <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear inline.</p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Prompt Tester</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Custom Prompt Tester</h2>
                   <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
                 </>
               )}
@@ -1485,10 +1485,7 @@ export default function CleanGeoPage() {
                 disabled={isRunningHealthCheck || !company}
                 className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors"
               >
-                <div className="flex items-center justify-center gap-2">
-                  <span>▶️</span>
-                  <span>Run Automated Health Check</span>
-                </div>
+                <div className="flex items-center justify-center">Run Automated Health Check</div>
               </button>
             )}
             {mode==='custom' && (
@@ -1517,7 +1514,7 @@ export default function CleanGeoPage() {
           {/* RIGHT: Status box (always status; shows progress for both modes) */}
           <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Status</h2>
               <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
             </div>
 
@@ -1549,19 +1546,13 @@ export default function CleanGeoPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  {lastRunType === 'health' ? (
-                    <><span className="text-primary">🏥</span> Health Check Results</>
-                  ) : (
-                    <><span className="text-primary">🧪</span> Custom Prompt Results</>
-                  )}
+                  {lastRunType === 'health' ? 'Health Check Results' : 'Custom Prompt Results'}
                 </h3>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => downloadCsv('geo-last-run.csv', lastResults as any)}
                     className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded text-sm font-medium transition-colors"
-                  >
-                    📊 Export CSV
-                  </button>
+                  >Export CSV</button>
                   <button
                     onClick={() => printReport('geo-report')}
                     className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded text-sm font-medium transition-colors"

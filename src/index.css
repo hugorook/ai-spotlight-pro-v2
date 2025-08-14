@@ -46,10 +46,9 @@
     --ring: 0 0% 0%;
 
     --radius: 0.75rem;
-    /* Body font */
-    --font-sans: "Silkscreen", Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    /* Heading/button font */
-    --font-mono: "Press Start 2P", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* Global font: Instrument Serif */
+    --font-sans: "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Design tokens */
@@ -92,18 +91,15 @@
     @apply bg-background text-foreground font-sans antialiased leading-relaxed;
   }
 
-  /* Titles and buttons in Press Start 2P */
-  h1, h2, h3, h4, h5, h6,
-  button,
-  .btn,
-  .title-font {
-    font-family: "Press Start 2P", monospace !important;
-    letter-spacing: 0.5px;
-  }
+  /* Use Instrument Serif everywhere */
+  * { font-family: var(--font-sans), serif; }
 
-  /* Body copy in Silkscreen */
-  p, span, li, input, textarea, select, label, small {
-    font-family: "Silkscreen", var(--font-sans), sans-serif;
+  /* Card/box styling: white background + soft shadow */
+  .bg-card, .bg-popover, .bg-background, .card, .panel, .box {
+    background-color: #ffffff !important;
+  }
+  .shadow-soft, .card, .panel, .box, .rounded-2xl, .rounded-xl {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
   }
 
   /* Global button styling: default off-white with black text; orange hover */
