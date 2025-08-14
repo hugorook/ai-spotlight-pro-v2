@@ -54,7 +54,7 @@ const CleanDashboard = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [weekly, setWeekly] = useState<any | null>(null);
-  const [role, setRole] = useState<'CEO'|'Marketing'|'SEO'>('CEO');
+  // Single-dashboard view (no role toggles)
 
   const loadDashboardData = useCallback(async () => {
     if (!user) {
@@ -207,11 +207,6 @@ const CleanDashboard = () => {
 
   const rightToggle = (
     <div className="flex items-center gap-2">
-      <div className="inline-flex items-center gap-1 border border-input rounded-md p-1">
-        {(['CEO','Marketing','SEO'] as const).map((r) => (
-          <button key={r} onClick={() => setRole(r)} className={`text-xs px-2 py-1 rounded ${role===r? 'bg-primary text-primary-foreground':'bg-background'}`}>{r}</button>
-        ))}
-      </div>
       {company && (
         <button
           onClick={() => (window.location.href = '/geo?edit=true')}
@@ -291,7 +286,7 @@ const CleanDashboard = () => {
       </div>
       {/* Movers and Matrix */}
       <div className="grid grid-cols-1 gap-4 mt-6">
-        <BigMovers wins={(weekly?.biggest_wins ?? []).slice(0, role==='CEO'?3:5)} losses={(weekly?.biggest_losses ?? []).slice(0, role==='CEO'?3:5)} />
+        <BigMovers wins={(weekly?.biggest_wins ?? []).slice(0, 5)} losses={(weekly?.biggest_losses ?? []).slice(0, 5)} />
         {(() => {
           const coverage = weekly?.model_coverage ?? {};
           // Inflate to stage-mapped matrix (awareness/consideration/comparison) for current single-provider data
