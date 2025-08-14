@@ -87,7 +87,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased leading-relaxed;
   }
 
   /* Global button styling: default off-white with black text; orange hover */

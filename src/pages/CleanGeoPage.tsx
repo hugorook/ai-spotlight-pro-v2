@@ -1448,9 +1448,19 @@ export default function CleanGeoPage() {
         {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
         <div className="grid lg:grid-cols-12 gap-8 mb-8">
           {/* LEFT stacked toggles (Automated / Custom) */}
-          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 flex flex-col gap-3">
-            <button className={`w-full text-lg px-4 py-4 rounded border ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('automated')}>Automated</button>
-            <button className={`w-full text-lg px-4 py-4 rounded border ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('custom')}>Custom</button>
+          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between">
+            <button
+              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`}
+              onClick={()=>setMode('automated')}
+            >
+              Automated
+            </button>
+            <button
+              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`}
+              onClick={()=>setMode('custom')}
+            >
+              Custom
+            </button>
           </div>
 
           {/* MIDDLE: Action box (changes by mode) */}
