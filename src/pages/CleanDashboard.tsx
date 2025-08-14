@@ -214,14 +214,14 @@ const CleanDashboard = () => {
   );
 
   return (
-    <AppShell title="AI Visibility Hub" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
+    <AppShell title="AI Visibility Hub v1.1" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
 
       {/* Header strip */}
       <div className="mb-4">
         <HeaderStrip score={headerScore} delta={headerDelta} momentum={momentum} forecast={forecastVal ?? undefined} />
       </div>
 
-      {/* Top row: Company Profile, Visibility Score, Total Tests */}
+      {/* Top row: Company Profile, Visibility Score, Total Tests (v1.1 order) */}
       <div className="grid md:grid-cols-3 gap-5 mb-6">
         {/* A. Company Profile */}
         <div className="rounded-xl border border-border bg-card p-6">
@@ -244,7 +244,7 @@ const CleanDashboard = () => {
         </div>
       </div>
 
-      {/* Second row: Trend, Recent Performance tiles, Recent Test Results */}
+      {/* Second row: Trend, Recent Performance tiles, Recent Test Results (v1.1 order) */}
       <div className="grid md:grid-cols-3 gap-5">
         {/* D. Visibility Trend */}
         <div id="dashboard-trend-report" className="rounded-xl border border-border bg-card p-6">

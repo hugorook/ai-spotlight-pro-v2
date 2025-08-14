@@ -1438,7 +1438,7 @@ export default function CleanGeoPage() {
   }
 
   return (
-    <AppShell title="Health Check" subtitle="AI Visibility Optimization" right={(
+    <AppShell title="Health Check + Strategy" subtitle="AI Visibility Optimization" right={(
       <div className="flex items-center gap-2 border border-border rounded-full px-4 py-2">
         <span>📈</span>
         <span className="text-foreground">Health Score: {healthScore}/100</span>
@@ -1447,13 +1447,13 @@ export default function CleanGeoPage() {
 
         {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
         <div className="grid lg:grid-cols-12 gap-8 mb-8">
-          {/* LEFT stacked toggles */}
+          {/* LEFT stacked toggles (Automated / Custom) */}
           <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 flex flex-col gap-3">
             <button className={`w-full text-sm px-3 py-2 rounded border ${mode==='automated'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('automated')}>Automated</button>
             <button className={`w-full text-sm px-3 py-2 rounded border ${mode==='custom'?'bg-[#BF5700] text-black':'bg-[#E8E6DF] text-black'}`} onClick={()=>setMode('custom')}>Custom</button>
           </div>
 
-          {/* MIDDLE: Action box */}
+          {/* MIDDLE: Action box (changes by mode) */}
           <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
               {mode==='automated' ? (
@@ -1514,7 +1514,7 @@ export default function CleanGeoPage() {
             )}
           </div>
 
-          {/* RIGHT: Status loading only for Automated, Custom tester for Custom */}
+          {/* RIGHT: Status box (loading for Automated, tester for Custom) */}
           <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
               {mode==='automated' ? (
