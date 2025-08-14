@@ -1463,8 +1463,8 @@ export default function CleanGeoPage() {
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Health Check</h2>
-                  <p className="text-muted-foreground">Use the existing custom flow exactly as before.</p>
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Prompt Tester</h2>
+                  <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
                 </>
               )}
             </div>
@@ -1481,32 +1481,8 @@ export default function CleanGeoPage() {
                 </div>
               </button>
             )}
-            
-            {/* Loading Animation */}
-            {/* No inline animation here; all live status is in the right Status box */}
-          </div>
-
-          {/* RIGHT: Status box (loading for Automated, tester for Custom) */}
-          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
-            <div className="mb-6">
-              {mode==='automated' ? (
-                <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status</h2>
-                  <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">🧪 Custom Prompt Tester</h2>
-                  <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
-                </>
-              )}
-            </div>
-
-            {mode==='automated' ? (
-              <div className="space-y-2 text-sm text-muted-foreground">Start an automated run using the button at left. Live progress will appear in Status.</div>
-            ) : (
+            {mode==='custom' && (
               <div className="space-y-4">
-                <h4 className="text-base font-semibold">Custom Prompt Tester</h4>
                 <input
                   type="text"
                   placeholder="Enter your custom prompt here..."
@@ -1523,6 +1499,21 @@ export default function CleanGeoPage() {
                 </button>
               </div>
             )}
+            
+            {/* Loading Animation */}
+            {/* No inline animation here; all live status is in the right Status box */}
+          </div>
+
+          {/* RIGHT: Status box (always status; shows progress for both modes) */}
+          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">⏳ Status</h2>
+              <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {mode==='automated' ? 'Start an automated run using the button at left. Live progress will appear here.' : 'Run a test in the Custom Prompt Tester. Live progress will appear here.'}
+            </div>
             
             {/* Status animations live here for both modes */}
             {(isRunningHealthCheck || isTestingCustom) && (
