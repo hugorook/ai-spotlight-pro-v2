@@ -146,16 +146,16 @@ const MinimalContentPage = () => {
                 value={contentTopic}
                 onChange={(e) => setContentTopic(e.target.value)}
                 placeholder="What should the content be about?"
-                 className="flex h-10 w-full rounded-md border border-transparent bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                className="flex h-10 w-full rounded-md border border-transparent bg-white text-black px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm placeholder:text-black/60"
               />
             </div>
 
             <button
               onClick={generateContent}
               disabled={!contentTopic.trim() || isGenerating}
-              className="inline-flex w-full items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center rounded-md gradient-accent text-primary-foreground px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              {isGenerating ? 'Generating…' : '⚡ Generate Content'}
+              {isGenerating ? 'Generating…' : 'Generate Content'}
             </button>
 
             {/* Company Info */}
@@ -174,7 +174,7 @@ const MinimalContentPage = () => {
               {generatedContent && (
                 <button
                   onClick={copyToClipboard}
-                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
+                   className="inline-flex items-center justify-center rounded-md border border-transparent gradient-accent px-3 py-1.5 text-xs font-medium"
                 >
                   Copy
                 </button>
@@ -185,7 +185,7 @@ const MinimalContentPage = () => {
               <textarea
                 value={generatedContent}
                 onChange={(e) => setGeneratedContent(e.target.value)}
-                className="w-full min-h-[400px] rounded-md border border-transparent bg-background p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-full min-h-[400px] rounded-md border border-transparent bg-white text-black p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             ) : (
               <div className="min-h-[400px] flex items-center justify-center text-muted-foreground text-center">

@@ -1483,7 +1483,7 @@ export default function CleanGeoPage() {
               <button
                 onClick={runHealthCheck}
                 disabled={isRunningHealthCheck || !company}
-                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors"
+                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors gradient-accent"
               >
                 <div className="flex items-center justify-center">Run Automated Health Check</div>
               </button>
@@ -1495,7 +1495,7 @@ export default function CleanGeoPage() {
                   placeholder="Enter your custom prompt here..."
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  className="w-full px-4 py-3 bg-white text-black border border-transparent rounded-lg placeholder:text-black/60 focus:outline-none"
                 />
                 <button
                   onClick={testCustomPrompt}
@@ -1525,10 +1525,10 @@ export default function CleanGeoPage() {
             {/* Status animations live here for both modes */}
             {(isRunningHealthCheck || isTestingCustom) && (
               <div className="mt-4 space-y-3">
-                <div className="bg-muted/50 rounded-lg p-3">
+                <div className="bg-white rounded-lg p-3 shadow-soft">
                   <p className="text-primary font-medium text-sm animate-pulse text-center">{jokes[jokeIndex]}</p>
                 </div>
-                <div className="bg-background border border-border rounded-lg p-3">
+                  <div className="bg-white text-black border border-transparent rounded-lg p-3">
                   <p className="text-xs text-muted-foreground mb-1">{mode==='automated' ? 'Currently Testing:' : 'Testing Prompt:'}</p>
                   <p className="text-sm font-medium">{mode==='automated' ? currentTestPrompt : `"${customPrompt}"`}</p>
                 </div>

@@ -107,6 +107,17 @@
     border-color: transparent !important;
   }
 
+  /* Accent gradient to replace burnt orange */
+  .gradient-accent {
+    background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%);
+  }
+  button:hover,
+  button:focus,
+  button:active {
+    background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%) !important;
+    color: #000000 !important;
+  }
+
   /* Global button styling: default off-white with black text; orange hover */
   button {
     background-color: #E8E6DF;
