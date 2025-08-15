@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/MinimalAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/types/supabase';
-import CleanAppHeader from '@/components/CleanAppHeader';
+import AppHeader from '@/components/AppHeader';
 
 type Company = Tables<'companies'>;
 
@@ -43,7 +43,7 @@ export default function QuickTestGeo() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#111', color: '#fff', padding: '20px' }}>
-        <CleanAppHeader />
+        <AppHeader />
         <div style={{ textAlign: 'center', paddingTop: '100px' }}>
           <div style={{ fontSize: '18px' }}>Loading Your GEO...</div>
         </div>
@@ -54,7 +54,7 @@ export default function QuickTestGeo() {
   if (!company) {
     return (
       <div style={{ minHeight: '100vh', background: '#111', color: '#fff', padding: '20px' }}>
-        <CleanAppHeader />
+        <AppHeader />
         <div style={{ textAlign: 'center', paddingTop: '100px' }}>
           <div style={{ fontSize: '24px', marginBottom: '20px' }}>⚠️ No Company Profile Found</div>
           <div style={{ fontSize: '16px', marginBottom: '30px', color: '#888' }}>
@@ -81,7 +81,7 @@ export default function QuickTestGeo() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#111', color: '#fff' }}>
-      <CleanAppHeader />
+      <AppHeader />
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
         <div style={{ 
           borderBottom: '1px solid #333',

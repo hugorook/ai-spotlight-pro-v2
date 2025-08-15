@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/MinimalAuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Tables } from "@/types/supabase";
 
 type Company = Pick<Tables<'companies'>, 'id' | 'company_name' | 'industry' | 'description' | 'target_customers' | 'key_differentiators'>;

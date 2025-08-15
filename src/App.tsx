@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MinimalAuthProvider } from "@/contexts/MinimalAuthContext";
-import { MinimalProtectedRoute } from "@/components/auth/MinimalProtectedRoute";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
 import CleanDashboard from "./pages/CleanDashboard";
@@ -17,7 +17,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <MinimalAuthProvider>
+    <AuthProvider>
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -27,44 +27,44 @@ const App = () => (
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
-              <MinimalProtectedRoute>
+              <ProtectedRoute>
                 <ErrorBoundary>
                   <CleanDashboard />
                 </ErrorBoundary>
-              </MinimalProtectedRoute>
+              </ProtectedRoute>
             } />
             <Route path="/geo" element={
-              <MinimalProtectedRoute>
+              <ProtectedRoute>
                 <ErrorBoundary>
                   <CleanGeoPage />
                 </ErrorBoundary>
-              </MinimalProtectedRoute>
+              </ProtectedRoute>
             } />
             <Route path="/strategy" element={
-              <MinimalProtectedRoute>
+              <ProtectedRoute>
                 <ErrorBoundary>
                   <StrategyPage />
                 </ErrorBoundary>
-              </MinimalProtectedRoute>
+              </ProtectedRoute>
             } />
             <Route path="/content" element={
-              <MinimalProtectedRoute>
+              <ProtectedRoute>
                 <ErrorBoundary>
                   <MinimalContentPage />
                 </ErrorBoundary>
-              </MinimalProtectedRoute>
+              </ProtectedRoute>
             } />
             <Route path="/settings" element={
-              <MinimalProtectedRoute>
+              <ProtectedRoute>
                 <ErrorBoundary>
                   <SettingsPage />
                 </ErrorBoundary>
-              </MinimalProtectedRoute>
+              </ProtectedRoute>
             } />
           </Routes>
           <Toaster />
         </BrowserRouter>
-    </MinimalAuthProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

@@ -94,11 +94,9 @@
   /* Use Instrument Serif everywhere */
   * { font-family: var(--font-sans), serif; }
 
-  /* Card/box styling: white background + soft shadow */
+  /* Card/box styling: white background + unified soft shadow */
   .bg-card, .bg-popover, .card, .panel, .box {
     background-color: #ffffff !important;
-  }
-  .shadow-soft, .card, .panel, .box, .rounded-2xl, .rounded-xl {
     box-shadow: 0 20px 60px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
   }
 
@@ -111,25 +109,22 @@
   .gradient-accent {
     background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%);
   }
+
+  /* Global button styling: default off-white with black text; gradient hover */
+  button {
+    background-color: #E8E6DF;
+    color: #000000;
+    border: 1px solid rgba(0,0,0,0.9);
+    transition: all 0.2s ease-in-out;
+  }
   button:hover,
   button:focus,
   button:active {
     background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%) !important;
     background-color: transparent !important;
     color: #000000 !important;
-  }
-
-  /* Global button styling: default off-white with black text; orange hover */
-  button {
-    background-color: #E8E6DF;
-    color: #000000;
-    border: 1px solid rgba(0,0,0,0.9);
-  }
-  button:hover,
-  button:active,
-  button:focus {
-    background-color: #BF5700 !important;
-    color: #000000 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(196, 181, 253, 0.3);
   }
   /* Inputs/cards off-white with black borders */
   input, select, textarea {
@@ -143,9 +138,115 @@
   /* Remove any leftover orange utility */
   .bg-\[\#BF5700\] { background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%) !important; background-color: transparent !important; }
 
-  /* Focus ring AA */
+  /* Enhanced accessibility and focus indicators */
   :focus-visible {
-    outline: 2px solid #000000;
+    outline: 3px solid #000000;
     outline-offset: 2px;
+    border-radius: 6px;
+  }
+  
+  /* Ensure proper contrast for text elements */
+  .text-muted-foreground {
+    color: #2c2c2c !important; /* Darker gray for better contrast */
+  }
+  
+  /* Interactive elements accessibility */
+  button, 
+  input, 
+  select, 
+  textarea, 
+  [role="button"], 
+  [role="tab"],
+  [role="menuitem"] {
+    min-height: 44px; /* Touch target size */
+    min-width: 44px;
+  }
+  
+  /* Focus indicators for interactive elements */
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [role="menuitem"]:focus-visible {
+    outline: 3px solid #000000;
+    outline-offset: 2px;
+    z-index: 10;
+  }
+  
+  /* Skip link for keyboard navigation */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000000;
+    color: #ffffff;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+  }
+  .skip-link:focus {
+    top: 6px;
+  }
+
+  /* Mobile optimization */
+  @media (max-width: 768px) {
+    /* Larger touch targets on mobile */
+    button, 
+    input, 
+    select, 
+    textarea, 
+    [role="button"], 
+    [role="tab"],
+    [role="menuitem"] {
+      min-height: 48px; /* Larger for mobile */
+      min-width: 48px;
+    }
+    
+    /* Responsive tables */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-responsive table {
+      min-width: 600px;
+    }
+    
+    /* Mobile-friendly padding and margins */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Sidebar optimization for mobile */
+    .sidebar-mobile {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar-mobile.open {
+      transform: translateX(0);
+    }
+    
+    /* Card spacing on mobile */
+    .card, .panel, .box {
+      margin-bottom: 1rem;
+    }
+    
+    /* Better text sizing on mobile */
+    body {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
 }

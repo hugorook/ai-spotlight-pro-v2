@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AppShell from '@/components/layout/AppShell';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/MinimalAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 type EventRow = {
   id: string;

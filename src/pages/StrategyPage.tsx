@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import AppShell from '@/components/layout/AppShell';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/MinimalAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import type { Tables } from '@/types/supabase';
 

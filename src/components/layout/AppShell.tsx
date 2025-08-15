@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactNode, useMemo } from "react";
-import CleanAppHeader from "@/components/CleanAppHeader";
+import AppHeader from "@/components/AppHeader";
 import { useLocation, Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -32,7 +32,7 @@ export default function AppShell({ title, subtitle, right, children }: AppShellP
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <CleanAppHeader />
+      <AppHeader />
       <div className="container mx-auto p-6">
         <div className="mb-4">
           <Breadcrumb>

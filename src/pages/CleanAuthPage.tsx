@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import CleanAppHeader from "@/components/CleanAppHeader";
+import AppHeader from "@/components/AppHeader";
 
 const CleanAuthPage = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -62,7 +62,7 @@ const CleanAuthPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <CleanAppHeader />
+      <AppHeader />
 
       {/* Auth Content */}
       <div className="flex-1 flex items-center justify-center p-4">

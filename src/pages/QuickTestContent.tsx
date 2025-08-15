@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/MinimalAuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Tables } from "@/types/supabase";
-import CleanAppHeader from "@/components/CleanAppHeader";
+import AppHeader from "@/components/AppHeader";
 
 type Company = Pick<Tables<'companies'>, 'id' | 'company_name' | 'industry' | 'description' | 'target_customers' | 'key_differentiators'>;
 
@@ -133,7 +133,7 @@ ${company.company_name} is positioned as a leader in ${company.industry} with fo
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#111', color: '#fff' }}>
-        <CleanAppHeader />
+        <AppHeader />
         <div style={{ textAlign: 'center', paddingTop: '100px' }}>
           <div style={{ fontSize: '18px' }}>Loading Content Assistant...</div>
         </div>
@@ -144,7 +144,7 @@ ${company.company_name} is positioned as a leader in ${company.industry} with fo
   if (!company) {
     return (
       <div style={{ minHeight: '100vh', background: '#111', color: '#fff' }}>
-        <CleanAppHeader />
+        <AppHeader />
         <div style={{ textAlign: 'center', paddingTop: '100px' }}>
           <div style={{ fontSize: '24px', marginBottom: '20px' }}>⚠️ No Company Profile Found</div>
           <div style={{ fontSize: '16px', marginBottom: '30px', color: '#888' }}>
@@ -171,7 +171,7 @@ ${company.company_name} is positioned as a leader in ${company.industry} with fo
 
   return (
     <div style={{ minHeight: '100vh', background: '#111', color: '#fff' }}>
-      <CleanAppHeader />
+      <AppHeader />
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
         {/* Header */}
         <div style={{
