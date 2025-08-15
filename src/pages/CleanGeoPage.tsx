@@ -969,6 +969,8 @@ export default function CleanGeoPage() {
   useEffect(() => {
     if (user) {
       loadCompanyData();
+    } else {
+      setLoading(false); // Don't stay loading if no user
     }
     
     // Check if we should enter edit mode from URL params
@@ -1416,8 +1418,8 @@ export default function CleanGeoPage() {
 
   if (loading) {
     return (
-      <AppShell title="Your GEO" subtitle="AI Visibility Optimization">
-        <LoadingOverlay loading label="Loading your GEO...">
+      <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models">
+        <LoadingOverlay loading label="Loading AI Health Check...">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-64" />
             <div className="h-64 bg-muted rounded" />
@@ -1430,7 +1432,7 @@ export default function CleanGeoPage() {
 
   if (!company) {
     return (
-      <AppShell title="Your GEO" subtitle="AI Visibility Optimization">
+      <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models">
           <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-80">⚠️</div>
           <h2 className="text-2xl font-semibold text-foreground mb-2">Company Profile Required</h2>
