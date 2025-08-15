@@ -86,7 +86,6 @@ export const WorkflowProgress: React.FC<WorkflowProgressProps> = ({ steps }) => 
 export const useWorkflowSteps = (
   hasCompanyProfile: boolean,
   hasRunHealthCheck: boolean,
-  hasViewedStrategy: boolean,
   hasCreatedContent: boolean
 ) => {
   const steps: WorkflowStep[] = [
@@ -107,20 +106,12 @@ export const useWorkflowSteps = (
       action: hasRunHealthCheck ? undefined : hasCompanyProfile ? () => window.location.href = '/geo' : undefined
     },
     {
-      id: 'strategy',
-      title: 'Optimization Strategy',
-      description: 'Get personalized recommendations',
-      icon: <Target className="w-6 h-6" />,
-      status: hasViewedStrategy ? 'completed' : hasRunHealthCheck ? 'current' : 'pending',
-      action: hasViewedStrategy ? undefined : hasRunHealthCheck ? () => window.location.href = '/strategy' : undefined
-    },
-    {
       id: 'content',
       title: 'Content Creation',
       description: 'Generate optimized content',
       icon: <FileText className="w-6 h-6" />,
-      status: hasCreatedContent ? 'completed' : hasViewedStrategy ? 'current' : 'pending',
-      action: hasCreatedContent ? undefined : hasViewedStrategy ? () => window.location.href = '/content' : undefined
+      status: hasCreatedContent ? 'completed' : hasRunHealthCheck ? 'current' : 'pending',
+      action: hasCreatedContent ? undefined : hasRunHealthCheck ? () => window.location.href = '/content' : undefined
     }
   ];
 

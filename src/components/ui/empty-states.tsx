@@ -85,21 +85,6 @@ export const NoCompanyProfile = ({ onSetupCompany }: { onSetupCompany: () => voi
   />
 );
 
-export const NoStrategyYet = ({ onRunHealthCheck }: { onRunHealthCheck: () => void }) => (
-  <EmptyState
-    icon={<Target className="w-8 h-8 text-green-500" />}
-    title="No Strategy Available"
-    description="Run an AI Health Check first to generate personalized optimization strategies. We'll analyze your results and provide actionable recommendations."
-    primaryAction={{
-      label: "Run Health Check",
-      onClick: onRunHealthCheck
-    }}
-    secondaryAction={{
-      label: "Learn About Strategies",
-      onClick: () => console.log('Show strategy info')
-    }}
-  />
-);
 
 export const DashboardEmptyState = ({ onStartJourney }: { onStartJourney: () => void }) => (
   <EmptyState

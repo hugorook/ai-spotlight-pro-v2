@@ -7,7 +7,6 @@ import CleanAuthPage from "./pages/CleanAuthPage";
 import CleanDashboard from "./pages/CleanDashboard";
 import CleanGeoPage from "./pages/CleanGeoPage";
 import MinimalContentPage from "./pages/MinimalContentPage";
-import StrategyPage from "./pages/StrategyPage";
 import SettingsPage from "./pages/SettingsPage";
 import PublicSnapshot from "./pages/PublicSnapshot";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -37,13 +36,6 @@ const App = () => (
               <ProtectedRoute>
                 <ErrorBoundary>
                   <CleanGeoPage />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/strategy" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <StrategyPage />
                 </ErrorBoundary>
               </ProtectedRoute>
             } />

@@ -1,5 +1,6 @@
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import AppHeader from "@/components/AppHeader";
+import Sidebar from "@/components/layout/Sidebar";
 import { useLocation, Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -31,47 +32,55 @@ export default function AppShell({ title, subtitle, right, children }: AppShellP
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <AppHeader />
-      <div className="container mx-auto p-6">
-        <div className="mb-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/dashboard">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              {segments.map((seg, idx) => (
-                <span key={seg.href} className="inline-flex items-center">
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    {idx < segments.length - 1 ? (
-                      <BreadcrumbLink asChild>
-                        <Link to={seg.href}>{seg.label}</Link>
-                      </BreadcrumbLink>
-                    ) : (
-                      <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-                    )}
-                  </BreadcrumbItem>
-                </span>
-              ))}
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-
-        {(title || right) && (
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              {title && <h1 className="text-2xl font-bold mb-1">{title}</h1>}
-              {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
-            </div>
-            {right}
+    <div className="min-h-screen bg-background text-foreground flex">
+      {/* Left Sidebar */}
+      <Sidebar />
+      
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        <AppHeader />
+        
+        <div className="flex-1 p-6">
+          <div className="mb-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/dashboard">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                {segments.map((seg, idx) => (
+                  <span key={seg.href} className="inline-flex items-center">
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {idx < segments.length - 1 ? (
+                        <BreadcrumbLink asChild>
+                          <Link to={seg.href}>{seg.label}</Link>
+                        </BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage>{seg.label}</BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                  </span>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
-        )}
 
-        {children}
+          {(title || right) && (
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                {title && <h1 className="text-2xl font-bold mb-1">{title}</h1>}
+                {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
+              </div>
+              {right}
+            </div>
+          )}
+
+          {children}
+        </div>
       </div>
+      
       <CopilotSidebar />
     </div>
   );
