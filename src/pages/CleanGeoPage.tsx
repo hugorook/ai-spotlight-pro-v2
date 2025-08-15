@@ -35,6 +35,14 @@ interface ContentOpportunity {
   expectedImpact: string;
 }
 
+// Persist last run locally so results remain when navigating away and back
+interface PersistedLastRun {
+  type: 'health' | 'custom';
+  results: TestResult[];
+  strategies?: any[];
+  timestamp: number;
+}
+
 interface CompanySetupFormProps {
   onComplete: () => void;
 }
@@ -867,6 +875,21 @@ export default function CleanGeoPage() {
   const [strategyLoading, setStrategyLoading] = useState(false);
   const [strategyError, setStrategyError] = useState<string | null>(null);
 
+  // On mount, load any persisted last run
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem('geo_last_run');
+      if (raw) {
+        const parsed: PersistedLastRun = JSON.parse(raw);
+        setLastRunType(parsed.type);
+        setLastResults(parsed.results || []);
+        if (parsed.type === 'health') {
+          setAutoStrategies(parsed.strategies || []);
+        }
+      }
+    } catch {}
+  }, []);
+
   const jokes = [
     'Optimizing your digital real estate…',
     'Calculating keyword karma…',
@@ -1227,6 +1250,10 @@ export default function CleanGeoPage() {
       setLastResults(results);
       calculateHealthScore(results);
       generateContentOpportunities(results, company);
+      try {
+        const payload: PersistedLastRun = { type: 'health', results, strategies: [], timestamp: Date.now() };
+        window.localStorage.setItem('geo_last_run', JSON.stringify(payload));
+      } catch {}
       
       const mentionCount = results.filter(r => r.mentioned).length;
       const successRate = Math.round((mentionCount / results.length) * 100);
@@ -1253,7 +1280,12 @@ export default function CleanGeoPage() {
         };
         const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
         if (error) throw error;
-        setAutoStrategies((data?.recommendations as any[]) || []);
+        const recs = (data?.recommendations as any[]) || [];
+        setAutoStrategies(recs);
+        try {
+          const payload: PersistedLastRun = { type: 'health', results, strategies: recs, timestamp: Date.now() };
+          window.localStorage.setItem('geo_last_run', JSON.stringify(payload));
+        } catch {}
       } catch (e: any) {
         setStrategyError(e?.message || 'Failed to generate strategy');
       } finally {
@@ -1343,6 +1375,10 @@ export default function CleanGeoPage() {
         setCustomPrompt('');
         console.log(testResult.mentioned ? `Mentioned at position ${testResult.position}!` : 'Not mentioned in response');
         toast({ title: 'Custom prompt tested', description: testResult.mentioned ? `Mentioned at position #${testResult.position}` : 'Not mentioned' });
+        try {
+          const payload: PersistedLastRun = { type: 'custom', results: [testResult], timestamp: Date.now() };
+          window.localStorage.setItem('geo_last_run', JSON.stringify(payload));
+        } catch {}
       }
       
     } catch (error) {
