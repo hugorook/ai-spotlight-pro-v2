@@ -972,15 +972,17 @@ export default function CleanGeoPage() {
     } else {
       setLoading(false); // Don't stay loading if no user
     }
-    
-    // Check if we should enter edit mode from URL params
+  }, [user, loadCompanyData]);
+
+  // Separate effect for URL parameter handling to avoid conflicts
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('edit') === 'true') {
       setIsEditingProfile(true);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [user, loadCompanyData]);
+  }, []); // Run only once on mount
 
   const calculateHealthScore = (results: TestResult[]) => {
     if (results.length === 0) {
@@ -1458,8 +1460,8 @@ export default function CleanGeoPage() {
     );
   }
 
-  // Show edit form when in edit mode
-  if (isEditingProfile && company) {
+  // Show edit form when in edit mode (but only after loading is complete)
+  if (isEditingProfile && !loading && company) {
     return (
       <AppShell title="Edit Company Profile" subtitle="Update your company information">
         <CompanyEditForm 
