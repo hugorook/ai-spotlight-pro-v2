@@ -35,12 +35,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('AuthProvider: Setting up auth listener');
     
+    // Safety timeout to ensure loading never gets stuck
+    const timeoutId = setTimeout(() => {
+      console.warn('AuthProvider: Timeout reached, forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 seconds max
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('AuthProvider: Initial session:', !!session);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      clearTimeout(timeoutId); // Clear timeout since we loaded successfully
+    }).catch(error => {
+      console.error('AuthProvider: Error getting initial session:', error);
+      setLoading(false);
+      clearTimeout(timeoutId);
     });
 
     // Set up auth state listener
@@ -51,7 +62,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkOnboardingStatus(session.user);
+          // Don't let onboarding check block the loading state
+          checkOnboardingStatus(session.user).catch(error => {
+            console.error('Onboarding check failed:', error);
+            setIsFirstTimeUser(false);
+            setHasCompletedOnboarding(true);
+          });
         } else {
           setIsFirstTimeUser(false);
           setHasCompletedOnboarding(false);
@@ -64,20 +80,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       console.log('MinimalAuthProvider: Cleaning up auth listener');
       subscription.unsubscribe();
+      clearTimeout(timeoutId);
     };
   }, []);
 
   const checkOnboardingStatus = async (user: User) => {
     try {
+      console.log('AuthProvider: Checking onboarding status for user:', user.id);
+      
       // Check if user has onboarding_completed in metadata
       const hasOnboardingFlag = user.user_metadata?.onboarding_completed === true;
       
-      // Also check if they have a company profile (alternative check)
-      const { data: companies } = await supabase
+      // Also check if they have a company profile (alternative check) with timeout
+      const companyQuery = supabase
         .from('companies')
         .select('id')
         .eq('user_id', user.id)
         .limit(1);
+      
+      // Add a 5-second timeout to the company query
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Company query timeout')), 5000)
+      );
+      
+      const { data: companies } = await Promise.race([companyQuery, timeoutPromise]);
       
       const hasCompanyProfile = companies && companies.length > 0;
       const isNew = !hasOnboardingFlag && !hasCompanyProfile;
@@ -85,16 +111,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsFirstTimeUser(isNew);
       setHasCompletedOnboarding(hasOnboardingFlag || hasCompanyProfile);
       
-      console.log('Onboarding status:', { 
+      console.log('AuthProvider: Onboarding status determined:', { 
         isFirstTimeUser: isNew, 
         hasCompletedOnboarding: hasOnboardingFlag || hasCompanyProfile,
         hasOnboardingFlag,
         hasCompanyProfile
       });
     } catch (error) {
-      console.error('Error checking onboarding status:', error);
+      console.error('AuthProvider: Error checking onboarding status:', error);
+      // Default to not first-time user to avoid blocking the app
       setIsFirstTimeUser(false);
-      setHasCompletedOnboarding(true); // Default to completed to avoid blocking
+      setHasCompletedOnboarding(true);
     }
   };
 
