@@ -972,7 +972,7 @@ export default function CleanGeoPage() {
     } else {
       setLoading(false); // Don't stay loading if no user
     }
-  }, [user, loadCompanyData]);
+  }, [user]); // Remove loadCompanyData dependency to prevent infinite loops
 
   // Separate effect for URL parameter handling to avoid conflicts
   useEffect(() => {
