@@ -12,7 +12,9 @@ import BigMovers from '@/components/dashboard/BigMovers';
 import Matrix from '@/components/dashboard/Matrix';
 import { printReport } from "@/lib/pdf";
 import { downloadCsv } from "@/lib/export";
-import React from 'react';
+import WelcomeFlow from "@/components/onboarding/WelcomeFlow";
+import { useNavigate } from "react-router-dom";
+import { NoHealthCheckResults } from "@/components/ui/empty-states";
 
 function RecentTestsTable({ tests }: { tests: any[] }) {
   return (
@@ -49,7 +51,8 @@ type Company = Tables<'companies'>;
 type TestResult = Tables<'ai_tests'>;
 
 const CleanDashboard = () => {
-  const { user } = useAuth();
+  const { user, isFirstTimeUser, hasCompletedOnboarding } = useAuth();
+  const navigate = useNavigate();
   const [company, setCompany] = useState<Company | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,6 +221,18 @@ const CleanDashboard = () => {
     </div>
   );
 
+  // Show welcome flow for first-time users
+  if (!loading && isFirstTimeUser && !hasCompletedOnboarding) {
+    return (
+      <WelcomeFlow 
+        onComplete={() => {
+          // After onboarding, redirect to health check
+          navigate('/geo');
+        }} 
+      />
+    );
+  }
+
   return (
     <AppShell title="AI Visibility Hub v1.1" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
 
@@ -279,7 +294,7 @@ const CleanDashboard = () => {
           </div>
         </div>
         {testResults.length === 0 ? (
-          <div className="text-sm">No test results yet</div>
+          <NoHealthCheckResults onStartHealthCheck={() => navigate('/geo')} />
         ) : (
           <RecentTestsTable tests={testResults} />
         )}

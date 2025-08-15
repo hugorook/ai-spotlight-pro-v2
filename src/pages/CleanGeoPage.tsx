@@ -8,6 +8,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { useToast } from '@/components/ui/use-toast';
 import PromptLibrary from '@/components/ai/PromptLibrary';
 import SavedPromptLibrary from '@/components/ai/SavedPromptLibrary';
+import { HelpTooltip, InfoBox } from '@/components/ui/help-tooltip';
 import ModelHeatmap from '@/components/ai/ModelHeatmap';
 import { scheduleJob, logEvent } from '@/integrations/supabase/functions';
 import { downloadCsv } from '@/lib/export';
@@ -890,22 +891,22 @@ export default function CleanGeoPage() {
     } catch {}
   }, []);
 
-  const jokes = [
-    'Optimizing your digital real estate…',
-    'Calculating keyword karma…',
-    'Geo‑locating your success…',
-    'Convincing robots to notice you…',
-    'Auditing backlinks and good vibes…',
-    'Measuring brand gravity in AI orbits…',
-    'Polishing your SERP sunglasses…',
-    'Feeding prompts their veggies…',
-    'Indexing awesomeness…',
-    'Tuning ranking resonance…'
+  const professionalMessages = [
+    'Analyzing AI model responses…',
+    'Processing prompt variations…',
+    'Evaluating mention accuracy…',
+    'Testing industry-specific queries…',
+    'Measuring visibility scores…',
+    'Analyzing competitor positioning…',
+    'Calculating sentiment analysis…',
+    'Processing response rankings…',
+    'Generating insights…',
+    'Finalizing visibility report…'
   ];
 
   useEffect(() => {
     if (isRunningHealthCheck || isTestingCustom) {
-      const id = setInterval(() => setJokeIndex((i) => (i + 1) % jokes.length), 1400);
+      const id = setInterval(() => setJokeIndex((i) => (i + 1) % professionalMessages.length), 1400);
       return () => clearInterval(id);
     }
   }, [isRunningHealthCheck, isTestingCustom]);
@@ -1474,10 +1475,11 @@ export default function CleanGeoPage() {
   }
 
   return (
-    <AppShell title="Health Check + Strategy" subtitle="AI Visibility Optimization" right={(
+    <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models" right={(
       <div className="flex items-center gap-2 border border-border rounded-full px-4 py-2">
         <span>📈</span>
         <span className="text-foreground">Health Score: {healthScore}/100</span>
+        <HelpTooltip content="Your health score shows the percentage of AI prompts where your company gets mentioned. Higher scores mean better AI visibility." />
       </div>
     )}>
 
@@ -1504,12 +1506,18 @@ export default function CleanGeoPage() {
             <div className="mb-6">
               {mode==='automated' ? (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Run Automated Health Check</h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-2xl font-bold text-foreground">Run Automated Health Check</h2>
+                    <HelpTooltip content="We'll test 10 AI prompts relevant to your industry to see how often your company gets mentioned and at what position." />
+                  </div>
                   <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear inline.</p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Custom Prompt Tester</h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-2xl font-bold text-foreground">Custom Prompt Tester</h2>
+                    <HelpTooltip content="Test specific prompts to see if your company gets mentioned. Great for testing particular use cases or competitor comparisons." />
+                  </div>
                   <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
                 </>
               )}
@@ -1551,7 +1559,7 @@ export default function CleanGeoPage() {
           <div className="lg:col-span-5 rounded-2xl bg-card p-8 shadow-soft">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">Status</h2>
-              <p className="text-muted-foreground">Progress and jokes while the health check runs.</p>
+              <p className="text-muted-foreground">Live progress and status updates during testing.</p>
             </div>
 
             <div className="text-sm text-muted-foreground">
@@ -1562,9 +1570,26 @@ export default function CleanGeoPage() {
             {(isRunningHealthCheck || isTestingCustom) && (
               <div className="mt-4 space-y-3">
                 <div className="bg-white rounded-lg p-3 shadow-soft">
-                  <p className="text-primary font-medium text-sm animate-pulse text-center">{jokes[jokeIndex]}</p>
+                  <p className="text-primary font-medium text-sm animate-pulse text-center">{professionalMessages[jokeIndex]}</p>
+                  {mode === 'automated' && testProgress.total > 0 && (
+                    <div className="mt-3">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <span>Testing Progress</span>
+                        <span>{testProgress.current}/{testProgress.total} prompts</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(testProgress.current / testProgress.total) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-center text-xs text-muted-foreground mt-1">
+                        {Math.round((testProgress.current / testProgress.total) * 100)}% complete
+                      </div>
+                    </div>
+                  )}
                 </div>
-                  <div className="bg-white text-black border border-transparent rounded-lg p-3">
+                <div className="bg-white text-black border border-transparent rounded-lg p-3">
                   <p className="text-xs text-muted-foreground mb-1">{mode==='automated' ? 'Currently Testing:' : 'Testing Prompt:'}</p>
                   <p className="text-sm font-medium">{mode==='automated' ? currentTestPrompt : `"${customPrompt}"`}</p>
                 </div>

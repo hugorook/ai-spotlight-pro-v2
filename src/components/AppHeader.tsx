@@ -20,10 +20,10 @@ const AppHeader = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard" },
-    { path: "/geo", label: "Health Check" },
-    { path: "/strategy", label: "Strategy" },
-    { path: "/content", label: "Content Assistant" },
+    { path: "/dashboard", label: "Dashboard", subtitle: "Overview & metrics" },
+    { path: "/geo", label: "AI Health Check", subtitle: "Test your visibility" },
+    { path: "/strategy", label: "Strategy", subtitle: "Optimization plan" },
+    { path: "/content", label: "Content Assistant", subtitle: "Generate content" },
   ];
 
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "U";

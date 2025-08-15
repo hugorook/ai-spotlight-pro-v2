@@ -6,10 +6,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isFirstTimeUser: boolean;
+  hasCompletedOnboarding: boolean;
   signUp: (email: string, password: string) => Promise<{ error?: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error?: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error?: Error | null }>;
+  markOnboardingComplete: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +29,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
     console.log('AuthProvider: Setting up auth listener');
@@ -40,10 +45,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('AuthProvider: Auth state change:', event, !!session);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await checkOnboardingStatus(session.user);
+        } else {
+          setIsFirstTimeUser(false);
+          setHasCompletedOnboarding(false);
+        }
+        
         setLoading(false);
       }
     );
@@ -53,6 +66,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const checkOnboardingStatus = async (user: User) => {
+    try {
+      // Check if user has onboarding_completed in metadata
+      const hasOnboardingFlag = user.user_metadata?.onboarding_completed === true;
+      
+      // Also check if they have a company profile (alternative check)
+      const { data: companies } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+      
+      const hasCompanyProfile = companies && companies.length > 0;
+      const isNew = !hasOnboardingFlag && !hasCompanyProfile;
+      
+      setIsFirstTimeUser(isNew);
+      setHasCompletedOnboarding(hasOnboardingFlag || hasCompanyProfile);
+      
+      console.log('Onboarding status:', { 
+        isFirstTimeUser: isNew, 
+        hasCompletedOnboarding: hasOnboardingFlag || hasCompanyProfile,
+        hasOnboardingFlag,
+        hasCompanyProfile
+      });
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setIsFirstTimeUser(false);
+      setHasCompletedOnboarding(true); // Default to completed to avoid blocking
+    }
+  };
+
+  const markOnboardingComplete = async () => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { onboarding_completed: true }
+      });
+      if (error) throw error;
+      
+      setHasCompletedOnboarding(true);
+      setIsFirstTimeUser(false);
+    } catch (error) {
+      console.error('Error marking onboarding complete:', error);
+    }
+  };
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -147,10 +205,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     user,
     session,
     loading,
+    isFirstTimeUser,
+    hasCompletedOnboarding,
     signUp,
     signIn,
     signOut,
     resetPassword,
+    markOnboardingComplete,
   };
 
   console.log('MinimalAuthProvider: Rendering with state:', { 

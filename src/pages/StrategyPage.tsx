@@ -84,7 +84,7 @@ export default function StrategyPage() {
   };
 
   return (
-    <AppShell title="Strategy" subtitle="From results to action">
+    <AppShell title="Optimization Strategy" subtitle="Get personalized recommendations to improve your AI visibility">
       <div className="flex bg-muted/20 rounded-md p-1 mb-6 w-fit">
         <button onClick={() => setActiveTab('results')} className={`px-3 py-2 rounded text-sm ${activeTab==='results'?'bg-primary/30 text-foreground':'text-muted-foreground'}`}>Results</button>
         <button onClick={() => setActiveTab('strategy')} className={`px-3 py-2 rounded text-sm ${activeTab==='strategy'?'bg-primary/30 text-foreground':'text-muted-foreground'}`}>Strategy</button>
