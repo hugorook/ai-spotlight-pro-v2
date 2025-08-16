@@ -12,71 +12,64 @@
 
 @layer base {
   :root {
-    /* v1.1 Hard Theme: off-white, black, orange */
-    /* Off-white #E8E6DF ≈ hsl(46 20% 89%) */
-    --background: 46 20% 89%;
-    --foreground: 0 0% 0%;
+    /* v2.0 Glass Theme: pure white backgrounds with glassmorphism */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 15%;
 
-    --card: 46 20% 89%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
 
-    --popover: 46 20% 89%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
 
-    /* Default buttons use off-white with black text; hover handled below */
-    --primary: 46 20% 89%;
-    --primary-foreground: 0 0% 0%;
-    --primary-glow: 46 20% 89%;
+    /* Primary uses gradient for buttons */
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 258 90% 66%;
 
-    --secondary: 46 20% 89%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 46 14% 85%;
-    --muted-foreground: 0 0% 0%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 46 20% 89%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 15%;
 
-    --destructive: 0 0% 20%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* UI Elements */
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
-    --ring: 0 0% 0%;
+    --border: 0 0% 90%;
+    --input: 0 0% 100%;
+    --ring: 258 90% 66%;
 
     --radius: 0.75rem;
     /* Global font: Instrument Serif */
     --font-sans: "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    /* Design tokens */
-    --gradient-ai: none;
-    --gradient-subtle: none;
-    --shadow-ai: none;
-    --shadow-glow: none;
+    /* Glassmorphism design tokens */
+    --gradient-ai: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
+    --gradient-subtle: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-glass-hover: 0 12px 40px rgba(31, 38, 135, 0.45);
+    --blur-glass: blur(8px);
     
     /* Performance indicators */
     --success: 142 76% 36%;
     --warning: 43 96% 56%;
     --info: 200 98% 39%;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar with glassmorphism */
+    --sidebar-background: rgba(255, 255, 255, 0.25);
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 258 90% 66%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: rgba(255, 255, 255, 0.1);
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: rgba(255, 255, 255, 0.18);
+    --sidebar-ring: 258 90% 66%;
   }
 
   .dark { /* dark mode not used in v1.1 theme; mirror light */ }
@@ -89,65 +82,136 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased leading-relaxed;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
   }
 
   /* Use Instrument Serif everywhere */
   * { font-family: var(--font-sans), serif; }
 
-  /* Card/box styling: white background + unified soft shadow */
+  /* Glassmorphism card styling */
   .bg-card, .bg-popover, .card, .panel, .box {
-    background-color: #ffffff !important;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: var(--shadow-glass) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
-  /* Hide borders on card-like containers */
-  .bg-card, .rounded-2xl, .rounded-xl, .rounded-lg {
-    border-color: transparent !important;
+  /* Glassmorphism hover effects */
+  .bg-card:hover, .card:hover, .panel:hover, .box:hover {
+    background: rgba(255, 255, 255, 0.35) !important;
+    box-shadow: var(--shadow-glass-hover) !important;
+    transform: translateY(-2px) !important;
   }
 
-  /* Accent gradient to replace burnt orange */
+  /* Special glassmorphism utility classes */
+  .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Additional glassmorphism utilities */
+  .shadow-soft {
+    box-shadow: var(--shadow-glass) !important;
+  }
+
+  .bg-gradient-ai {
+    background: var(--gradient-ai) !important;
+  }
+
+  /* Override any remaining solid backgrounds */
+  .bg-background {
+    background: transparent !important;
+  }
+
+  /* Special glass effects for different elements */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    box-shadow: var(--shadow-glass);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: var(--shadow-glass-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Glassmorphism gradient accents */
   .gradient-accent {
-    background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%);
+    background: var(--gradient-ai);
   }
 
-  /* Global button styling: default off-white with black text; gradient hover */
-  button {
-    background-color: #E8E6DF;
-    color: #000000;
-    border: 1px solid rgba(0,0,0,0.9);
-    transition: all 0.2s ease-in-out;
+  .bg-gradient-ai {
+    background: var(--gradient-ai) !important;
   }
+
+  /* Glassmorphism button styling */
+  button {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: hsl(var(--foreground));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
   button:hover,
   button:focus,
   button:active {
-    background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%) !important;
-    background-color: transparent !important;
-    color: #000000 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(196, 181, 253, 0.3);
+    background: var(--gradient-ai) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glass-hover);
+    border-color: rgba(196, 181, 253, 0.3);
   }
-  /* Inputs/cards off-white with black borders */
+
+  /* Glassmorphism inputs */
   input, select, textarea {
-    background-color: #E8E6DF;
-    color: #000000;
-    border: 1px solid rgba(0,0,0,0.9);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: hsl(var(--foreground));
+    transition: all 0.3s ease;
   }
-  .bg-card, .bg-popover, .bg-background { background-color: #E8E6DF !important; }
-  .text-foreground, .text-muted-foreground { color: #000000 !important; }
+
+  input:focus, select:focus, textarea:focus {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px rgba(196, 181, 253, 0.1);
+  }
 
   /* Remove any leftover orange utility */
-  .bg-\[\#BF5700\] { background-image: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 100%) !important; background-color: transparent !important; }
+  .bg-\[\#BF5700\] { background: var(--gradient-ai) !important; }
 
   /* Enhanced accessibility and focus indicators */
   :focus-visible {
-    outline: 3px solid #000000;
+    outline: 3px solid hsl(var(--primary));
     outline-offset: 2px;
     border-radius: 6px;
   }
   
   /* Ensure proper contrast for text elements */
   .text-muted-foreground {
-    color: #2c2c2c !important; /* Darker gray for better contrast */
+    color: hsl(var(--muted-foreground)) !important;
   }
   
   /* Interactive elements accessibility */

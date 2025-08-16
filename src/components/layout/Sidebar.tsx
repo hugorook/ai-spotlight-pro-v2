@@ -38,9 +38,9 @@ const Sidebar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="w-64 h-screen bg-card border-r border-border flex flex-col">
+    <div className="w-64 h-screen glass-strong border-r border-white/20 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-border">
+      <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-ai rounded-lg">
             <Brain className="w-6 h-6 text-white" />
@@ -59,10 +59,10 @@ const Sidebar = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
+                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-300 backdrop-blur-sm",
                 isActive(item.path)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-gradient-ai text-white shadow-lg transform scale-[1.02]"
+                  : "text-foreground hover:text-foreground hover:bg-white/20 hover:backdrop-blur-md hover:transform hover:scale-[1.01]"
               )}
             >
               {item.icon}
@@ -71,7 +71,7 @@ const Sidebar = () => {
                 <div className={cn(
                   "text-xs",
                   isActive(item.path) 
-                    ? "text-primary-foreground/70" 
+                    ? "text-white/80" 
                     : "text-muted-foreground"
                 )}>
                   {item.subtitle}
@@ -83,14 +83,14 @@ const Sidebar = () => {
       </nav>
 
       {/* Settings at bottom */}
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-white/10">
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
+            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-300 backdrop-blur-sm",
             isActive("/settings")
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              ? "bg-gradient-ai text-white shadow-lg transform scale-[1.02]"
+              : "text-foreground hover:text-foreground hover:bg-white/20 hover:backdrop-blur-md hover:transform hover:scale-[1.01]"
           )}
         >
           <Settings className="w-5 h-5" />
@@ -99,7 +99,7 @@ const Sidebar = () => {
             <div className={cn(
               "text-xs",
               isActive("/settings") 
-                ? "text-primary-foreground/70" 
+                ? "text-white/80" 
                 : "text-muted-foreground"
             )}>
               Account & preferences
