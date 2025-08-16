@@ -38,7 +38,7 @@ const Sidebar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="w-64 h-screen glass-strong border-r border-white/20 flex flex-col">
+    <div className="w-64 h-screen glass-strong border-r border-white/20 flex flex-col sticky top-0">
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">

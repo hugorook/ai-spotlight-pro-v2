@@ -53,7 +53,7 @@
     --gradient-ai: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
     --gradient-subtle-purple: linear-gradient(135deg, rgba(196, 181, 253, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
     --shadow-glass: none;
-    --shadow-glass-hover: 0 12px 40px rgba(31, 38, 135, 0.45);
+    --shadow-glass-hover: 0 4px 20px rgba(31, 38, 135, 0.15);
     --blur-glass: blur(8px);
     
     /* Performance indicators */
