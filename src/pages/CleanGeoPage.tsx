@@ -13,6 +13,8 @@ import ModelHeatmap from '@/components/ai/ModelHeatmap';
 import { scheduleJob, logEvent } from '@/integrations/supabase/functions';
 import { downloadCsv } from '@/lib/export';
 import { printReport } from '@/lib/pdf';
+import AnimatedPath from '@/components/ui/animated-path';
+import ResultsSection from '@/components/ui/results-section';
 
 type Company = Tables<'companies'>;
 
@@ -875,6 +877,7 @@ export default function CleanGeoPage() {
   const [autoStrategies, setAutoStrategies] = useState<any[]>([]);
   const [strategyLoading, setStrategyLoading] = useState(false);
   const [strategyError, setStrategyError] = useState<string | null>(null);
+  const [showResultsSection, setShowResultsSection] = useState(false);
 
   // On mount, load any persisted last run
   useEffect(() => {
@@ -1104,6 +1107,7 @@ export default function CleanGeoPage() {
     setLastRunType('health');
     setLastResults([]);
     setTestProgress({ current: 0, total: 25 });
+    setShowResultsSection(false);
     
     try {
       console.log('Starting health check for company:', {
@@ -1265,6 +1269,11 @@ export default function CleanGeoPage() {
       
       console.log(`Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate).`);
       toast({ title: 'Health Check Complete', description: `${successRate}% mention rate across ${results.length} prompts.` });
+      
+      // Trigger animated path completion and show results section
+      setTimeout(() => {
+        setShowResultsSection(true);
+      }, 1000);
 
       // Auto-generate strategy for Automated flow (right column)
       try {
@@ -1570,32 +1579,27 @@ export default function CleanGeoPage() {
               {mode==='automated' ? 'Start an automated run using the button at left. Live progress will appear here.' : 'Run a test in the Custom Prompt Tester. Live progress will appear here.'}
             </div>
             
-            {/* Status animations live here for both modes */}
-            {(isRunningHealthCheck || isTestingCustom) && (
+            {/* Animated Path for Health Check */}
+            {mode === 'automated' && isRunningHealthCheck && (
+              <AnimatedPath
+                isActive={isRunningHealthCheck}
+                progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+                onComplete={() => {
+                  // Animation completion handled in runHealthCheck function
+                }}
+                currentStep={professionalMessages[jokeIndex]}
+              />
+            )}
+            
+            {/* Custom prompt testing UI (non-animated) */}
+            {mode === 'custom' && isTestingCustom && (
               <div className="mt-4 space-y-3">
                 <div className="bg-white rounded-lg p-3 shadow-soft">
                   <p className="text-primary font-medium text-sm animate-pulse text-center">{professionalMessages[jokeIndex]}</p>
-                  {mode === 'automated' && testProgress.total > 0 && (
-                    <div className="mt-3">
-                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                        <span>Testing Progress</span>
-                        <span>{testProgress.current}/{testProgress.total} prompts</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${(testProgress.current / testProgress.total) * 100}%` }}
-                        />
-                      </div>
-                      <div className="text-center text-xs text-muted-foreground mt-1">
-                        {Math.round((testProgress.current / testProgress.total) * 100)}% complete
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="bg-white text-black border border-transparent rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground mb-1">{mode==='automated' ? 'Currently Testing:' : 'Testing Prompt:'}</p>
-                  <p className="text-sm font-medium">{mode==='automated' ? currentTestPrompt : `"${customPrompt}"`}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Testing Prompt:</p>
+                  <p className="text-sm font-medium">"{customPrompt}"</p>
                 </div>
               </div>
             )}
@@ -1603,6 +1607,21 @@ export default function CleanGeoPage() {
             {/* Export/Print moved to Results header once results exist */}
           </div>
         </div>
+
+        {/* New Animated Results Section */}
+        {mode === 'automated' && showResultsSection && lastResults.length > 0 && (
+          <div className="mt-8">
+            <ResultsSection
+              isVisible={showResultsSection}
+              results={lastResults}
+              healthScore={healthScore}
+              onNewTest={() => {
+                setShowResultsSection(false);
+                runHealthCheck();
+              }}
+            />
+          </div>
+        )}
 
         {/* After run: left results accordion, right strategy panel */}
         {mode==='automated' && lastRunType==='health' && lastResults.length > 0 && (
