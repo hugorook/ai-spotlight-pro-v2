@@ -51,8 +51,8 @@
 
     /* Glassmorphism design tokens */
     --gradient-ai: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
-    --gradient-subtle: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
-    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --gradient-subtle-purple: linear-gradient(135deg, rgba(196, 181, 253, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
+    --shadow-glass: none;
     --shadow-glass-hover: 0 12px 40px rgba(31, 38, 135, 0.45);
     --blur-glass: blur(8px);
     
@@ -89,43 +89,62 @@
   /* Use Instrument Serif everywhere */
   * { font-family: var(--font-sans), serif; }
 
-  /* Glassmorphism card styling */
+  /* Glassmorphism card styling with faint purple gradient */
   .bg-card, .bg-popover, .card, .panel, .box {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: var(--gradient-subtle-purple) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: var(--shadow-glass) !important;
+    border: 1px solid rgba(196, 181, 253, 0.2) !important;
+    box-shadow: none !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
-  /* Glassmorphism hover effects */
+  /* Glassmorphism hover effects - only show shadow on hover */
   .bg-card:hover, .card:hover, .panel:hover, .box:hover {
-    background: rgba(255, 255, 255, 0.35) !important;
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%) !important;
     box-shadow: var(--shadow-glass-hover) !important;
     transform: translateY(-2px) !important;
+    border-color: rgba(196, 181, 253, 0.3) !important;
   }
 
   /* Special glassmorphism utility classes */
   .glass {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--gradient-subtle-purple);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: var(--shadow-glass);
+    border: 1px solid rgba(196, 181, 253, 0.2);
+    box-shadow: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass:hover {
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%);
+    box-shadow: var(--shadow-glass-hover);
+    transform: translateY(-2px);
   }
 
   .glass-strong {
-    background: rgba(255, 255, 255, 0.4);
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: var(--shadow-glass);
+    border: 1px solid rgba(196, 181, 253, 0.25);
+    box-shadow: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-strong:hover {
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.25) 0%, rgba(147, 197, 253, 0.15) 100%);
+    box-shadow: var(--shadow-glass-hover);
+    transform: translateY(-2px);
   }
 
   /* Additional glassmorphism utilities */
   .shadow-soft {
-    box-shadow: var(--shadow-glass) !important;
+    box-shadow: none !important;
+  }
+
+  .shadow-soft:hover {
+    box-shadow: var(--shadow-glass-hover) !important;
   }
 
   .bg-gradient-ai {
@@ -139,17 +158,17 @@
 
   /* Special glass effects for different elements */
   .glass-card {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--gradient-subtle-purple);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(196, 181, 253, 0.2);
     border-radius: 12px;
-    box-shadow: var(--shadow-glass);
+    box-shadow: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-card:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%);
     box-shadow: var(--shadow-glass-hover);
     transform: translateY(-2px);
   }
