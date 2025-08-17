@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Brain, BarChart3, Activity, FileText, Settings } from 'lucide-react';
+import { Brain, BarChart3, Activity, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -29,9 +29,9 @@ const Sidebar = () => {
     },
     { 
       path: "/content", 
-      label: "Content Assistant", 
-      subtitle: "Generate content",
-      icon: <FileText className="w-5 h-5" />
+      label: "Company Profile", 
+      subtitle: "Edit company info",
+      icon: <User className="w-5 h-5" />
     },
   ];
 

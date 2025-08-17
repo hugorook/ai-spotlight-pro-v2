@@ -6,7 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
 import CleanDashboard from "./pages/CleanDashboard";
 import CleanGeoPage from "./pages/CleanGeoPage";
-import MinimalContentPage from "./pages/MinimalContentPage";
+import CompanyProfilePage from "./pages/CompanyProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import PublicSnapshot from "./pages/PublicSnapshot";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -42,7 +42,7 @@ const App = () => (
             <Route path="/content" element={
               <ProtectedRoute>
                 <ErrorBoundary>
-                  <MinimalContentPage />
+                  <CompanyProfilePage />
                 </ErrorBoundary>
               </ProtectedRoute>
             } />

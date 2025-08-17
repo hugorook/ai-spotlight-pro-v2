@@ -41,42 +41,6 @@ export default function AppShell({ title, subtitle, right, children }: AppShellP
         <AppHeader />
         
         <div className="flex-1 p-6">
-          <div className="mb-4">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link to="/dashboard">Home</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                {segments.map((seg, idx) => (
-                  <span key={seg.href} className="inline-flex items-center">
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      {idx < segments.length - 1 ? (
-                        <BreadcrumbLink asChild>
-                          <Link to={seg.href}>{seg.label}</Link>
-                        </BreadcrumbLink>
-                      ) : (
-                        <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-                      )}
-                    </BreadcrumbItem>
-                  </span>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-
-          {(title || right) && (
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                {title && <h1 className="text-2xl font-bold mb-1">{title}</h1>}
-                {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
-              </div>
-              {right}
-            </div>
-          )}
-
           {children}
         </div>
       </div>
