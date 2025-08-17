@@ -1282,36 +1282,8 @@ export default function CleanGeoPage() {
         setShowResultsSection(true);
       }, 1000);
 
-      // Auto-generate strategy for Automated flow (right column)
-      try {
-        setStrategyLoading(true);
-        setStrategyError(null);
-        setAutoStrategies([]);
-        const payload = {
-          companyName: company.company_name,
-          results: results.slice(0, 100).map(r => ({
-            prompt_text: r.prompt,
-            company_mentioned: r.mentioned,
-            mention_position: r.position,
-            sentiment: r.sentiment,
-            mention_context: r.context,
-            ai_model: 'openai-gpt-4o-mini',
-            test_date: new Date().toISOString()
-          }))
-        };
-        const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
-        if (error) throw error;
-        const recs = (data?.recommendations as any[]) || [];
-        setAutoStrategies(recs);
-        try {
-          const payload: PersistedLastRun = { type: 'health', results, strategies: recs, timestamp: Date.now() };
-          window.localStorage.setItem('geo_last_run', JSON.stringify(payload));
-        } catch {}
-      } catch (e: any) {
-        setStrategyError(e?.message || 'Failed to generate strategy');
-      } finally {
-        setStrategyLoading(false);
-      }
+      // Generate strategy using all available results
+      await generateStrategiesFromAllResults();
       
     } catch (error) {
       console.error('❌ FATAL ERROR in health check:', error);
@@ -1330,6 +1302,61 @@ export default function CleanGeoPage() {
       setIsRunningHealthCheck(false);
       setCurrentTestPrompt('');
       setTestProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Generate strategies from all available test results (both automated and custom)
+  const generateStrategiesFromAllResults = async () => {
+    try {
+      setStrategyLoading(true);
+      setStrategyError(null);
+      setAutoStrategies([]);
+      
+      // Get all test results (both from current session and previous runs)
+      const allResults = [...testResults, ...lastResults].filter((result, index, self) => 
+        index === self.findIndex(r => r.prompt === result.prompt) // Remove duplicates
+      );
+      
+      if (allResults.length === 0) {
+        console.log('No results available for strategy generation');
+        return;
+      }
+      
+      const payload = {
+        companyName: company?.company_name,
+        results: allResults.slice(0, 100).map(r => ({
+          prompt_text: r.prompt,
+          company_mentioned: r.mentioned,
+          mention_position: r.position,
+          sentiment: r.sentiment,
+          mention_context: r.context,
+          ai_model: 'openai-gpt-4o-mini',
+          test_date: new Date().toISOString()
+        }))
+      };
+      
+      console.log(`Generating strategies from ${allResults.length} total results`);
+      const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
+      if (error) throw error;
+      const recs = (data?.recommendations as any[]) || [];
+      setAutoStrategies(recs);
+      
+      // Update localStorage with new strategies
+      try {
+        const currentRun = window.localStorage.getItem('geo_last_run');
+        if (currentRun) {
+          const parsed = JSON.parse(currentRun);
+          parsed.strategies = recs;
+          window.localStorage.setItem('geo_last_run', JSON.stringify(parsed));
+        }
+      } catch {}
+      
+      console.log(`Generated ${recs.length} strategy recommendations`);
+    } catch (e: any) {
+      console.error('Strategy generation error:', e);
+      setStrategyError(e?.message || 'Failed to generate strategy');
+    } finally {
+      setStrategyLoading(false);
     }
   };
 
@@ -1401,6 +1428,12 @@ export default function CleanGeoPage() {
           const payload: PersistedLastRun = { type: 'custom', results: [testResult], timestamp: Date.now() };
           window.localStorage.setItem('geo_last_run', JSON.stringify(payload));
         } catch {}
+        
+        // Generate strategies from all results (including this new custom result)
+        await generateStrategiesFromAllResults();
+        
+        // Show results section if not already visible
+        setShowResultsSection(true);
       }
       
     } catch (error) {
@@ -1507,8 +1540,8 @@ export default function CleanGeoPage() {
         {/* Side by side: Automated Health Check and Custom Prompt boxes */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* LEFT: Automated Health Check */}
-          <div className="rounded-2xl bg-card p-8 shadow-soft">
-            <div className="mb-6">
+          <div className="rounded-2xl bg-card p-8 shadow-soft flex flex-col">
+            <div className="mb-6 flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-2xl font-bold text-foreground">Run Automated Health Check</h2>
                 <HelpTooltip content="We'll test 10 AI prompts relevant to your industry to see how often your company gets mentioned and at what position." />
@@ -1519,14 +1552,29 @@ export default function CleanGeoPage() {
             <button
               onClick={runHealthCheck}
               disabled={isRunningHealthCheck || !company}
-              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent"
+              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent relative overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%), 
+                            linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`
+              }}
             >
-              <div className="flex items-center justify-center">Run Automated Health Check</div>
+              {/* Morse code background for "HEALTH CHECK" */}
+              <div 
+                className="absolute inset-0 opacity-10 pointer-events-none text-xs font-mono flex items-center justify-center"
+                style={{
+                  background: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 12px)`,
+                  fontSize: '8px',
+                  letterSpacing: '1px'
+                }}
+              >
+                .... . .- .-.. - .... / -.-. .... . -.-. -.-
+              </div>
+              <div className="relative z-10 flex items-center justify-center">Run Automated Health Check</div>
             </button>
           </div>
 
           {/* RIGHT: Custom Prompt Tester */}
-          <div className="rounded-2xl bg-card p-8 shadow-soft">
+          <div className="rounded-2xl bg-card p-8 shadow-soft flex flex-col">
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-2xl font-bold text-foreground">Custom Prompt Tester</h2>

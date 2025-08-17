@@ -260,10 +260,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
       letterGroup.style.display = 'flex';
       letterGroup.style.alignItems = 'center';
       letterGroup.style.gap = '3px';
-      letterGroup.style.padding = '4px 8px';
-      letterGroup.style.border = '1px solid rgba(196, 181, 253, 0.3)';
-      letterGroup.style.borderRadius = '6px';
-      letterGroup.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+      letterGroup.style.padding = '2px 4px';
       
       morseArea.appendChild(letterGroup);
       
