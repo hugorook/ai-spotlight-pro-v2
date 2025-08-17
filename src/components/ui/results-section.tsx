@@ -38,6 +38,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onCopyResults
 }) => {
   const [activeTab, setActiveTab] = useState('results');
+  const [showAllResults, setShowAllResults] = useState(false);
   
   // Persist active tab in localStorage
   useEffect(() => {
@@ -240,7 +241,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
             {/* Detailed Results */}
             <div className="space-y-3">
-              {results.slice(0, 5).map((result, index) => (
+              {results.slice(0, showAllResults ? results.length : 5).map((result, index) => (
                 <div key={index} className="p-3 glass rounded-lg">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 mr-4">
@@ -275,8 +276,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             
             {results.length > 5 && (
               <div className="mt-4 text-center">
-                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  View all {results.length} results →
+                <button 
+                  onClick={() => setShowAllResults(!showAllResults)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showAllResults ? 'Show less ↑' : `View all ${results.length} results →`}
                 </button>
               </div>
             )}
