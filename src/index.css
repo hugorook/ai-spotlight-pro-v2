@@ -172,14 +172,14 @@
     background: var(--gradient-ai) !important;
   }
 
-  /* Glassmorphism button styling */
+  /* Glassmorphism button styling with instant transitions */
   button {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: hsl(var(--foreground));
-    transition: all 0.1s ease;
+    transition: all 0s !important;
   }
   
   button:hover,
@@ -195,7 +195,7 @@
 
   /* Instant hover for toggles and tabs */
   [role="tab"], .toggle, .tab {
-    transition: all 0.1s ease;
+    transition: all 0s !important;
   }
 
   [role="tab"]:hover, .toggle:hover, .tab:hover {

@@ -25,6 +25,7 @@ interface TestResult {
   position: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   context: string;
+  response?: string; // Full AI response
 }
 
 interface ContentOpportunity {
@@ -1182,7 +1183,8 @@ export default function CleanGeoPage() {
               mentioned: Boolean(result.mentioned),
               position: Number(result.position) || 0,
               sentiment: (result.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-              context: result.context || result.response || ''
+              context: result.context || '',
+              response: result.response || ''
             };
             
             results.push(testResult);
@@ -1362,7 +1364,8 @@ export default function CleanGeoPage() {
           mentioned: result.mentioned || false,
           position: result.position || 0,
           sentiment: (result.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-          context: result.context || result.response || ''
+          context: result.context || '',
+          response: result.response || ''
         };
         
         // Save custom prompt result to database

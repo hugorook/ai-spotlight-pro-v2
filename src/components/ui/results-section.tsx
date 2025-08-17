@@ -8,6 +8,7 @@ interface TestResult {
   position: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   context: string;
+  response?: string; // Full AI response
 }
 
 interface ResultsSectionProps {
@@ -260,8 +261,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             <div className="space-y-3">
               {results.slice(0, showAllResults ? results.length : 5).map((result, index) => {
                 const isExpanded = expandedResults.has(index);
-                const hasContext = result.context && result.context.length > 0;
-                const truncatedContext = hasContext ? result.context.slice(0, 150) + (result.context.length > 150 ? '...' : '') : 'No context available';
+                const hasResponse = result.response && result.response.length > 0;
+                const displayContext = result.context || 'No context available';
                 
                 return (
                   <div key={index} className="p-3 glass rounded-lg">
@@ -287,11 +288,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         }`}>
                           {result.sentiment}
                         </span>
-                        {hasContext && (
+                        {hasResponse && (
                           <button
                             onClick={() => toggleResultExpansion(index)}
                             className="p-1 rounded-full hover:bg-white/20 transition-colors"
-                            title={isExpanded ? 'Collapse AI response' : 'View full AI response'}
+                            title={isExpanded ? 'Hide full AI response' : 'View full AI response'}
                           >
                             {isExpanded ? (
                               <Minus className="w-4 h-4 text-muted-foreground" />
@@ -302,9 +303,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         )}
                       </div>
                     </div>
-                    <div className="text-sm text-muted-foreground break-words">
-                      {isExpanded ? result.context : truncatedContext}
+                    
+                    {/* Always show context summary */}
+                    <div className="text-sm text-muted-foreground break-words mb-2">
+                      <strong>Summary:</strong> {displayContext}
                     </div>
+                    
+                    {/* Show full AI response when expanded */}
+                    {isExpanded && hasResponse && (
+                      <div className="text-sm text-foreground break-words bg-white/10 p-3 rounded border-l-4 border-purple-400">
+                        <strong className="text-purple-400">Full AI Response:</strong>
+                        <div className="mt-2 whitespace-pre-wrap">{result.response}</div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
