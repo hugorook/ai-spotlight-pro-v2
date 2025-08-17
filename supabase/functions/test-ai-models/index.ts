@@ -4,28 +4,65 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
-async function evaluatePrompt(input: {
+async function getActualAIResponse(prompt: string): Promise<string> {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY not set');
+  }
+
+  console.log('Getting actual AI response for prompt:', prompt);
+  
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a helpful AI assistant. Answer the user\'s question naturally and comprehensively.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    }),
+  });
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('OpenAI API error getting response:', { status: res.status, statusText: res.statusText, body: errorText });
+    throw new Error(`OpenAI API error (${res.status}): ${errorText}`);
+  }
+  
+  const data = await res.json();
+  const response = data?.choices?.[0]?.message?.content ?? '';
+  console.log('Got AI response:', response.substring(0, 200) + '...');
+  
+  return response;
+}
+
+async function analyzeResponse(input: {
   prompt: string;
+  response: string;
   companyName: string;
   industry?: string;
   description?: string;
   differentiators?: string;
 }) {
   if (!OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY environment variable not set');
     throw new Error('OPENAI_API_KEY not set');
   }
   
   const sys =
-    'You are simulating how ChatGPT, Claude, or similar AI assistants would ACTUALLY respond to user prompts. '
-    + 'Be completely honest and realistic - only mention companies that would genuinely appear in a real AI response. '
+    'You are analyzing an AI response to determine if a specific company was mentioned. '
+    + 'Look at the actual response and determine: 1) if the company is mentioned by name or clearly implied, '
+    + '2) what position it appears in (1-10, where 1 = first mentioned), 3) the sentiment of the mention. '
     + 'Return STRICT JSON with keys: mentioned (boolean), position (integer 1-10 where 1=first mentioned, 0=not mentioned), '
-    + "sentiment ('positive'|'neutral'|'negative'), context (brief explanation of why mentioned/not mentioned). No extra text.";
-  const user = `User asks: "${input.prompt}"\n\nEvaluate this company:\nCompany: ${input.companyName}\nIndustry: ${input.industry ?? ''}\nDescription: ${input.description ?? ''}\nKey Differentiators: ${input.differentiators ?? ''}\n\nWould this company actually be mentioned in a realistic AI response to this question? Consider:\n- Is this company well-known enough to be mentioned?\n- Does it directly address what the user is asking?\n- Would a real AI assistant include it in their response?\n\nBe honest - most companies should NOT be mentioned for most prompts.`;
+    + "sentiment ('positive'|'neutral'|'negative'), context (brief explanation of the mention or why not mentioned). No extra text.";
+    
+  const user = `Original prompt: "${input.prompt}"\n\nAI Response to analyze:\n"${input.response}"\n\nCompany to look for:\nCompany: ${input.companyName}\nIndustry: ${input.industry ?? ''}\nDescription: ${input.description ?? ''}\nKey Differentiators: ${input.differentiators ?? ''}\n\nAnalyze this ACTUAL AI response - is the company mentioned by name or clearly referenced? What position? What sentiment?`;
 
-  console.log('Calling OpenAI API with model: gpt-4o-mini');
-  console.log('System prompt:', sys);
-  console.log('User prompt for evaluation:', user);
+  console.log('Analyzing response for company mentions');
   
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -46,37 +83,55 @@ async function evaluatePrompt(input: {
   
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('OpenAI API error:', { status: res.status, statusText: res.statusText, body: errorText });
+    console.error('OpenAI API error analyzing response:', { status: res.status, statusText: res.statusText, body: errorText });
     throw new Error(`OpenAI API error (${res.status}): ${errorText}`);
   }
   
   const data = await res.json();
-  console.log('OpenAI API response:', { usage: data.usage, model: data.model });
-  
   const text = data?.choices?.[0]?.message?.content ?? '{}';
-  console.log('OpenAI response content:', text);
-  
-  if (!text || text.trim() === '{}') {
-    throw new Error('OpenAI returned empty response');
-  }
+  console.log('Analysis result:', text);
   
   let parsed;
   try {
     parsed = JSON.parse(text);
   } catch (parseError) {
-    console.error('Failed to parse OpenAI response as JSON:', text);
-    throw new Error(`Invalid JSON response from OpenAI: ${parseError.message}`);
+    console.error('Failed to parse analysis as JSON:', text);
+    throw new Error(`Invalid JSON response from analysis: ${parseError.message}`);
   }
   
-  const result = {
+  return {
     mentioned: !!parsed.mentioned,
     position: Number(parsed.position) || 0,
     sentiment: (parsed.sentiment ?? 'neutral') as 'positive' | 'neutral' | 'negative',
     context: String(parsed.context ?? ''),
   };
+}
+
+async function evaluatePrompt(input: {
+  prompt: string;
+  companyName: string;
+  industry?: string;
+  description?: string;
+  differentiators?: string;
+}) {
+  // Step 1: Get the actual AI response to the prompt
+  const actualResponse = await getActualAIResponse(input.prompt);
   
-  console.log('Processed result:', result);
-  return result;
+  // Step 2: Analyze that response for company mentions
+  const analysis = await analyzeResponse({
+    prompt: input.prompt,
+    response: actualResponse,
+    companyName: input.companyName,
+    industry: input.industry,
+    description: input.description,
+    differentiators: input.differentiators
+  });
+  
+  // Return both the original response and the analysis
+  return {
+    ...analysis,
+    response: actualResponse // Include the full original AI response
+  };
 }
 
 const corsHeaders = {
