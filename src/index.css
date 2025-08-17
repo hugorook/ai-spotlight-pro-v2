@@ -55,8 +55,8 @@
     --ring: 258 90% 66%;
 
     --radius: 0.75rem;
-    /* Global font: Instrument Serif */
-    --font-sans: "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+    /* Global font: Caladea */
+    --font-sans: "Caladea", Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Glassmorphism design tokens */
@@ -96,7 +96,7 @@
     min-height: 100vh;
   }
 
-  /* Use Instrument Serif everywhere */
+  /* Use Caladea everywhere */
   * { font-family: var(--font-sans), serif; }
 
   /* Glassmorphism card styling with faint purple gradient */
@@ -127,11 +127,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .glass:hover {
-    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%);
-    box-shadow: var(--shadow-glass-hover);
-    transform: translateY(-2px);
-  }
+  /* Remove hover effects from glass containers */
 
   .glass-strong {
     background: linear-gradient(135deg, rgba(196, 181, 253, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%);
@@ -142,20 +138,14 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .glass-strong:hover {
-    background: linear-gradient(135deg, rgba(196, 181, 253, 0.25) 0%, rgba(147, 197, 253, 0.15) 100%);
-    box-shadow: var(--shadow-glass-hover);
-    transform: translateY(-2px);
-  }
+  /* Remove hover effects from glass-strong containers */
 
   /* Additional glassmorphism utilities */
   .shadow-soft {
     box-shadow: none !important;
   }
 
-  .shadow-soft:hover {
-    box-shadow: var(--shadow-glass-hover) !important;
-  }
+  /* Remove hover effects from shadow-soft containers */
 
   .bg-gradient-ai {
     background: var(--gradient-ai) !important;

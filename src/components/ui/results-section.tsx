@@ -100,78 +100,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   return (
     <div className="w-full animate-fade-in">
-      {/* Results Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-ai rounded-lg flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">Health Check Results</h2>
-            <p className="text-muted-foreground">Your AI visibility analysis is complete</p>
-          </div>
-        </div>
-        {onNewTest && (
-          <button
-            onClick={onNewTest}
-            className="glass p-3 rounded-lg hover:bg-gradient-ai hover:text-white transition-all duration-300"
-          >
-            Run New Test
-          </button>
-        )}
-      </div>
-
-      {/* Health Score Card */}
-      <div className="glass-card p-6 mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Overall Health Score</h3>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-4xl font-bold ${getHealthScoreColor(healthScore)}`}>
-                {healthScore}
-              </span>
-              <span className="text-xl text-muted-foreground">/ 100</span>
-              <span className={`text-lg font-medium ${getHealthScoreColor(healthScore)} ml-2`}>
-                ({getHealthScoreGrade(healthScore)})
-              </span>
-            </div>
-          </div>
-          <div className="w-24 h-24 relative">
-            <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#c4b5fd" />
-                  <stop offset="100%" stopColor="#9333ea" />
-                </linearGradient>
-              </defs>
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                stroke="rgba(196, 181, 253, 0.2)"
-                strokeWidth="8"
-                fill="none"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                stroke="url(#pathGradient)"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={`${(healthScore / 100) * 251.2} 251.2`}
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className={`text-lg font-bold ${getHealthScoreColor(healthScore)}`}>
-                {healthScore}%
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Tabs */}
       <div className="mb-6">
         <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1">
@@ -200,6 +128,78 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       <div className="glass-card p-6">
         {activeTab === 'results' && (
           <div>
+            {/* Results Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-ai rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Health Check Results</h2>
+                  <p className="text-muted-foreground">Your AI visibility analysis is complete</p>
+                </div>
+              </div>
+              {onNewTest && (
+                <button
+                  onClick={onNewTest}
+                  className="glass p-3 rounded-lg hover:bg-gradient-ai hover:text-white transition-all duration-300"
+                >
+                  Run New Test
+                </button>
+              )}
+            </div>
+
+            {/* Health Score Card */}
+            <div className="glass p-6 mb-6 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Overall Health Score</h3>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-4xl font-bold ${getHealthScoreColor(healthScore)}`}>
+                      {healthScore}
+                    </span>
+                    <span className="text-xl text-muted-foreground">/ 100</span>
+                    <span className={`text-lg font-medium ${getHealthScoreColor(healthScore)} ml-2`}>
+                      ({getHealthScoreGrade(healthScore)})
+                    </span>
+                  </div>
+                </div>
+                <div className="w-24 h-24 relative">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                    <defs>
+                      <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#c4b5fd" />
+                        <stop offset="100%" stopColor="#9333ea" />
+                      </linearGradient>
+                    </defs>
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="rgba(196, 181, 253, 0.2)"
+                      strokeWidth="8"
+                      fill="none"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="url(#pathGradient)"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeDasharray={`${(healthScore / 100) * 251.2} 251.2`}
+                      className="transition-all duration-1000 ease-out"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className={`text-lg font-bold ${getHealthScoreColor(healthScore)}`}>
+                      {healthScore}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Detailed Test Results</h3>
               <div className="flex items-center gap-2">
@@ -269,34 +269,33 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {/* Detailed Results */}
             <div className="space-y-3">
               {results.slice(0, 5).map((result, index) => (
-                <div key={index} className="flex items-center justify-between p-3 glass rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium text-foreground truncate max-w-md">
-                      {result.prompt}
+                <div key={index} className="p-3 glass rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 mr-4">
+                      <div className="font-medium text-foreground mb-1">
+                        {result.prompt}
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {result.context && result.context.length > 100 
-                        ? `${result.context.substring(0, 100)}...` 
-                        : result.context || 'No context available'
-                      }
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className={`w-3 h-3 rounded-full ${
+                        result.mentioned ? 'bg-green-500' : 'bg-red-500'
+                      }`}></div>
+                      {result.mentioned && (
+                        <span className="text-sm font-medium text-foreground">
+                          #{result.position}
+                        </span>
+                      )}
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        result.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
+                        result.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {result.sentiment}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 ml-4">
-                    <div className={`w-3 h-3 rounded-full ${
-                      result.mentioned ? 'bg-green-500' : 'bg-red-500'
-                    }`}></div>
-                    {result.mentioned && (
-                      <span className="text-sm font-medium text-foreground">
-                        #{result.position}
-                      </span>
-                    )}
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      result.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
-                      result.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
-                      {result.sentiment}
-                    </span>
+                  <div className="text-sm text-muted-foreground break-words">
+                    {result.context || 'No context available'}
                   </div>
                 </div>
               ))}
@@ -328,24 +327,27 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {strategies.map((strategy, index) => (
                   <div key={index} className="glass p-4 rounded-lg">
                     <h4 className="font-semibold text-foreground mb-2">{strategy.title}</h4>
-                    <p className="text-sm text-muted-foreground mb-3">{strategy.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3 break-words">{strategy.reason || strategy.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        strategy.priority === 'high' ? 'bg-red-100 text-red-700' :
-                        strategy.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-green-100 text-green-700'
-                      }`}>
-                        {strategy.priority} priority
-                      </span>
-                      <button
-                        onClick={() => {
-                          setActiveTab('content');
-                          setContentTopic(strategy.title);
-                        }}
-                        className="text-xs glass px-3 py-1 rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
-                      >
-                        Create Content
-                      </button>
+                      <div></div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          strategy.priority === 'high' ? 'bg-red-100 text-red-700' :
+                          strategy.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {strategy.priority} priority
+                        </span>
+                        <button
+                          onClick={() => {
+                            setActiveTab('content');
+                            setContentTopic(strategy.title);
+                          }}
+                          className="text-xs glass px-3 py-1 rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
+                        >
+                          Create Content
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -361,65 +363,84 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         {activeTab === 'content' && (
           <div>
             <h3 className="text-lg font-semibold mb-4">Content Assistant</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Strategy Recommendations */}
+              <div className="glass p-4 rounded-lg h-fit">
+                <h4 className="text-sm font-semibold mb-2">Strategy Recommendations</h4>
+                {strategies.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No items yet. Add from Strategy tab.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {strategies.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          const title = item.title || String(item);
+                          setContentTopic(title);
+                          generateContent(title);
+                        }}
+                        className="text-left rounded-md border border-input bg-background px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                      >
+                        {item.title || String(item)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Content Generator */}
-              <div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-foreground mb-2">Content Topic</label>
+              <div className="glass p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Generate Content</h3>
+                
+                <div className="mb-5">
+                  <label className="block text-sm font-medium text-foreground mb-1">Content Topic</label>
                   <input
                     type="text"
                     value={contentTopic}
                     onChange={(e) => setContentTopic(e.target.value)}
                     placeholder="What should the content be about?"
-                    className="w-full p-3 glass rounded-lg border border-white/20 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="flex h-10 w-full rounded-md border border-transparent bg-white text-black px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm placeholder:text-black/60"
                   />
                 </div>
-                
+
                 <button
                   onClick={() => generateContent()}
                   disabled={!contentTopic.trim() || isGenerating}
-                  className="w-full bg-gradient-ai text-white px-4 py-3 rounded-lg font-medium disabled:opacity-50 hover:scale-[1.02] transition-all duration-300"
+                  className="inline-flex w-full items-center justify-center rounded-md gradient-accent text-primary-foreground px-4 py-2 text-sm font-medium disabled:opacity-50"
                 >
-                  {isGenerating ? 'Generating Content...' : 'Generate Content'}
+                  {isGenerating ? 'Generating…' : 'Generate Content'}
                 </button>
+              </div>
+            </div>
 
-                {company && (
-                  <div className="mt-4 glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold text-foreground mb-2">Company Profile</h4>
-                    <div className="text-sm text-muted-foreground space-y-1">
-                      <p><span className="font-medium text-foreground">Name:</span> {company.company_name}</p>
-                      <p><span className="font-medium text-foreground">Industry:</span> {company.industry}</p>
-                      <p><span className="font-medium text-foreground">Customers:</span> {company.target_customers}</p>
-                    </div>
-                  </div>
+            {/* Generated Content */}
+            <div className="glass p-6 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground">Generated Content</h3>
+                {generatedContent && (
+                  <button
+                    onClick={() => copyToClipboard(generatedContent)}
+                    className="inline-flex items-center justify-center rounded-md border border-transparent gradient-accent px-3 py-1.5 text-xs font-medium"
+                  >
+                    Copy
+                  </button>
                 )}
               </div>
 
-              {/* Generated Content */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-semibold text-foreground">Generated Content</h4>
-                  {generatedContent && (
-                    <button
-                      onClick={() => copyToClipboard(generatedContent)}
-                      className="flex items-center gap-2 text-xs glass px-3 py-1 rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
-                    >
-                      <Copy className="w-3 h-3" />
-                      Copy
-                    </button>
-                  )}
+              {generatedContent ? (
+                <textarea
+                  value={generatedContent}
+                  onChange={(e) => setGeneratedContent(e.target.value)}
+                  className="w-full min-h-[400px] rounded-md border border-transparent bg-white text-black p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              ) : (
+                <div className="min-h-[400px] flex items-center justify-center text-muted-foreground text-center">
+                  <div>
+                    <p>Generated content will appear here</p>
+                    <p className="text-sm">Enter a topic and click generate to start</p>
+                  </div>
                 </div>
-                
-                <div className="glass p-4 rounded-lg min-h-[300px]">
-                  {generatedContent ? (
-                    <pre className="text-sm text-foreground whitespace-pre-wrap">{generatedContent}</pre>
-                  ) : (
-                    <div className="text-center text-muted-foreground py-12">
-                      Enter a topic and click "Generate Content" to get started
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}
