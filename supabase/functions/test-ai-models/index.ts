@@ -24,7 +24,7 @@ async function getActualAIResponse(prompt: string): Promise<string> {
         { role: 'user', content: prompt },
       ],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 500,
     }),
   });
   
@@ -114,24 +114,48 @@ async function evaluatePrompt(input: {
   description?: string;
   differentiators?: string;
 }) {
-  // Step 1: Get the actual AI response to the prompt
-  const actualResponse = await getActualAIResponse(input.prompt);
-  
-  // Step 2: Analyze that response for company mentions
-  const analysis = await analyzeResponse({
-    prompt: input.prompt,
-    response: actualResponse,
-    companyName: input.companyName,
-    industry: input.industry,
-    description: input.description,
-    differentiators: input.differentiators
-  });
-  
-  // Return both the original response and the analysis
-  return {
-    ...analysis,
-    response: actualResponse // Include the full original AI response
-  };
+  try {
+    // Step 1: Get the actual AI response to the prompt
+    console.log('Step 1: Getting actual AI response...');
+    const actualResponse = await getActualAIResponse(input.prompt);
+    
+    if (!actualResponse || actualResponse.trim().length === 0) {
+      throw new Error('Empty response from AI');
+    }
+    
+    // Step 2: Analyze that response for company mentions
+    console.log('Step 2: Analyzing response for company mentions...');
+    const analysis = await analyzeResponse({
+      prompt: input.prompt,
+      response: actualResponse,
+      companyName: input.companyName,
+      industry: input.industry,
+      description: input.description,
+      differentiators: input.differentiators
+    });
+    
+    // Return both the original response and the analysis
+    const result = {
+      mentioned: analysis.mentioned,
+      position: analysis.position,
+      sentiment: analysis.sentiment,
+      context: analysis.context,
+      response: actualResponse
+    };
+    
+    console.log('Final result:', { 
+      mentioned: result.mentioned, 
+      position: result.position, 
+      sentiment: result.sentiment,
+      contextLength: result.context.length,
+      responseLength: result.response.length 
+    });
+    
+    return result;
+  } catch (error) {
+    console.error('Error in evaluatePrompt:', error);
+    throw error;
+  }
 }
 
 const corsHeaders = {

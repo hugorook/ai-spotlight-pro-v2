@@ -875,7 +875,6 @@ export default function CleanGeoPage() {
   const [jokeIndex, setJokeIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('health');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [mode, setMode] = useState<'automated'|'custom'>('automated');
   const [autoStrategies, setAutoStrategies] = useState<any[]>([]);
   const [strategyLoading, setStrategyLoading] = useState(false);
   const [strategyError, setStrategyError] = useState<string | null>(null);
@@ -1505,100 +1504,69 @@ export default function CleanGeoPage() {
       </div>
     )}>
 
-        {/* Top row per wireframe: left stacked toggles, middle action box, right loading */}
-        <div className="grid lg:grid-cols-12 gap-8 mb-8">
-          {/* LEFT stacked toggles (Automated / Custom) */}
-          <div className="lg:col-span-2 rounded-2xl bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between shadow-soft">
-            <button
-              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='automated'?'gradient-accent text-black':'bg-white text-black'}`}
-              onClick={()=>setMode('automated')}
-            >
-              Automated
-            </button>
-            <button
-              className={`flex-1 w-full text-lg px-4 rounded border flex items-center justify-center ${mode==='custom'?'gradient-accent text-black':'bg-white text-black'}`}
-              onClick={()=>setMode('custom')}
-            >
-              Custom
-            </button>
-          </div>
-
-          {/* MIDDLE: Action box (changes by mode) */}
-          <div className="lg:col-span-5 rounded-2xl bg-card p-8 shadow-soft">
+        {/* Side by side: Automated Health Check and Custom Prompt boxes */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          {/* LEFT: Automated Health Check */}
+          <div className="rounded-2xl bg-card p-8 shadow-soft">
             <div className="mb-6">
-              {mode==='automated' ? (
-                <>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h2 className="text-2xl font-bold text-foreground">Run Automated Health Check</h2>
-                    <HelpTooltip content="We'll test 10 AI prompts relevant to your industry to see how often your company gets mentioned and at what position." />
-                  </div>
-                  <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear inline.</p>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h2 className="text-2xl font-bold text-foreground">Custom Prompt Tester</h2>
-                    <HelpTooltip content="Test specific prompts to see if your company gets mentioned. Great for testing particular use cases or competitor comparisons." />
-                  </div>
-                  <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
-                </>
-              )}
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-2xl font-bold text-foreground">Run Automated Health Check</h2>
+                <HelpTooltip content="We'll test 10 AI prompts relevant to your industry to see how often your company gets mentioned and at what position." />
+              </div>
+              <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear below.</p>
             </div>
 
-            {mode==='automated' && (
-              <>
-                <button
-                  onClick={runHealthCheck}
-                  disabled={isRunningHealthCheck || !company}
-                  className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-4 transition-colors gradient-accent"
-                >
-                  <div className="flex items-center justify-center">Run Automated Health Check</div>
-                </button>
-                
-                {/* Morse animation below button */}
-                {isRunningHealthCheck && (
-                  <div className="mb-6">
-                    <div className="flex justify-center">
-                      <MorseLoader
-                        isActive={isRunningHealthCheck}
-                        progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-            {mode==='custom' && (
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Enter your custom prompt here..."
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  className="w-full px-4 py-3 bg-white text-black border border-transparent rounded-lg placeholder:text-black/60 focus:outline-none"
-                />
-                <button
-                  onClick={testCustomPrompt}
-                  disabled={!customPrompt || isTestingCustom}
-                  className="w-full disabled:opacity-50 font-semibold py-3 px-6 rounded-lg"
-                >
-                  Test Prompt
-                </button>
-              </div>
-            )}
-            
-            {/* Loading Animation */}
-            {/* No inline animation here; all live status is in the right Status box */}
+            <button
+              onClick={runHealthCheck}
+              disabled={isRunningHealthCheck || !company}
+              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent"
+            >
+              <div className="flex items-center justify-center">Run Automated Health Check</div>
+            </button>
           </div>
 
-          {/* RIGHT: Empty space */}
-          <div className="lg:col-span-5">
-            {/* This space is intentionally left empty */}
+          {/* RIGHT: Custom Prompt Tester */}
+          <div className="rounded-2xl bg-card p-8 shadow-soft">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-2xl font-bold text-foreground">Custom Prompt Tester</h2>
+                <HelpTooltip content="Test specific prompts to see if your company gets mentioned. Great for testing particular use cases or competitor comparisons." />
+              </div>
+              <p className="text-muted-foreground">Test any custom prompt to see if your company gets mentioned</p>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Enter your custom prompt here..."
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                className="w-full px-4 py-3 bg-white text-black border border-transparent rounded-lg placeholder:text-black/60 focus:outline-none"
+              />
+              <button
+                onClick={testCustomPrompt}
+                disabled={!customPrompt || isTestingCustom}
+                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent"
+              >
+                Test Custom Prompt
+              </button>
+            </div>
           </div>
         </div>
 
+        {/* Morse animation below buttons - separate section so it doesn't stretch boxes */}
+        {(isRunningHealthCheck || isTestingCustom) && (
+          <div className="mb-8 flex justify-center">
+            <MorseLoader
+              isActive={isRunningHealthCheck || isTestingCustom}
+              progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+            />
+          </div>
+        )}
+
+
         {/* New Animated Results Section */}
-        {mode === 'automated' && showResultsSection && lastResults.length > 0 && (
+        {showResultsSection && lastResults.length > 0 && (
           <div className="mt-8">
             <ResultsSection
               isVisible={showResultsSection}
