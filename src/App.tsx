@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
 import CleanDashboard from "./pages/CleanDashboard";
 import CleanGeoPage from "./pages/CleanGeoPage";
+import PromptsPage from "./pages/PromptsPage";
 import CompanyProfilePage from "./pages/CompanyProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import PublicSnapshot from "./pages/PublicSnapshot";
@@ -36,6 +37,13 @@ const App = () => (
               <ProtectedRoute>
                 <ErrorBoundary>
                   <CleanGeoPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/prompts" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <PromptsPage />
                 </ErrorBoundary>
               </ProtectedRoute>
             } />

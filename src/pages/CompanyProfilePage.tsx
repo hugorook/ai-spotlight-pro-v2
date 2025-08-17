@@ -142,7 +142,10 @@ const CompanyProfilePage = () => {
       });
       
       // Reload the data
-      loadCompanyData();
+      await loadCompanyData();
+      
+      // Generate new prompts based on updated company info
+      await generatePromptsForCompany();
     } catch (error) {
       console.error('Error:', error);
       toast({ 
@@ -152,6 +155,53 @@ const CompanyProfilePage = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const generatePromptsForCompany = async () => {
+    if (!company) return;
+    
+    try {
+      console.log('Generating prompts for updated company profile...');
+      
+      const { data, error } = await supabase.functions.invoke('generate-prompts', {
+        body: {
+          companyName: company.company_name,
+          industry: company.industry,
+          description: company.description,
+          targetCustomers: company.target_customers,
+          keyDifferentiators: company.key_differentiators,
+          websiteUrl: company.website_url
+        }
+      });
+
+      if (error) {
+        console.error('Error generating prompts:', error);
+        toast({ 
+          title: 'Prompt Generation Warning', 
+          description: 'Company saved but failed to generate new test prompts. You can generate them manually from the Prompts page.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const generatedPrompts = (data?.prompts || []).map((p: any) => ({ ...p, isEditing: false }));
+      
+      // Save to localStorage
+      localStorage.setItem(`prompts_${company.id}`, JSON.stringify(generatedPrompts));
+      
+      console.log(`Generated ${generatedPrompts.length} new prompts`);
+      toast({ 
+        title: 'Prompts Updated', 
+        description: `Generated ${generatedPrompts.length} new test prompts based on your updated company profile.`
+      });
+    } catch (error) {
+      console.error('Error generating prompts:', error);
+      toast({ 
+        title: 'Prompt Generation Warning', 
+        description: 'Company saved but failed to generate new test prompts. You can generate them manually from the Prompts page.',
+        variant: 'destructive'
+      });
     }
   };
 

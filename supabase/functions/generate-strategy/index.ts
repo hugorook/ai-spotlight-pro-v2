@@ -42,15 +42,17 @@ serve(async (req: Request) => {
 
     const sys = [
       'You are a B2B go-to-market strategist specialized in AI visibility and demand generation.',
-      'Analyze recent AI test results and website analysis to create comprehensive optimization recommendations.',
+      'Create SPECIFIC, ACTIONABLE recommendations with exact copy changes, page updates, and content to create.',
       'Return STRICT JSON with key "recommendations" as an array of items: { id, title, reason, priority }.',
       'Guidelines:',
-      '- Prioritize actions that improve mention rate and position: content gaps, SEO optimization, AI-friendly content structure.',
-      '- Use evidence from both AI test results AND website analysis to justify recommendations.',
-      '- Address specific content gaps and optimization opportunities found in the website analysis.',
-      '- Keep titles concise (<=80 chars) and reasons short (<=160 chars).',
+      '- Be EXTREMELY specific: "Add FAQ section with question: How does [Company] compare to [Competitor]?"',
+      '- Give exact copy suggestions: "Change homepage headline from X to Y"',
+      '- Specify exact content: "Write blog post: 5 Ways [Industry] Companies Reduce [Specific Problem]"',
+      '- Reference specific missed opportunities from the AI test results',
+      '- Include specific keywords and phrases to add to pages',
+      '- Be actionable: "Update About page to include these 3 sentences: [exact text]"',
       '- priorities are one of: "high" | "medium" | "low".',
-      '- 4-8 recommendations max. No prose outside of JSON.',
+      '- 5-8 recommendations max. Be surgical, not generic.',
     ].join(' ');
 
     const websiteContext = websiteAnalysis ? [
@@ -70,7 +72,18 @@ serve(async (req: Request) => {
       'Recent AI Test Results (JSON):',
       JSON.stringify(trimmed, null, 2),
       '',
-      'Create comprehensive, actionable recommendations that combine insights from both website analysis and AI test performance.',
+      'IMPORTANT: Analyze the test results and identify:',
+      '1. Which specific searches the company was NOT mentioned in',
+      '2. What competitors might have been mentioned instead',
+      '3. What exact content/keywords are missing from their website',
+      '',
+      'Then provide SPECIFIC actions like:',
+      '- "Add this exact FAQ: Q: Best software for X? A: [Company] offers Y feature that Z"',
+      '- "Write case study: How [Company] helped [Industry] company reduce [specific problem] by X%"',
+      '- "Update homepage to include this phrase: [exact keywords from missed searches]"',
+      '- "Create comparison page: [Company] vs [specific competitor mentioned in results]"',
+      '',
+      'Be surgical and specific, not generic. Reference the actual failed searches.',
     ].join('\n');
 
     const res = await fetch('https://api.openai.com/v1/chat/completions', {

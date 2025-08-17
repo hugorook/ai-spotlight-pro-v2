@@ -1124,22 +1124,45 @@ export default function CleanGeoPage() {
         description: company.description
       });
 
-      // Generate 10 focused prompts from company context
-      const prompts = [
-        `Best ${company.industry} providers for ${company.target_customers || 'SMBs'}`,
-        `Top ${company.industry} companies`,
-        `${company.industry} comparison guide`,
-        `How to choose a ${company.industry} partner`,
-        `${company.industry} implementation checklist`,
-        `Most recommended ${company.industry} vendors`,
-        `Case studies in ${company.industry}`,
-        `ROI of ${company.industry} solutions`,
-        `${company.industry} trends and leaders`,
-        `${company.industry} alternatives to market leaders`
-      ];
+      // Load saved prompts or use fallback
+      const savedPrompts = localStorage.getItem(`prompts_${company.id}`);
+      let prompts: string[] = [];
+      
+      if (savedPrompts) {
+        try {
+          const parsedPrompts = JSON.parse(savedPrompts);
+          prompts = parsedPrompts.map((p: any) => p.text).filter((text: string) => text && text.trim());
+          console.log(`Using ${prompts.length} saved prompts for health check`);
+        } catch (e) {
+          console.error('Error parsing saved prompts:', e);
+        }
+      }
+      
+      // Fallback to basic prompts if no saved prompts found
+      if (prompts.length === 0) {
+        prompts = [
+          `Best ${company.industry} providers for ${company.target_customers || 'SMBs'}`,
+          `Top ${company.industry} companies`,
+          `${company.industry} comparison guide`,
+          `How to choose a ${company.industry} partner`,
+          `${company.industry} implementation checklist`,
+          `Most recommended ${company.industry} vendors`,
+          `Case studies in ${company.industry}`,
+          `ROI of ${company.industry} solutions`,
+          `${company.industry} trends and leaders`,
+          `${company.industry} alternatives to market leaders`
+        ];
+        console.log('No saved prompts found, using fallback prompts. Visit the Prompts page to generate better ones.');
+        toast({ 
+          title: 'Using Basic Prompts', 
+          description: 'Visit the Prompts page to generate more realistic test queries for better results.',
+          variant: 'default'
+        });
+      }
+      
       setTestProgress({ current: 0, total: prompts.length });
 
-      console.log('Generated prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
+      console.log('Using prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
 
       const results: TestResult[] = [];
       const errors: string[] = [];
