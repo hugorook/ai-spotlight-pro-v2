@@ -271,8 +271,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   (fullResponse.length > 150 ? fullResponse.slice(0, 150) + '...' : fullResponse) ||
                   'No context available';
                 
-                // Only show plus button if full response is longer than summary
-                const hasExpandableContent = fullResponse.length > 200 && fullResponse !== displayContext;
+                // Show plus button if we have any content at all (for testing purposes)
+                const hasExpandableContent = fullResponse.length > 0;
                 
                 return (
                   <div key={index} className="p-3 glass rounded-lg">
@@ -301,7 +301,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         {hasExpandableContent && (
                           <button
                             onClick={() => toggleResultExpansion(index)}
-                            className="p-1 rounded-full hover:bg-white/20 transition-colors"
+                            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors"
                             title={isExpanded ? 'Hide full AI response' : 'View full AI response'}
                           >
                             {isExpanded ? (
