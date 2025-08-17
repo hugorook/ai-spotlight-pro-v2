@@ -14,6 +14,7 @@ import { scheduleJob, logEvent } from '@/integrations/supabase/functions';
 import { downloadCsv } from '@/lib/export';
 import { printReport } from '@/lib/pdf';
 import AnimatedPath from '@/components/ui/animated-path';
+import ButtonToTabPath from '@/components/ui/button-to-tab-path';
 import ResultsSection from '@/components/ui/results-section';
 
 type Company = Tables<'companies'>;
@@ -1497,7 +1498,18 @@ export default function CleanGeoPage() {
     )}>
 
         {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
-        <div className="grid lg:grid-cols-12 gap-8 mb-8">
+        <div className="grid lg:grid-cols-12 gap-8 mb-8 relative">
+          {/* Animated Path from button to results tab */}
+          {mode === 'automated' && isRunningHealthCheck && (
+            <ButtonToTabPath
+              isActive={isRunningHealthCheck}
+              progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+              onComplete={() => {
+                // Animation completion handled in runHealthCheck function
+              }}
+            />
+          )}
+          
           {/* LEFT stacked toggles (Automated / Custom) */}
           <div className="lg:col-span-2 rounded-2xl bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between shadow-soft">
             <button
@@ -1537,13 +1549,29 @@ export default function CleanGeoPage() {
             </div>
 
             {mode==='automated' && (
-              <button
-                onClick={runHealthCheck}
-                disabled={isRunningHealthCheck || !company}
-                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-6 transition-colors gradient-accent"
-              >
-                <div className="flex items-center justify-center">Run Automated Health Check</div>
-              </button>
+              <>
+                <button
+                  onClick={runHealthCheck}
+                  disabled={isRunningHealthCheck || !company}
+                  className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg mb-4 transition-colors gradient-accent"
+                >
+                  <div className="flex items-center justify-center">Run Automated Health Check</div>
+                </button>
+                
+                {/* Loading messages below button */}
+                {isRunningHealthCheck && (
+                  <div className="mb-6">
+                    <div className="text-sm text-muted-foreground text-center animate-pulse">
+                      {professionalMessages[jokeIndex]}
+                    </div>
+                    {currentTestPrompt && (
+                      <div className="text-xs text-muted-foreground text-center mt-2">
+                        {currentTestPrompt}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
             {mode==='custom' && (
               <div className="space-y-4">
@@ -1568,43 +1596,9 @@ export default function CleanGeoPage() {
             {/* No inline animation here; all live status is in the right Status box */}
           </div>
 
-          {/* RIGHT: Status box (always status; shows progress for both modes) */}
-          <div className="lg:col-span-5 rounded-2xl bg-card p-8 shadow-soft">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Status</h2>
-              <p className="text-muted-foreground">Live progress and status updates during testing.</p>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              {mode==='automated' ? 'Start an automated run using the button at left. Live progress will appear here.' : 'Run a test in the Custom Prompt Tester. Live progress will appear here.'}
-            </div>
-            
-            {/* Animated Path for Health Check */}
-            {mode === 'automated' && isRunningHealthCheck && (
-              <AnimatedPath
-                isActive={isRunningHealthCheck}
-                progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
-                onComplete={() => {
-                  // Animation completion handled in runHealthCheck function
-                }}
-                currentStep={professionalMessages[jokeIndex]}
-              />
-            )}
-            
-            {/* Custom prompt testing UI (non-animated) */}
-            {mode === 'custom' && isTestingCustom && (
-              <div className="mt-4 space-y-3">
-                <div className="bg-white rounded-lg p-3 shadow-soft">
-                  <p className="text-primary font-medium text-sm animate-pulse text-center">{professionalMessages[jokeIndex]}</p>
-                </div>
-                <div className="bg-white text-black border border-transparent rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Testing Prompt:</p>
-                  <p className="text-sm font-medium">"{customPrompt}"</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Export/Print moved to Results header once results exist */}
+          {/* RIGHT: Empty space or could be used for other content */}
+          <div className="lg:col-span-5">
+            {/* This space is intentionally left empty */}
           </div>
         </div>
 

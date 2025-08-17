@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -38,6 +38,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onCopyResults
 }) => {
   const [activeTab, setActiveTab] = useState('results');
+  
+  // Persist active tab in localStorage
+  useEffect(() => {
+    const savedTab = localStorage.getItem('activeResultsTab');
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy')) {
+      setActiveTab(savedTab);
+    }
+  }, []);
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    localStorage.setItem('activeResultsTab', tabId);
+  };
   const [contentTopic, setContentTopic] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -109,7 +122,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 ${
                 activeTab === tab.id
                   ? 'bg-gradient-ai text-white shadow-lg'
