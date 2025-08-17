@@ -16,16 +16,16 @@ const Sidebar = () => {
 
   const navItems: NavItem[] = [
     { 
-      path: "/dashboard", 
-      label: "Dashboard", 
-      subtitle: "Overview & metrics",
-      icon: <BarChart3 className="w-5 h-5" />
-    },
-    { 
       path: "/geo", 
       label: "AI Health Check", 
       subtitle: "Test your visibility",
       icon: <Activity className="w-5 h-5" />
+    },
+    { 
+      path: "/dashboard", 
+      label: "Results Dashboard", 
+      subtitle: "Overview & metrics",
+      icon: <BarChart3 className="w-5 h-5" />
     },
     { 
       path: "/content", 

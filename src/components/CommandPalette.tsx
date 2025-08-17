@@ -28,15 +28,15 @@ export default function CommandPalette() {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
-          <CommandItem onSelect={() => run(() => navigate('/dashboard'))}>Go to Dashboard</CommandItem>
-          <CommandItem onSelect={() => run(() => navigate('/geo'))}>Go to My GEO</CommandItem>
-          <CommandItem onSelect={() => run(() => navigate('/competitors'))}>Go to Competitors</CommandItem>
-          <CommandItem onSelect={() => run(() => navigate('/content'))}>Go to Content Assistant</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/geo'))}>Go to AI Health Check</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/dashboard'))}>Go to Results Dashboard</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/content'))}>Go to Company Profile</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/settings'))}>Go to Settings</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Actions">
-          <CommandItem onSelect={() => run(() => navigate('/geo?run=health'))}>Run Health Check</CommandItem>
-          <CommandItem onSelect={() => run(() => navigate('/competitors?add=1'))}>Add Competitor</CommandItem>
-          <CommandItem onSelect={() => run(() => navigate('/content?new=brief'))}>Generate Content Brief</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/geo'))}>Run Health Check</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/content'))}>Edit Company Profile</CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/dashboard'))}>View Results</CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>

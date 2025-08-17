@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -39,6 +39,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('results');
   const [showAllResults, setShowAllResults] = useState(false);
+  const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
   
   // Persist active tab in localStorage
   useEffect(() => {
@@ -47,6 +48,22 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       setActiveTab(savedTab);
     }
   }, []);
+
+  // Reset show all results when results change
+  useEffect(() => {
+    setShowAllResults(false);
+    setExpandedResults(new Set());
+  }, [results.length]);
+
+  const toggleResultExpansion = (index: number) => {
+    const newExpanded = new Set(expandedResults);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedResults(newExpanded);
+  };
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -241,37 +258,56 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
             {/* Detailed Results */}
             <div className="space-y-3">
-              {results.slice(0, showAllResults ? results.length : 5).map((result, index) => (
-                <div key={index} className="p-3 glass rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 mr-4">
-                      <div className="font-medium text-foreground mb-1">
-                        {result.prompt}
+              {results.slice(0, showAllResults ? results.length : 5).map((result, index) => {
+                const isExpanded = expandedResults.has(index);
+                const hasContext = result.context && result.context.length > 0;
+                const truncatedContext = hasContext ? result.context.slice(0, 150) + (result.context.length > 150 ? '...' : '') : 'No context available';
+                
+                return (
+                  <div key={index} className="p-3 glass rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 mr-4">
+                        <div className="font-medium text-foreground mb-1">
+                          {result.prompt}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className={`w-3 h-3 rounded-full ${
+                          result.mentioned ? 'bg-green-500' : 'bg-red-500'
+                        }`}></div>
+                        {result.mentioned && (
+                          <span className="text-sm font-medium text-foreground">
+                            #{result.position}
+                          </span>
+                        )}
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          result.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
+                          result.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {result.sentiment}
+                        </span>
+                        {hasContext && (
+                          <button
+                            onClick={() => toggleResultExpansion(index)}
+                            className="p-1 rounded-full hover:bg-white/20 transition-colors"
+                            title={isExpanded ? 'Collapse AI response' : 'View full AI response'}
+                          >
+                            {isExpanded ? (
+                              <Minus className="w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <Plus className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <div className={`w-3 h-3 rounded-full ${
-                        result.mentioned ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                      {result.mentioned && (
-                        <span className="text-sm font-medium text-foreground">
-                          #{result.position}
-                        </span>
-                      )}
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        result.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
-                        result.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {result.sentiment}
-                      </span>
+                    <div className="text-sm text-muted-foreground break-words">
+                      {isExpanded ? result.context : truncatedContext}
                     </div>
                   </div>
-                  <div className="text-sm text-muted-foreground break-words">
-                    {result.context || 'No context available'}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             {results.length > 5 && (
