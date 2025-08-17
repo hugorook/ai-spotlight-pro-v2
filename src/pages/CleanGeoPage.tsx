@@ -1619,6 +1619,13 @@ export default function CleanGeoPage() {
                 setShowResultsSection(false);
                 runHealthCheck();
               }}
+              strategies={autoStrategies}
+              strategyLoading={strategyLoading}
+              strategyError={strategyError}
+              company={company}
+              onExportCsv={() => downloadCsv('geo-health-check.csv', lastResults as any)}
+              onPrintReport={() => printReport('geo-report')}
+              onCopyResults={copyGeoResultsToClipboard}
             />
           </div>
         )}
