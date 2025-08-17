@@ -262,6 +262,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               {results.slice(0, showAllResults ? results.length : 5).map((result, index) => {
                 const isExpanded = expandedResults.has(index);
                 const hasResponse = result.response && result.response.length > 0;
+                const hasContent = hasResponse || (result.context && result.context.length > 0);
                 const displayContext = result.context || 'No context available';
                 
                 return (
@@ -288,7 +289,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         }`}>
                           {result.sentiment}
                         </span>
-                        {hasResponse && (
+                        {hasContent && (
                           <button
                             onClick={() => toggleResultExpansion(index)}
                             className="p-1 rounded-full hover:bg-white/20 transition-colors"
@@ -310,10 +311,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                     
                     {/* Show full AI response when expanded */}
-                    {isExpanded && hasResponse && (
+                    {isExpanded && hasContent && (
                       <div className="text-sm text-foreground break-words bg-white/10 p-3 rounded border-l-4 border-purple-400">
-                        <strong className="text-purple-400">Full AI Response:</strong>
-                        <div className="mt-2 whitespace-pre-wrap">{result.response}</div>
+                        <strong className="text-purple-400">
+                          {hasResponse ? 'Full AI Response:' : 'Full Context:'}
+                        </strong>
+                        <div className="mt-2 whitespace-pre-wrap">
+                          {hasResponse ? result.response : result.context}
+                        </div>
                       </div>
                     )}
                   </div>
