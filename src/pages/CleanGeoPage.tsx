@@ -14,7 +14,7 @@ import { scheduleJob, logEvent } from '@/integrations/supabase/functions';
 import { downloadCsv } from '@/lib/export';
 import { printReport } from '@/lib/pdf';
 import AnimatedPath from '@/components/ui/animated-path';
-import ButtonToTabPath from '@/components/ui/button-to-tab-path';
+import MorseLoader from '@/components/ui/morse-loader';
 import ResultsSection from '@/components/ui/results-section';
 
 type Company = Tables<'companies'>;
@@ -1497,19 +1497,8 @@ export default function CleanGeoPage() {
       </div>
     )}>
 
-        {/* Top row per wireframe: left stacked toggles, middle action box, right status */}
-        <div className="grid lg:grid-cols-12 gap-8 mb-8 relative">
-          {/* Animated Path from button to results tab */}
-          {mode === 'automated' && isRunningHealthCheck && (
-            <ButtonToTabPath
-              isActive={isRunningHealthCheck}
-              progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
-              onComplete={() => {
-                // Animation completion handled in runHealthCheck function
-              }}
-            />
-          )}
-          
+        {/* Top row per wireframe: left stacked toggles, middle action box, right loading */}
+        <div className="grid lg:grid-cols-12 gap-8 mb-8">
           {/* LEFT stacked toggles (Automated / Custom) */}
           <div className="lg:col-span-2 rounded-2xl bg-card p-4 flex flex-col gap-4 h-full min-h-[320px] justify-between shadow-soft">
             <button
@@ -1596,9 +1585,19 @@ export default function CleanGeoPage() {
             {/* No inline animation here; all live status is in the right Status box */}
           </div>
 
-          {/* RIGHT: Empty space or could be used for other content */}
-          <div className="lg:col-span-5">
-            {/* This space is intentionally left empty */}
+          {/* RIGHT: Loading animation */}
+          <div className="lg:col-span-5 flex items-center justify-center">
+            {mode === 'automated' && isRunningHealthCheck && (
+              <MorseLoader
+                isActive={isRunningHealthCheck}
+                progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+              />
+            )}
+            {mode === 'custom' && isTestingCustom && (
+              <div className="text-center">
+                <div className="animate-pulse text-muted-foreground">{professionalMessages[jokeIndex]}</div>
+              </div>
+            )}
           </div>
         </div>
 
