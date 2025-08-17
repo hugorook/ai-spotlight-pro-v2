@@ -16,23 +16,18 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
       style.textContent = `
         .morse-loader-container {
           text-align: center;
-          background: var(--gradient-subtle-purple);
-          backdrop-filter: blur(10px);
-          padding: 40px;
-          border-radius: 20px;
-          border: 1px solid rgba(196, 181, 253, 0.2);
-          box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
           font-family: var(--font-sans), serif;
+          padding: 20px;
         }
 
         .morse-display {
-          font-size: 3rem;
-          margin-bottom: 10px;
-          min-height: 60px;
+          font-size: 1.5rem;
+          margin-bottom: 8px;
+          min-height: 30px;
           display: flex;
           align-items: center;
           justify-content: center;
-          letter-spacing: 8px;
+          letter-spacing: 4px;
         }
 
         .morse-char {
@@ -43,24 +38,24 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         }
 
         .dot {
-          width: 20px;
-          height: 20px;
+          width: 12px;
+          height: 12px;
           background: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
           border-radius: 50%;
-          margin: 0 4px;
+          margin: 0 2px;
         }
 
         .dash {
-          width: 50px;
-          height: 20px;
+          width: 30px;
+          height: 12px;
           background: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
-          border-radius: 10px;
-          margin: 0 4px;
+          border-radius: 6px;
+          margin: 0 2px;
         }
 
         .space {
-          width: 40px;
-          height: 20px;
+          width: 20px;
+          height: 12px;
         }
 
         @keyframes morseAppear {
@@ -79,21 +74,21 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         }
 
         .letter-display {
-          font-size: 2rem;
-          margin-top: 10px;
-          min-height: 50px;
+          font-size: 1.2rem;
+          margin-top: 8px;
+          min-height: 30px;
           display: flex;
-          justify-content: flex-start;
+          justify-content: center;
           align-items: flex-start;
-          letter-spacing: 8px;
-          padding-left: 20px;
+          letter-spacing: 4px;
+          padding: 0;
         }
 
         .letter-container {
           display: inline-flex;
           flex-direction: column;
           align-items: center;
-          margin: 0 15px;
+          margin: 0 8px;
           opacity: 0;
           transform: translateX(-20px);
           animation: containerSlideIn 0.3s ease-out forwards;
@@ -113,8 +108,8 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         .morse-section {
           display: flex;
           align-items: center;
-          min-height: 60px;
-          margin-bottom: 5px;
+          min-height: 30px;
+          margin-bottom: 3px;
         }
 
         .letter {
@@ -124,7 +119,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
           background-clip: text;
           color: transparent;
           font-weight: bold;
-          font-size: 2rem;
+          font-size: 1.2rem;
           opacity: 0;
           transform: translateY(20px);
           animation: letterAppear 0.5s ease-out forwards;

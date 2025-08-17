@@ -1547,9 +1547,15 @@ export default function CleanGeoPage() {
                   <div className="flex items-center justify-center">Run Automated Health Check</div>
                 </button>
                 
-                {/* Loading messages below button */}
+                {/* Loading messages and morse animation below button */}
                 {isRunningHealthCheck && (
                   <div className="mb-6">
+                    <div className="flex justify-center mb-4">
+                      <MorseLoader
+                        isActive={isRunningHealthCheck}
+                        progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+                      />
+                    </div>
                     <div className="text-sm text-muted-foreground text-center animate-pulse">
                       {professionalMessages[jokeIndex]}
                     </div>
@@ -1585,19 +1591,9 @@ export default function CleanGeoPage() {
             {/* No inline animation here; all live status is in the right Status box */}
           </div>
 
-          {/* RIGHT: Loading animation */}
-          <div className="lg:col-span-5 flex items-center justify-center">
-            {mode === 'automated' && isRunningHealthCheck && (
-              <MorseLoader
-                isActive={isRunningHealthCheck}
-                progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
-              />
-            )}
-            {mode === 'custom' && isTestingCustom && (
-              <div className="text-center">
-                <div className="animate-pulse text-muted-foreground">{professionalMessages[jokeIndex]}</div>
-              </div>
-            )}
+          {/* RIGHT: Empty space */}
+          <div className="lg:col-span-5">
+            {/* This space is intentionally left empty */}
           </div>
         </div>
 
