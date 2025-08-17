@@ -156,17 +156,18 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
 
   if (!isActive) return null;
 
-  // Morse code mapping
+  // Complete morse code mapping
   const morseCode: { [key: string]: string } = {
-    'S': '...', // dot dot dot
-    'E': '.',   // dot
-    'A': '.-',  // dot dash
-    'R': '.-.', // dot dash dot
-    'C': '-.-.', // dash dot dash dot
-    'H': '....' // dot dot dot dot
+    'A': '.-',    'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+    'G': '--.',   'H': '....', 'I': '..',   'J': '.---', 'K': '-.-', 'L': '.-..',
+    'M': '--',    'N': '-.',   'O': '---',  'P': '.--.', 'Q': '--.-', 'R': '.-.',
+    'S': '...',   'T': '-',    'U': '..-',  'V': '...-', 'W': '.--', 'X': '-..-',
+    'Y': '-.--',  'Z': '--..'
   };
 
-  const word = 'SEARCH';
+  const message = 'YOUR AUDIENCE IS SEARCHING - CAN THEY FIND YOU?';
+  // Remove punctuation and convert to morse-friendly format
+  const cleanMessage = message.replace(/[^A-Z\s]/g, '').replace(/\s+/g, ' ');
 
   function createMorseElement(symbol: string) {
     const element = document.createElement('div');
@@ -193,93 +194,105 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
     morseDisplay.innerHTML = '';
     letterDisplay.innerHTML = '';
     
-    // Create containers for each letter - they start hidden
-    for (let i = 0; i < word.length; i++) {
-      const letterContainer = document.createElement('div');
-      letterContainer.className = 'letter-container';
-      letterContainer.id = `container-${i}`;
-      letterContainer.style.opacity = '0';
-      letterContainer.style.transform = 'translateX(-20px)';
-      
-      const morseSection = document.createElement('div');
-      morseSection.className = 'morse-section';
-      morseSection.id = `morse-${i}`;
-      
-      const letterElement = document.createElement('div');
-      letterElement.className = 'letter';
-      letterElement.textContent = word[i];
-      letterElement.id = `letter-${i}`;
-      letterElement.style.opacity = '0';
-      letterElement.style.visibility = 'hidden';
-      
-      letterContainer.appendChild(morseSection);
-      letterContainer.appendChild(letterElement);
-      letterDisplay.appendChild(letterContainer);
-    }
+    // Split message into characters (including spaces)
+    const characters = cleanMessage.split('');
+    let currentIndex = 0;
     
-    function animateLetterMorse(letterIndex: number): void {
-      if (letterIndex >= word.length) {
-        // All morse code complete, now show all letters
+    // Create morse display area
+    const morseArea = document.createElement('div');
+    morseArea.style.display = 'flex';
+    morseArea.style.flexWrap = 'wrap';
+    morseArea.style.justifyContent = 'center';
+    morseArea.style.alignItems = 'center';
+    morseArea.style.gap = '8px';
+    morseDisplay.appendChild(morseArea);
+    
+    // Create text display area
+    const textArea = document.createElement('div');
+    textArea.style.fontSize = '1.5rem';
+    textArea.style.fontWeight = 'bold';
+    textArea.style.background = 'linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%)';
+    textArea.style.webkitBackgroundClip = 'text';
+    textArea.style.webkitTextFillColor = 'transparent';
+    textArea.style.backgroundClip = 'text';
+    textArea.style.textAlign = 'center';
+    textArea.style.marginTop = '16px';
+    textArea.style.minHeight = '2rem';
+    letterDisplay.appendChild(textArea);
+    
+    function animateNextCharacter(): void {
+      if (currentIndex >= characters.length) {
+        // Animation complete - show full message
         setTimeout(() => {
-          for (let i = 0; i < word.length; i++) {
-            const letterElement = document.getElementById(`letter-${i}`);
-            if (letterElement) {
-              setTimeout(() => {
-                letterElement.style.visibility = 'visible';
-                letterElement.style.animation = 'letterAppear 0.5s ease-out forwards';
-              }, i * 150); // Stagger the letter appearances
-            }
-          }
-        }, 300);
+          textArea.innerHTML = message;
+          textArea.style.animation = 'letterAppear 1s ease-out forwards';
+        }, 500);
         return;
       }
       
-      // Show the container for this letter first
-      const container = document.getElementById(`container-${letterIndex}`);
-      if (container) {
-        container.style.animation = 'containerSlideIn 0.3s ease-out forwards';
+      const char = characters[currentIndex];
+      
+      if (char === ' ') {
+        // Add word space
+        const wordSpace = document.createElement('div');
+        wordSpace.style.width = '30px';
+        wordSpace.style.height = '20px';
+        morseArea.appendChild(wordSpace);
+        
+        // Show partial text
+        const partialText = characters.slice(0, currentIndex + 1).join('');
+        textArea.textContent = partialText;
+        
+        currentIndex++;
+        setTimeout(animateNextCharacter, 600);
+        return;
       }
       
-      const letter = word[letterIndex];
-      const morse = morseCode[letter];
-      const morseSection = document.getElementById(`morse-${letterIndex}`);
-      let morseIndex = 0;
+      const morse = morseCode[char];
+      if (!morse) {
+        currentIndex++;
+        setTimeout(animateNextCharacter, 100);
+        return;
+      }
       
-      function animateNextMorseSymbol(): void {
-        if (morseIndex >= morse.length) {
-          // Letter morse complete, move to next letter after a pause
-          setTimeout(() => {
-            animateLetterMorse(letterIndex + 1);
-          }, 400);
+      // Create letter group
+      const letterGroup = document.createElement('div');
+      letterGroup.style.display = 'flex';
+      letterGroup.style.alignItems = 'center';
+      letterGroup.style.gap = '3px';
+      letterGroup.style.padding = '4px 8px';
+      letterGroup.style.border = '1px solid rgba(196, 181, 253, 0.3)';
+      letterGroup.style.borderRadius = '6px';
+      letterGroup.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+      
+      morseArea.appendChild(letterGroup);
+      
+      // Animate morse symbols for this letter
+      let symbolIndex = 0;
+      function animateNextSymbol(): void {
+        if (symbolIndex >= morse.length) {
+          // Letter complete, show it in text
+          const partialText = characters.slice(0, currentIndex + 1).join('');
+          textArea.textContent = partialText;
+          
+          currentIndex++;
+          setTimeout(animateNextCharacter, 400);
           return;
         }
         
-        const symbol = morse[morseIndex];
+        const symbol = morse[symbolIndex];
         const element = createMorseElement(symbol);
-        if (morseSection) {
-          morseSection.appendChild(element);
-        }
+        letterGroup.appendChild(element);
         
-        // Trigger animation
-        setTimeout(() => {
-          element.style.animationDelay = '0s';
-        }, 10);
-        
-        morseIndex++;
-        
-        // Different timing for dots and dashes
-        let delay = symbol === '-' ? 350 : 250;
-        
-        animationRef.current = setTimeout(animateNextMorseSymbol, delay);
+        symbolIndex++;
+        const delay = symbol === '-' ? 300 : 200;
+        setTimeout(animateNextSymbol, delay);
       }
       
-      // Small delay before starting morse for this letter
-      setTimeout(animateNextMorseSymbol, 200);
+      setTimeout(animateNextSymbol, 100);
     }
     
-    setTimeout(() => {
-      animateLetterMorse(0);
-    }, 500);
+    setTimeout(animateNextCharacter, 300);
   }
 
   return (
