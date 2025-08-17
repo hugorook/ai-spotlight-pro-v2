@@ -1552,23 +1552,15 @@ export default function CleanGeoPage() {
                   <div className="flex items-center justify-center">Run Automated Health Check</div>
                 </button>
                 
-                {/* Loading messages and morse animation below button */}
+                {/* Morse animation below button */}
                 {isRunningHealthCheck && (
                   <div className="mb-6">
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center">
                       <MorseLoader
                         isActive={isRunningHealthCheck}
                         progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
                       />
                     </div>
-                    <div className="text-sm text-muted-foreground text-center animate-pulse">
-                      {professionalMessages[jokeIndex]}
-                    </div>
-                    {currentTestPrompt && (
-                      <div className="text-xs text-muted-foreground text-center mt-2">
-                        {currentTestPrompt}
-                      </div>
-                    )}
                   </div>
                 )}
               </>

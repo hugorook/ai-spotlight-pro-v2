@@ -299,7 +299,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <div className="text-red-600 text-xs">Error: {strategyError}</div>
                   </div>
                 ) : strategies.length > 0 ? (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 h-full">
                     {strategies.map((item, idx) => (
                       <button
                         key={idx}
@@ -308,17 +308,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           setContentTopic(title);
                           generateContent(title);
                         }}
-                        className="text-left rounded-md border border-input bg-background px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                        className="text-left rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground"
                       >
-                        <div className="font-medium">{item.title || String(item)}</div>
+                        <div className="font-semibold text-sm leading-tight break-words">{item.title || String(item)}</div>
                         {item.reason && (
-                          <div className="text-xs text-muted-foreground mt-1">{item.reason}</div>
+                          <div className="text-xs text-muted-foreground mt-1 leading-relaxed break-words">{item.reason}</div>
                         )}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground">No items yet. Run a health check to generate recommendations.</p>
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-sm text-muted-foreground text-center">No items yet. Run a health check to generate recommendations.</p>
+                  </div>
                 )}
               </div>
 

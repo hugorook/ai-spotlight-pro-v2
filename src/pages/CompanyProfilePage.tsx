@@ -86,26 +86,54 @@ const CompanyProfilePage = () => {
 
     setSaving(true);
     try {
-      const { data, error } = await supabase.functions.invoke('save-company', {
-        body: {
-          company_name: formData.companyName,
-          website_url: formData.website,
-          description: formData.description,
-          industry: formData.industry,
-          target_customers: formData.targetCustomers,
-          key_differentiators: formData.differentiators,
-          geographic_focus: [formData.geography]
-        }
-      });
+      // Use direct database update if company exists, otherwise create new
+      if (company) {
+        const { error } = await supabase
+          .from('companies')
+          .update({
+            company_name: formData.companyName,
+            website_url: formData.website,
+            description: formData.description,
+            industry: formData.industry,
+            target_customers: formData.targetCustomers,
+            key_differentiators: formData.differentiators,
+            geographic_focus: formData.geography ? [formData.geography] : null
+          })
+          .eq('id', company.id);
 
-      if (error) {
-        console.error('Error updating company:', error);
-        toast({ 
-          title: 'Save Failed', 
-          description: 'Failed to update company data. Please try again.', 
-          variant: 'destructive' 
-        });
-        return;
+        if (error) {
+          console.error('Error updating company:', error);
+          toast({ 
+            title: 'Save Failed', 
+            description: `Failed to update company: ${error.message}`, 
+            variant: 'destructive' 
+          });
+          return;
+        }
+      } else {
+        // Create new company
+        const { error } = await supabase
+          .from('companies')
+          .insert({
+            user_id: user?.id,
+            company_name: formData.companyName,
+            website_url: formData.website,
+            description: formData.description,
+            industry: formData.industry,
+            target_customers: formData.targetCustomers,
+            key_differentiators: formData.differentiators,
+            geographic_focus: formData.geography ? [formData.geography] : null
+          });
+
+        if (error) {
+          console.error('Error creating company:', error);
+          toast({ 
+            title: 'Save Failed', 
+            description: `Failed to create company: ${error.message}`, 
+            variant: 'destructive' 
+          });
+          return;
+        }
       }
 
       toast({ 
