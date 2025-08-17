@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -23,6 +23,7 @@ interface ResultsSectionProps {
   onExportCsv?: () => void;
   onPrintReport?: () => void;
   onCopyResults?: () => void;
+  websiteAnalysis?: any;
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
@@ -36,7 +37,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   company,
   onExportCsv,
   onPrintReport,
-  onCopyResults
+  onCopyResults,
+  websiteAnalysis
 }) => {
   const [activeTab, setActiveTab] = useState('results');
   const [showAllResults, setShowAllResults] = useState(false);
@@ -45,7 +47,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website')) {
       setActiveTab(savedTab);
     }
   }, []);
@@ -137,7 +139,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1">
           {[
             { id: 'results', label: 'Results', icon: BarChart3 },
-            { id: 'strategy', label: 'Strategy', icon: Lightbulb }
+            { id: 'strategy', label: 'Strategy', icon: Lightbulb },
+            { id: 'website', label: 'Website Analysis', icon: Globe }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -439,6 +442,101 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'website' && (
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Website Analysis</h3>
+            
+            {websiteAnalysis ? (
+              <div className="space-y-6">
+                {/* Content Summary */}
+                <div className="glass p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold mb-2 text-foreground">Content Summary</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
+                  </p>
+                </div>
+
+                {/* Key Topics */}
+                {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">Key Topics</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
+                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* AI Optimization Opportunities */}
+                {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">AI Optimization Opportunities</h4>
+                    <ul className="space-y-2">
+                      {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-2 h-2 bg-gradient-ai rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {opportunity}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Content Gaps */}
+                {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">Content Gaps</h4>
+                    <ul className="space-y-2">
+                      {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {gap}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {websiteAnalysis.analysis?.recommendations?.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">Recommendations</h4>
+                    <ul className="space-y-2">
+                      {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {rec}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Analysis Timestamp */}
+                <div className="text-xs text-muted-foreground text-center">
+                  Analysis completed: {new Date(websiteAnalysis.fetchedAt).toLocaleString()}
+                </div>
+              </div>
+            ) : (
+              <div className="glass p-6 rounded-lg text-center">
+                <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-foreground mb-2">No Website Analysis Available</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Website analysis will be performed when you run a health check with a company website URL configured.
+                </p>
+                {!company?.website_url && (
+                  <p className="text-xs text-muted-foreground">
+                    Please add a website URL to your company profile to enable website analysis.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

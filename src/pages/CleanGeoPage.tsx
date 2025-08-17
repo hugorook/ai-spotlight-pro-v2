@@ -879,6 +879,7 @@ export default function CleanGeoPage() {
   const [strategyLoading, setStrategyLoading] = useState(false);
   const [strategyError, setStrategyError] = useState<string | null>(null);
   const [showResultsSection, setShowResultsSection] = useState(false);
+  const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null);
 
   // On mount, load any persisted last run
   useEffect(() => {
@@ -895,6 +896,7 @@ export default function CleanGeoPage() {
         }
         if (parsed.type === 'health') {
           setAutoStrategies(parsed.strategies || []);
+          setWebsiteAnalysis(parsed.websiteAnalysis || null);
         }
       }
     } catch {}
@@ -1306,6 +1308,36 @@ export default function CleanGeoPage() {
   };
 
   // Generate strategies from all available test results (both automated and custom)
+  const getWebsiteAnalysis = async () => {
+    if (!company?.website_url) {
+      console.log('No website URL available for analysis');
+      return null;
+    }
+    
+    try {
+      console.log('Analyzing website:', company.website_url);
+      const { data, error } = await supabase.functions.invoke('analyze-website', {
+        body: {
+          url: company.website_url,
+          companyName: company.company_name,
+          industry: company.industry,
+          description: company.description
+        }
+      });
+      
+      if (error) {
+        console.error('Website analysis error:', error);
+        return null;
+      }
+      
+      console.log('Website analysis completed');
+      return data;
+    } catch (error) {
+      console.error('Failed to analyze website:', error);
+      return null;
+    }
+  };
+
   const generateStrategiesFromAllResults = async () => {
     try {
       setStrategyLoading(true);
@@ -1322,6 +1354,12 @@ export default function CleanGeoPage() {
         return;
       }
       
+      // Get website analysis to enhance strategy generation
+      const websiteAnalysisData = await getWebsiteAnalysis();
+      if (websiteAnalysisData) {
+        setWebsiteAnalysis(websiteAnalysisData);
+      }
+      
       const payload = {
         companyName: company?.company_name,
         results: allResults.slice(0, 100).map(r => ({
@@ -1332,21 +1370,23 @@ export default function CleanGeoPage() {
           mention_context: r.context,
           ai_model: 'openai-gpt-4o-mini',
           test_date: new Date().toISOString()
-        }))
+        })),
+        websiteAnalysis: websiteAnalysisData
       };
       
-      console.log(`Generating strategies from ${allResults.length} total results`);
+      console.log(`Generating strategies from ${allResults.length} total results${websiteAnalysisData ? ' + website analysis' : ''}`);
       const { data, error } = await supabase.functions.invoke('generate-strategy', { body: payload });
       if (error) throw error;
       const recs = (data?.recommendations as any[]) || [];
       setAutoStrategies(recs);
       
-      // Update localStorage with new strategies
+      // Update localStorage with new strategies and website analysis
       try {
         const currentRun = window.localStorage.getItem('geo_last_run');
         if (currentRun) {
           const parsed = JSON.parse(currentRun);
           parsed.strategies = recs;
+          parsed.websiteAnalysis = websiteAnalysisData;
           window.localStorage.setItem('geo_last_run', JSON.stringify(parsed));
         }
       } catch {}
@@ -1631,6 +1671,7 @@ export default function CleanGeoPage() {
               onExportCsv={() => downloadCsv('geo-health-check.csv', lastResults as any)}
               onPrintReport={() => printReport('geo-report')}
               onCopyResults={copyGeoResultsToClipboard}
+              websiteAnalysis={websiteAnalysis}
             />
           </div>
         )}

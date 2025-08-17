@@ -26,7 +26,7 @@ serve(async (req: Request) => {
   try {
     if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
 
-    const { companyName, results } = await req.json();
+    const { companyName, results, websiteAnalysis } = await req.json();
     if (!Array.isArray(results)) throw new Error('Missing or invalid results array');
 
     // Trim and cap payload size for safety
@@ -42,21 +42,35 @@ serve(async (req: Request) => {
 
     const sys = [
       'You are a B2B go-to-market strategist specialized in AI visibility and demand generation.',
-      'Analyze recent AI test results that show whether a company was mentioned in LLM answers.',
+      'Analyze recent AI test results and website analysis to create comprehensive optimization recommendations.',
       'Return STRICT JSON with key "recommendations" as an array of items: { id, title, reason, priority }.',
       'Guidelines:',
-      '- Prioritize actions that improve mention rate and position: content, FAQs, comparisons, case studies, integrations, partners.',
-      '- Use evidence from prompts and contexts to justify each recommendation.',
+      '- Prioritize actions that improve mention rate and position: content gaps, SEO optimization, AI-friendly content structure.',
+      '- Use evidence from both AI test results AND website analysis to justify recommendations.',
+      '- Address specific content gaps and optimization opportunities found in the website analysis.',
       '- Keep titles concise (<=80 chars) and reasons short (<=160 chars).',
       '- priorities are one of: "high" | "medium" | "low".',
-      '- 3-7 recommendations max. No prose outside of JSON.',
+      '- 4-8 recommendations max. No prose outside of JSON.',
     ].join(' ');
+
+    const websiteContext = websiteAnalysis ? [
+      'Website Analysis:',
+      `Content Summary: ${websiteAnalysis.analysis?.contentSummary || 'No summary available'}`,
+      `Key Topics: ${websiteAnalysis.analysis?.keyTopics?.join(', ') || 'None identified'}`,
+      `Content Gaps: ${websiteAnalysis.analysis?.contentGaps?.join(', ') || 'None identified'}`,
+      `AI Optimization Opportunities: ${websiteAnalysis.analysis?.aiOptimizationOpportunities?.join(', ') || 'None identified'}`,
+      `Current Recommendations: ${websiteAnalysis.analysis?.recommendations?.join(', ') || 'None available'}`,
+    ].join('\n') : 'No website analysis available.';
 
     const user = [
       `Company: ${companyName ?? 'Unknown'}`,
-      'Recent AI results (JSON):',
+      '',
+      websiteContext,
+      '',
+      'Recent AI Test Results (JSON):',
       JSON.stringify(trimmed, null, 2),
-      'Produce tailored, actionable recommendations.',
+      '',
+      'Create comprehensive, actionable recommendations that combine insights from both website analysis and AI test performance.',
     ].join('\n');
 
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
