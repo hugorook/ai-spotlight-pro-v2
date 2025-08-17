@@ -105,17 +105,11 @@
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(196, 181, 253, 0.2) !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
-  /* Glassmorphism hover effects - only show shadow on hover */
-  .bg-card:hover, .card:hover, .panel:hover, .box:hover {
-    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%) !important;
-    box-shadow: var(--shadow-glass-hover) !important;
-    transform: translateY(-2px) !important;
-    border-color: rgba(196, 181, 253, 0.3) !important;
-  }
+  /* Remove hover effects from card containers */
 
   /* Special glassmorphism utility classes */
   .glass {
@@ -123,7 +117,7 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(196, 181, 253, 0.2);
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -134,7 +128,7 @@
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(196, 181, 253, 0.25);
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -142,7 +136,7 @@
 
   /* Additional glassmorphism utilities */
   .shadow-soft {
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1) !important;
   }
 
   /* Remove hover effects from shadow-soft containers */
@@ -163,15 +157,11 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(196, 181, 253, 0.2);
     border-radius: 12px;
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .glass-card:hover {
-    background: linear-gradient(135deg, rgba(196, 181, 253, 0.15) 0%, rgba(147, 197, 253, 0.1) 100%);
-    box-shadow: var(--shadow-glass-hover);
-    transform: translateY(-2px);
-  }
+  /* Remove hover effects from glass-card containers */
 
   /* Glassmorphism gradient accents */
   .gradient-accent {

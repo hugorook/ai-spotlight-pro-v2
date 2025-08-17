@@ -105,8 +105,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1">
           {[
             { id: 'results', label: 'Results', icon: BarChart3 },
-            { id: 'strategy', label: 'Strategy', icon: Lightbulb },
-            { id: 'content', label: 'Content Assistant', icon: FileText }
+            { id: 'strategy', label: 'Strategy', icon: Lightbulb }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -128,80 +127,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       <div className="glass-card p-6">
         {activeTab === 'results' && (
           <div>
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-ai rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">Health Check Results</h2>
-                  <p className="text-muted-foreground">Your AI visibility analysis is complete</p>
-                </div>
-              </div>
-              {onNewTest && (
-                <button
-                  onClick={onNewTest}
-                  className="glass p-3 rounded-lg hover:bg-gradient-ai hover:text-white transition-all duration-300"
-                >
-                  Run New Test
-                </button>
-              )}
-            </div>
-
-            {/* Health Score Card */}
-            <div className="glass p-6 mb-6 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Overall Health Score</h3>
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-4xl font-bold ${getHealthScoreColor(healthScore)}`}>
-                      {healthScore}
-                    </span>
-                    <span className="text-xl text-muted-foreground">/ 100</span>
-                    <span className={`text-lg font-medium ${getHealthScoreColor(healthScore)} ml-2`}>
-                      ({getHealthScoreGrade(healthScore)})
-                    </span>
-                  </div>
-                </div>
-                <div className="w-24 h-24 relative">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-                    <defs>
-                      <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#c4b5fd" />
-                        <stop offset="100%" stopColor="#9333ea" />
-                      </linearGradient>
-                    </defs>
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      stroke="rgba(196, 181, 253, 0.2)"
-                      strokeWidth="8"
-                      fill="none"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      stroke="url(#pathGradient)"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray={`${(healthScore / 100) * 251.2} 251.2`}
-                      className="transition-all duration-1000 ease-out"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className={`text-lg font-bold ${getHealthScoreColor(healthScore)}`}>
-                      {healthScore}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Detailed Test Results</h3>
+              <h3 className="text-lg font-semibold">Test Results</h3>
               <div className="flex items-center gap-2">
                 {onExportCsv && (
                   <button
@@ -236,11 +163,43 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="glass p-4 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Target className="w-8 h-8 text-blue-500" />
+                <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-2xl font-bold text-foreground">{mentionRate}%</div>
+                    <div className="text-2xl font-bold text-foreground mb-1">{mentionRate}%</div>
                     <div className="text-sm text-muted-foreground">Mention Rate</div>
+                  </div>
+                  <div className="w-16 h-16 relative">
+                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+                      <defs>
+                        <linearGradient id="mentionRateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#c4b5fd" />
+                          <stop offset="100%" stopColor="#9333ea" />
+                        </linearGradient>
+                      </defs>
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="rgba(196, 181, 253, 0.2)"
+                        strokeWidth="8"
+                        fill="none"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="url(#mentionRateGradient)"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={`${(mentionRate / 100) * 251.2} 251.2`}
+                        className="transition-all duration-1000 ease-out"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-foreground">
+                        {mentionRate}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -313,63 +272,20 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'strategy' && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Optimization Strategy</h3>
-            {strategyLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-pulse text-muted-foreground">Generating personalized strategies...</div>
-              </div>
-            ) : strategyError ? (
-              <div className="text-center py-8">
-                <div className="text-red-600">Error: {strategyError}</div>
-              </div>
-            ) : strategies.length > 0 ? (
-              <div className="space-y-4">
-                {strategies.map((strategy, index) => (
-                  <div key={index} className="glass p-4 rounded-lg">
-                    <h4 className="font-semibold text-foreground mb-2">{strategy.title}</h4>
-                    <p className="text-sm text-muted-foreground mb-3 break-words">{strategy.reason || strategy.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div></div>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          strategy.priority === 'high' ? 'bg-red-100 text-red-700' :
-                          strategy.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {strategy.priority} priority
-                        </span>
-                        <button
-                          onClick={() => {
-                            setActiveTab('content');
-                            setContentTopic(strategy.title);
-                          }}
-                          className="text-xs glass px-3 py-1 rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
-                        >
-                          Create Content
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No strategies available yet. Run a health check to generate recommendations.
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'content' && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Content Assistant</h3>
+            <h3 className="text-lg font-semibold mb-4">Strategy & Content</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Strategy Recommendations */}
               <div className="glass p-4 rounded-lg h-fit">
                 <h4 className="text-sm font-semibold mb-2">Strategy Recommendations</h4>
-                {strategies.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No items yet. Add from Strategy tab.</p>
-                ) : (
+                {strategyLoading ? (
+                  <div className="text-center py-4">
+                    <div className="animate-pulse text-muted-foreground text-xs">Generating personalized strategies...</div>
+                  </div>
+                ) : strategyError ? (
+                  <div className="text-center py-4">
+                    <div className="text-red-600 text-xs">Error: {strategyError}</div>
+                  </div>
+                ) : strategies.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {strategies.map((item, idx) => (
                       <button
@@ -381,10 +297,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         }}
                         className="text-left rounded-md border border-input bg-background px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
                       >
-                        {item.title || String(item)}
+                        <div className="font-medium">{item.title || String(item)}</div>
+                        {item.reason && (
+                          <div className="text-xs text-muted-foreground mt-1">{item.reason}</div>
+                        )}
                       </button>
                     ))}
                   </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No items yet. Run a health check to generate recommendations.</p>
                 )}
               </div>
 
