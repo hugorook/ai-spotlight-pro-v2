@@ -179,7 +179,7 @@
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: hsl(var(--foreground));
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.1s ease;
   }
   
   button:hover,
@@ -188,8 +188,19 @@
     background: var(--gradient-ai) !important;
     color: white !important;
     transform: translateY(-2px);
-    box-shadow: var(--shadow-glass-hover);
+    box-shadow: 0 4px 20px rgba(31, 38, 135, 0.15);
     border-color: rgba(196, 181, 253, 0.3);
+    transition: all 0s !important;
+  }
+
+  /* Instant hover for toggles and tabs */
+  [role="tab"], .toggle, .tab {
+    transition: all 0.1s ease;
+  }
+
+  [role="tab"]:hover, .toggle:hover, .tab:hover {
+    box-shadow: 0 4px 20px rgba(31, 38, 135, 0.15);
+    transition: all 0s !important;
   }
 
   /* Glassmorphism inputs */

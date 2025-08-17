@@ -888,6 +888,11 @@ export default function CleanGeoPage() {
         const parsed: PersistedLastRun = JSON.parse(raw);
         setLastRunType(parsed.type);
         setLastResults(parsed.results || []);
+        setTestResults(parsed.results || []);
+        if (parsed.results && parsed.results.length > 0) {
+          setShowResultsSection(true);
+          calculateHealthScore(parsed.results);
+        }
         if (parsed.type === 'health') {
           setAutoStrategies(parsed.strategies || []);
         }

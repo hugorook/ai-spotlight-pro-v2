@@ -123,7 +123,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-lg font-medium transition-all duration-300 ${
                 activeTab === tab.id
                   ? 'bg-gradient-ai text-white shadow-lg'
                   : 'text-foreground hover:bg-white/20'
@@ -288,7 +288,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             <h3 className="text-lg font-semibold mb-4">Strategy & Content</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Strategy Recommendations */}
-              <div className="glass p-4 rounded-lg h-fit">
+              <div className="glass p-4 rounded-lg min-h-[400px] h-fit">
                 <h4 className="text-sm font-semibold mb-2">Strategy Recommendations</h4>
                 {strategyLoading ? (
                   <div className="text-center py-4">
