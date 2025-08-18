@@ -251,7 +251,7 @@ const PromptsPage = () => {
         <div className="space-y-4">
           {prompts.map((prompt, index) => (
             <div key={prompt.id} className="glass p-4 rounded-lg">
-              <div className="flex items-start justify-between mb-1">
+              <div className="flex items-start justify-between">
                 <div className="flex items-center gap-1">
                   <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
                   <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
@@ -325,7 +325,7 @@ const PromptsPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1">
+                <div>
                   <p className="text-foreground font-medium">"{prompt.text}"</p>
                   {prompt.intent && (
                     <p className="text-xs text-muted-foreground">Intent: {prompt.intent}</p>

@@ -279,9 +279,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 
                 return (
                   <div key={index} className="p-3 glass rounded-lg">
-                    <div className="flex items-start justify-between mb-1">
+                    <div className="flex items-start justify-between">
                       <div className="flex-1 mr-4">
-                        <div className="font-medium text-foreground">
+                        <div className="font-bold text-foreground">
                           {result.prompt}
                         </div>
                       </div>
