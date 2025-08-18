@@ -284,6 +284,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         <div className="font-bold text-foreground">
                           {result.prompt}
                         </div>
+                        <div className="text-sm text-muted-foreground break-words">
+                          <strong>Summary:</strong> {displayContext}
+                        </div>
                       </div>
                       <div className="flex items-center gap-4 flex-shrink-0">
                         <div className={`w-3 h-3 rounded-full ${
@@ -315,11 +318,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           </button>
                         )}
                       </div>
-                    </div>
-                    
-                    {/* Always show context summary */}
-                    <div className="text-sm text-muted-foreground break-words">
-                      <strong>Summary:</strong> {displayContext}
                     </div>
                     
                     {/* Show full AI response when expanded */}
