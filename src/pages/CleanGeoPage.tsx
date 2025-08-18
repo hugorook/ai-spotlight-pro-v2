@@ -1633,7 +1633,7 @@ export default function CleanGeoPage() {
               >
                 .... . .- .-.. - .... / -.-. .... . -.-. -.-
               </div>
-              <div className="relative z-10 flex items-center justify-center">Run Automated Health Check</div>
+              Run Automated Health Check
             </button>
           </div>
 
