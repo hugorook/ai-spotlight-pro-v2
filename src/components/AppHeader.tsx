@@ -48,7 +48,7 @@ const AppHeader = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-ai text-white">
+                      <AvatarFallback className="bg-[#111E63] text-white">
                         {initials}
                       </AvatarFallback>
                     </Avatar>

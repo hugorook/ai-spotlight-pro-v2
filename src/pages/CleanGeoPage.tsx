@@ -195,8 +195,8 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
               <div style={{
                 width: `${progress}%`,
                 height: '100%',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                transition: 'width 0.3s ease'
+                background: '#111E63',
+                transition: 'transition-none'
               }} />
             </div>
           </div>
@@ -212,7 +212,7 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
               }}>
                 <div style={{
                   padding: '8px',
-                  background: 'rgba(102, 126, 234, 0.2)',
+                  background: 'rgba(17, 30, 99, 0.2)',
                   borderRadius: '8px'
                 }}>
                   <span style={{ fontSize: '20px' }}>🏢</span>
@@ -336,7 +336,7 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
               }}>
                 <div style={{
                   padding: '8px',
-                  background: 'rgba(102, 126, 234, 0.2)',
+                  background: 'rgba(17, 30, 99, 0.2)',
                   borderRadius: '8px'
                 }}>
                   <span style={{ fontSize: '20px' }}>🎯</span>
@@ -412,7 +412,7 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
               }}>
                 <div style={{
                   padding: '8px',
-                  background: 'rgba(102, 126, 234, 0.2)',
+                  background: 'rgba(17, 30, 99, 0.2)',
                   borderRadius: '8px'
                 }}>
                   <span style={{ fontSize: '20px' }}>📍</span>
@@ -477,8 +477,8 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
                           justifyContent: 'center',
                           width: '24px',
                           height: '24px',
-                          background: 'rgba(102, 126, 234, 0.2)',
-                          color: '#667eea',
+                          background: 'rgba(17, 30, 99, 0.2)',
+                          color: '#111E63',
                           borderRadius: '4px',
                           fontSize: '12px',
                           fontWeight: 'bold'
@@ -522,7 +522,7 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
                 padding: '12px 24px',
                 background: (!formData.companyName || !formData.website || !formData.industry || loading) 
                   ? '#333' 
-                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  : '#111E63',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '6px',
@@ -825,7 +825,7 @@ const CompanyEditForm: React.FC<CompanyEditFormProps> = ({ company, onComplete, 
               padding: '12px 24px',
               background: (!formData.companyName || !formData.industry || loading) 
                 ? '#333' 
-                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                : '#111E63',
               color: '#fff',
               border: 'none',
               borderRadius: '6px',
@@ -1615,10 +1615,9 @@ export default function CleanGeoPage() {
             <button
               onClick={runHealthCheck}
               disabled={isRunningHealthCheck || !company}
-              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent relative overflow-hidden"
+              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white relative overflow-hidden"
               style={{
-                background: `linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%), 
-                            linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`
+                background: '#111E63'
               }}
             >
               {/* Morse code background for "HEALTH CHECK" */}
@@ -1657,7 +1656,7 @@ export default function CleanGeoPage() {
               <button
                 onClick={testCustomPrompt}
                 disabled={!customPrompt || isTestingCustom}
-                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-colors gradient-accent"
+                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white"
               >
                 Test Custom Prompt
               </button>

@@ -223,7 +223,7 @@ const PromptsPage = () => {
             <button
               onClick={regeneratePrompts}
               disabled={generating}
-              className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-gradient-ai hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-[#111E63] hover:text-white transition-none"
             >
               <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
               {generating ? 'Generating...' : 'Regenerate'}
@@ -231,7 +231,7 @@ const PromptsPage = () => {
             <button
               onClick={savePrompts}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-ai text-white rounded-lg hover:opacity-90 transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 bg-[#111E63] text-white rounded-lg hover:opacity-90 transition-none"
             >
               <Save className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save Changes'}
@@ -263,13 +263,13 @@ const PromptsPage = () => {
                     <>
                       <button
                         onClick={() => toggleEdit(prompt.id)}
-                        className="p-1 text-green-600 hover:bg-green-100 rounded"
+                        className="p-1 text-green-600 hover:bg-[#111E63] hover:text-white rounded transition-none"
                       >
                         <Check className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => removePrompt(prompt.id)}
-                        className="p-1 text-red-600 hover:bg-red-100 rounded"
+                        className="p-1 text-red-600 hover:bg-[#111E63] hover:text-white rounded transition-none"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -277,7 +277,7 @@ const PromptsPage = () => {
                   ) : (
                     <button
                       onClick={() => toggleEdit(prompt.id)}
-                      className="p-1 text-muted-foreground hover:bg-white/20 rounded"
+                      className="p-1 text-muted-foreground hover:bg-[#111E63] hover:text-white rounded transition-none"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -338,7 +338,7 @@ const PromptsPage = () => {
           {/* Add New Prompt Button */}
           <button
             onClick={addNewPrompt}
-            className="w-full p-4 glass rounded-lg border-2 border-dashed border-white/30 hover:border-white/50 hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+            className="w-full p-4 glass rounded-lg border-2 border-dashed border-white/30 hover:border-white/50 hover:bg-[#111E63] hover:text-white transition-none flex items-center justify-center gap-2 text-muted-foreground"
           >
             <Plus className="w-4 h-4" />
             Add New Prompt

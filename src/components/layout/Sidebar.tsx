@@ -48,7 +48,7 @@ const Sidebar = () => {
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-ai rounded-lg">
+          <div className="p-2 bg-[#111E63] rounded-lg">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -65,10 +65,10 @@ const Sidebar = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-300 backdrop-blur-sm",
+                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm",
                 isActive(item.path)
-                  ? "bg-gradient-ai text-white shadow-lg transform scale-[1.02]"
-                  : "text-foreground hover:text-foreground hover:bg-white/20 hover:backdrop-blur-md hover:transform hover:scale-[1.01]"
+                  ? "bg-[#111E63] text-white"
+                  : "text-foreground hover:text-white hover:bg-[#111E63]"
               )}
             >
               {item.icon}
@@ -93,10 +93,10 @@ const Sidebar = () => {
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-300 backdrop-blur-sm",
+            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm",
             isActive("/settings")
-              ? "bg-gradient-ai text-white shadow-lg transform scale-[1.02]"
-              : "text-foreground hover:text-foreground hover:bg-white/20 hover:backdrop-blur-md hover:transform hover:scale-[1.01]"
+              ? "bg-[#111E63] text-white"
+              : "text-foreground hover:text-white hover:bg-[#111E63]"
           )}
         >
           <Settings className="w-5 h-5" />

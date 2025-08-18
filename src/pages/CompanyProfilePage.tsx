@@ -338,7 +338,7 @@ const CompanyProfilePage = () => {
             <button
               onClick={handleSubmit}
               disabled={!formData.companyName || !formData.industry || saving}
-              className="px-6 py-3 bg-gradient-ai text-white rounded-lg font-medium disabled:opacity-50 hover:scale-[1.02] transition-all duration-300"
+              className="px-6 py-3 bg-[#111E63] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#111E63] hover:text-white transition-none"
             >
               {saving ? (
                 <>

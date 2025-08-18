@@ -145,10 +145,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-lg font-medium transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-lg font-medium transition-none ${
                 activeTab === tab.id
-                  ? 'bg-gradient-ai text-white shadow-lg'
-                  : 'text-foreground hover:bg-white/20'
+                  ? 'bg-[#111E63] text-white'
+                  : 'text-foreground hover:bg-[#111E63] hover:text-white'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -168,7 +168,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {onExportCsv && (
                   <button
                     onClick={onExportCsv}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
                   >
                     <Download className="w-3 h-3" />
                     Export CSV
@@ -177,7 +177,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {onPrintReport && (
                   <button
                     onClick={onPrintReport}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
                   >
                     <Printer className="w-3 h-3" />
                     Print PDF
@@ -186,7 +186,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {onCopyResults && (
                   <button
                     onClick={onCopyResults}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-gradient-ai hover:text-white transition-all duration-300"
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
                   >
                     <Copy className="w-3 h-3" />
                     Copy
@@ -207,15 +207,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
                       <defs>
                         <linearGradient id="mentionRateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#c4b5fd" />
-                          <stop offset="100%" stopColor="#9333ea" />
+                          <stop offset="0%" stopColor="#111E63" />
+                          <stop offset="100%" stopColor="#111E63" />
                         </linearGradient>
                       </defs>
                       <circle
                         cx="50"
                         cy="50"
                         r="40"
-                        stroke="rgba(196, 181, 253, 0.2)"
+                        stroke="rgba(17, 30, 99, 0.2)"
                         strokeWidth="8"
                         fill="none"
                       />
@@ -304,7 +304,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         {hasExpandableContent && (
                           <button
                             onClick={() => toggleResultExpansion(index)}
-                            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors"
+                            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#111E63] hover:text-white transition-none"
                             title={isExpanded ? 'Hide full AI response' : 'View full AI response'}
                           >
                             {isExpanded ? (
@@ -324,8 +324,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     
                     {/* Show full AI response when expanded */}
                     {isExpanded && hasExpandableContent && (
-                      <div className="text-sm text-foreground break-words bg-white/10 p-3 rounded border-l-4 border-purple-400">
-                        <strong className="text-purple-400">Full AI Response:</strong>
+                      <div className="text-sm text-foreground break-words bg-white/10 p-3 rounded border-l-4 border-[#111E63]">
+                        <strong className="text-[#111E63]">Full AI Response:</strong>
                         <div className="mt-2 whitespace-pre-wrap">{fullResponse}</div>
                       </div>
                     )}
@@ -338,7 +338,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               <div className="mt-4 text-center">
                 <button 
                   onClick={() => setShowAllResults(!showAllResults)}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:bg-[#111E63] hover:text-white px-2 py-1 rounded transition-none"
                 >
                   {showAllResults ? 'Show less ↑' : `View all ${results.length} results →`}
                 </button>
@@ -372,7 +372,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           setContentTopic(title);
                           generateContent(title);
                         }}
-                        className="text-left rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground"
+                        className="text-left rounded-md border border-input bg-background px-3 py-2 hover:bg-[#111E63] hover:text-white transition-none"
                       >
                         <div className="font-semibold text-sm leading-tight break-words">{item.title || String(item)}</div>
                         {item.reason && (
@@ -406,7 +406,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <button
                   onClick={() => generateContent()}
                   disabled={!contentTopic.trim() || isGenerating}
-                  className="inline-flex w-full items-center justify-center rounded-md gradient-accent text-primary-foreground px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center rounded-md bg-[#111E63] text-white px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#111E63] transition-none"
                 >
                   {isGenerating ? 'Generating…' : 'Generate Content'}
                 </button>
@@ -420,7 +420,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {generatedContent && (
                   <button
                     onClick={() => copyToClipboard(generatedContent)}
-                    className="inline-flex items-center justify-center rounded-md border border-transparent gradient-accent px-3 py-1.5 text-xs font-medium"
+                    className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#111E63] text-white px-3 py-1.5 text-xs font-medium hover:bg-[#111E63] transition-none"
                   >
                     Copy
                   </button>
@@ -465,7 +465,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <h4 className="text-sm font-semibold mb-2 text-foreground">Key Topics</h4>
                     <div className="flex flex-wrap gap-2">
                       {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                        <span key={index} className="px-2 py-1 bg-[#111E63] text-white rounded-full text-xs">
                           {topic}
                         </span>
                       ))}
@@ -480,7 +480,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <ul className="space-y-2">
                       {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
                         <li key={index} className="text-sm text-muted-foreground flex items-start">
-                          <span className="w-2 h-2 bg-gradient-ai rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          <span className="w-2 h-2 bg-[#111E63] rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {opportunity}
                         </li>
                       ))}
