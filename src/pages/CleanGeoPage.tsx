@@ -1611,9 +1611,9 @@ export default function CleanGeoPage() {
             <button
               onClick={runHealthCheck}
               disabled={isRunningHealthCheck || !company}
-              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white relative overflow-hidden"
+              className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#E7E2F9] hover:bg-[#111E63] text-foreground hover:text-white relative overflow-hidden"
               style={{
-                background: '#111E63',
+                background: '#E7E2F9',
                 fontFamily: 'Syne, sans-serif',
                 fontWeight: '600'
               }}
@@ -1654,7 +1654,7 @@ export default function CleanGeoPage() {
               <button
                 onClick={testCustomPrompt}
                 disabled={!customPrompt || isTestingCustom}
-                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white"
+                className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#E7E2F9] hover:bg-[#111E63] text-foreground hover:text-white"
                 style={{
                   fontFamily: 'Syne, sans-serif',
                   fontWeight: '600'

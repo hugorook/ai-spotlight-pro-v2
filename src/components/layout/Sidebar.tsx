@@ -58,8 +58,8 @@ const Sidebar = () => {
         <div className="p-2 border-b border-white/10">
           <div 
             className={cn(
-              "w-full flex items-center rounded-lg transition-none",
-              isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2"
+              "w-full flex items-center rounded-lg transition-none h-10",
+              isExpanded ? "gap-3 px-3" : "justify-center"
             )}
           >
             <div className="flex-shrink-0 sidebar-icon">
@@ -91,8 +91,8 @@ const Sidebar = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "w-full flex items-center rounded-lg text-left transition-none group",
-                  isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2",
+                  "w-full flex items-center rounded-lg text-left transition-none group h-10",
+                  isExpanded ? "gap-3 px-3" : "justify-center",
                   isActive(item.path)
                     ? "bg-[#111E63] text-white"
                     : "text-foreground hover:text-white hover:bg-[#111E63]"
@@ -118,8 +118,8 @@ const Sidebar = () => {
           <button
             onClick={() => navigate("/settings")}
             className={cn(
-              "w-full flex items-center rounded-lg text-left transition-none group",
-              isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2",
+              "w-full flex items-center rounded-lg text-left transition-none group h-10",
+              isExpanded ? "gap-3 px-3" : "justify-center",
               isActive("/settings")
                 ? "bg-[#111E63] text-white"
                 : "text-foreground hover:text-white hover:bg-[#111E63]"

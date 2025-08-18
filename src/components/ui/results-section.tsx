@@ -148,7 +148,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-lg font-medium transition-none ${
                 activeTab === tab.id
                   ? 'bg-[#111E63] text-white'
-                  : 'text-foreground hover:bg-[#111E63] hover:text-white'
+                  : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
               }`}
             >
               <tab.icon className="w-4 h-4" />
