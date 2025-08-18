@@ -55,11 +55,16 @@ const Sidebar = () => {
     >
       <div className="h-full glass-strong backdrop-blur-xl border-r border-white/20 flex flex-col">
         {/* Logo */}
-        <div className="p-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#111E63] rounded-lg">
+        <div className="p-2 border-b border-white/10">
+          <div 
+            className={cn(
+              "w-full flex items-center rounded-lg transition-none",
+              isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2"
+            )}
+          >
+            <div className="flex-shrink-0 sidebar-icon">
               <svg 
-                className="w-6 h-6 text-white" 
+                className="w-5 h-5 text-[#111E63]" 
                 viewBox="0 0 24 24" 
                 fill="currentColor"
               >

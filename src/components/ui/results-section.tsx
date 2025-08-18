@@ -159,7 +159,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="glass-card p-6">
+      <div className="p-6">
         {activeTab === 'results' && (
           <div>
             <div className="flex items-center justify-between mb-4">
