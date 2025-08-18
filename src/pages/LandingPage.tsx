@@ -189,7 +189,7 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
+      <section className="pt-48 pb-20 px-4 relative overflow-hidden">
         <div className="container mx-auto relative z-10">
           {/* Ghost Animation Overlay - Brought to front */}
           <div className="absolute inset-0 pointer-events-none z-50">
