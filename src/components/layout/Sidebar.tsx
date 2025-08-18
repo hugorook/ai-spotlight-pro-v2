@@ -47,7 +47,7 @@ const Sidebar = () => {
   return (
     <div 
       className={cn(
-        "fixed left-0 top-0 h-screen z-50 transition-all duration-300 ease-in-out",
+        "fixed left-0 top-0 h-screen z-[100] transition-all duration-300 ease-in-out",
         isExpanded ? "w-64" : "w-16"
       )}
       onMouseEnter={() => setIsExpanded(true)}
@@ -86,7 +86,8 @@ const Sidebar = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "w-full flex items-center gap-3 p-4 rounded-lg text-left transition-none group",
+                  "w-full flex items-center rounded-lg text-left transition-none group",
+                  isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2",
                   isActive(item.path)
                     ? "bg-[#111E63] text-white"
                     : "text-foreground hover:text-white hover:bg-[#111E63]"
@@ -112,7 +113,8 @@ const Sidebar = () => {
           <button
             onClick={() => navigate("/settings")}
             className={cn(
-              "w-full flex items-center gap-3 p-4 rounded-lg text-left transition-none group",
+              "w-full flex items-center rounded-lg text-left transition-none group",
+              isExpanded ? "gap-3 px-3 py-2" : "justify-center py-2",
               isActive("/settings")
                 ? "bg-[#111E63] text-white"
                 : "text-foreground hover:text-white hover:bg-[#111E63]"
