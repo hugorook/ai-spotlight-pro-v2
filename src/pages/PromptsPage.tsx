@@ -258,14 +258,14 @@ const PromptsPage = () => {
                     <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
                       {prompt.category}
                     </span>
+                    {!prompt.isEditing && (
+                      <>
+                        <p className="text-foreground font-medium ml-2">"{prompt.text}"</p>
+                      </>
+                    )}
                   </div>
-                  {!prompt.isEditing && (
-                    <div>
-                      <p className="text-foreground font-medium">"{prompt.text}"</p>
-                      {prompt.intent && (
-                        <p className="text-xs text-muted-foreground">Intent: {prompt.intent}</p>
-                      )}
-                    </div>
+                  {!prompt.isEditing && prompt.intent && (
+                    <p className="text-xs text-muted-foreground">Intent: {prompt.intent}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
