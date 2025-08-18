@@ -193,6 +193,9 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: #111E63;
     transition: none !important;
+    font-family: var(--font-sans), sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
   }
   
   button:hover,
@@ -220,6 +223,9 @@
   /* Instant navy hover for toggles and tabs */
   [role="tab"], .toggle, .tab {
     transition: none !important;
+    font-family: var(--font-sans), sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 
   [role="tab"]:hover, .toggle:hover, .tab:hover {
@@ -401,6 +407,20 @@
       padding-left: 2rem;
       padding-right: 2rem;
     }
+  }
+
+  /* IMPORTANT: All button-like elements use Syne Bold uppercase */
+  button,
+  [role="button"],
+  [role="tab"],
+  .btn,
+  .button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    font-family: var(--font-sans), sans-serif !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
   }
 
   /* IMPORTANT: Final catch-all rule for navy hover states */
