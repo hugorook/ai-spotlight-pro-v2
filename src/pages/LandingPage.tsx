@@ -21,6 +21,7 @@ import {
   Star
 } from "lucide-react";
 import heroImage from "@/assets/hero-ai-visibility.jpg";
+import GhostAnimation from "@/components/GhostAnimation";
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -168,7 +169,10 @@ const LandingPage = () => {
               <Button variant="ghost" onClick={handleLogin}>
                 Login
               </Button>
-              <Button variant="hero" onClick={handleGetStarted}>
+              <Button 
+                className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+                onClick={handleGetStarted}
+              >
                 Get Started
               </Button>
             </div>
@@ -178,13 +182,14 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-subtle opacity-50" />
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        {/* Ghost Animation Overlay */}
+        <div className="absolute inset-0 pointer-events-none z-10">
+          <GhostAnimation />
+        </div>
         
-        <div className="container mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
+        <div className="container mx-auto relative z-20">
+          {/* Centered Hero Content */}
+          <div className="text-center max-w-4xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-4">
                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
@@ -199,41 +204,49 @@ const LandingPage = () => {
                   </span>
                 </h1>
                 
-                <p className="text-xl text-muted-foreground leading-relaxed">
+                <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                   Optimize your company's presence in ChatGPT, Claude, and other AI models. 
                   Get recommended when your customers ask AI for solutions.
                 </p>
               </div>
 
               {/* Value Props */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
+              <div className="space-y-3 max-w-2xl mx-auto">
+                <div className="flex items-center justify-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-foreground">Increase AI recommendations by 300%</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-foreground">Monitor mentions across all major AI models</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-foreground">Generate AI-optimized content automatically</span>
                 </div>
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="group" onClick={handleGetStarted}>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="group bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none" 
+                  onClick={handleGetStarted}
+                >
                   Start Free Trial
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+                >
                   Watch Demo (3 min)
                 </Button>
               </div>
 
               {/* Social Proof */}
-              <div className="flex items-center gap-6 pt-4">
+              <div className="flex items-center justify-center gap-6 pt-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-foreground">2,500+</div>
                   <div className="text-sm text-muted-foreground">Companies Optimized</div>
@@ -249,43 +262,6 @@ const LandingPage = () => {
                   <div className="text-sm text-muted-foreground">Average ROI</div>
                 </div>
               </div>
-            </div>
-
-            {/* Right Content - Hero Image */}
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-ai">
-                <img 
-                  src={heroImage} 
-                  alt="AI Visibility Dashboard" 
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
-              </div>
-              
-              {/* Floating Stats Cards */}
-              <Card className="absolute -bottom-4 -left-4 p-4 bg-card/90 backdrop-blur border-primary/20 shadow-glow">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-success/20 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-success" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-foreground">+247%</div>
-                    <div className="text-sm text-muted-foreground">AI Mentions</div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="absolute -top-4 -right-4 p-4 bg-card/90 backdrop-blur border-accent/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/20 rounded-lg">
-                    <Shield className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-foreground">Top 3</div>
-                    <div className="text-sm text-muted-foreground">AI Rankings</div>
-                  </div>
-                </div>
-              </Card>
             </div>
           </div>
         </div>
@@ -315,7 +291,7 @@ const LandingPage = () => {
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
-                <Card key={index} className="p-8 bg-card/50 backdrop-blur border-border/50 hover:border-primary/30 transition-all duration-300 group">
+                <Card key={index} className="p-8 bg-[#E7E2F9] border-border/50 hover:border-primary/30 transition-all duration-300 group shadow-soft">
                   <div className="space-y-6">
                     <div className="flex items-start gap-4">
                       <div className="p-3 rounded-xl bg-primary/20 text-primary group-hover:scale-110 transition-transform duration-300">
@@ -454,8 +430,7 @@ const LandingPage = () => {
                   </ul>
 
                   <Button 
-                    className="w-full" 
-                    variant={plan.highlighted ? "hero" : "outline"}
+                    className={`w-full ${plan.highlighted ? 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none' : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none'}`}
                     onClick={handleGetStarted}
                   >
                     {plan.buttonText}
@@ -527,15 +502,17 @@ const LandingPage = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              variant="secondary" 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90"
+              className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
               onClick={handleGetStarted}
             >
               Start Free Trial
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+            <Button 
+              size="lg" 
+              className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+            >
               Schedule Demo
             </Button>
           </div>
