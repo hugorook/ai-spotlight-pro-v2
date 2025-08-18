@@ -1617,7 +1617,9 @@ export default function CleanGeoPage() {
               disabled={isRunningHealthCheck || !company}
               className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white relative overflow-hidden"
               style={{
-                background: '#111E63'
+                background: '#111E63',
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: '600'
               }}
             >
               {/* Morse code background for "HEALTH CHECK" */}
@@ -1657,6 +1659,10 @@ export default function CleanGeoPage() {
                 onClick={testCustomPrompt}
                 disabled={!customPrompt || isTestingCustom}
                 className="w-full disabled:opacity-50 font-semibold py-4 px-6 rounded-lg text-lg transition-none bg-[#111E63] hover:bg-[#111E63] text-white"
+                style={{
+                  fontFamily: 'Syne, sans-serif',
+                  fontWeight: '600'
+                }}
               >
                 Test Custom Prompt
               </button>
