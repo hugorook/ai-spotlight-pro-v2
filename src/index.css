@@ -200,10 +200,21 @@
   button:active {
     background: #111E63 !important;
     color: white !important;
-    border-color: #111E63;
+    border-color: #111E63 !important;
     box-shadow: none !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  /* Force white text on any navy background */
+  button:hover *,
+  button:focus *,
+  button:active *,
+  .bg-\[\#111E63\]:hover *,
+  .hover\:bg-\[\#111E63\]:hover *,
+  [style*="background: #111E63"]:hover *,
+  [style*="background-color: #111E63"]:hover * {
+    color: white !important;
   }
 
   /* Instant navy hover for toggles and tabs */
@@ -217,6 +228,41 @@
     box-shadow: none !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  /* Force white text on tabs and toggles */
+  [role="tab"]:hover *,
+  .toggle:hover *,
+  .tab:hover * {
+    color: white !important;
+  }
+
+  /* Comprehensive hover rules for all interactive elements */
+  .hover\:bg-\[\#111E63\]:hover,
+  .hover\:bg-\[\#111E63\]:focus,
+  button[class*="hover:bg-[#111E63]"]:hover,
+  button[class*="hover:bg-[#111E63]"]:focus {
+    background: #111E63 !important;
+    color: white !important;
+    transition: none !important;
+  }
+
+  .hover\:bg-\[\#111E63\]:hover *,
+  .hover\:bg-\[\#111E63\]:focus *,
+  button[class*="hover:bg-[#111E63]"]:hover *,
+  button[class*="hover:bg-[#111E63]"]:focus *,
+  .hover\:bg-\[\#111E63\]:hover svg,
+  .hover\:bg-\[\#111E63\]:focus svg,
+  button[class*="hover:bg-[#111E63]"]:hover svg,
+  button[class*="hover:bg-[#111E63]"]:focus svg {
+    color: white !important;
+    fill: white !important;
+    stroke: white !important;
+  }
+
+  /* Specific targeting for Tailwind hover utilities */
+  .hover\:text-white:hover {
+    color: white !important;
   }
 
   /* Input styling with navy colors */
@@ -355,5 +401,16 @@
       padding-left: 2rem;
       padding-right: 2rem;
     }
+  }
+
+  /* IMPORTANT: Final catch-all rule for navy hover states */
+  *[class*="hover:bg-[#111E63]"]:hover,
+  *[class*="hover:bg-[#111E63]"]:hover *,
+  *[class*="hover:bg-[#111E63]"]:hover svg,
+  .bg-\[\#111E63\] *,
+  .bg-\[\#111E63\] svg {
+    color: white !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
   }
 }

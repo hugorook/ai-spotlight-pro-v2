@@ -65,7 +65,7 @@ const Sidebar = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm",
+                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm group",
                 isActive(item.path)
                   ? "bg-[#111E63] text-white"
                   : "text-foreground hover:text-white hover:bg-[#111E63]"
@@ -73,9 +73,9 @@ const Sidebar = () => {
             >
               {item.icon}
               <div>
-                <div className="font-medium">{item.label}</div>
+                <div className="font-medium group-hover:text-white">{item.label}</div>
                 <div className={cn(
-                  "text-xs",
+                  "text-xs group-hover:text-white",
                   isActive(item.path) 
                     ? "text-white/80" 
                     : "text-muted-foreground"
@@ -93,7 +93,7 @@ const Sidebar = () => {
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm",
+            "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none backdrop-blur-sm group",
             isActive("/settings")
               ? "bg-[#111E63] text-white"
               : "text-foreground hover:text-white hover:bg-[#111E63]"
@@ -101,9 +101,9 @@ const Sidebar = () => {
         >
           <Settings className="w-5 h-5" />
           <div>
-            <div className="font-medium">Settings</div>
+            <div className="font-medium group-hover:text-white">Settings</div>
             <div className={cn(
-              "text-xs",
+              "text-xs group-hover:text-white",
               isActive("/settings") 
                 ? "text-white/80" 
                 : "text-muted-foreground"
