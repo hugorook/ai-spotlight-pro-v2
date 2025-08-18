@@ -145,8 +145,16 @@ const LandingPage = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-ai rounded-lg">
-                <Brain className="w-6 h-6 text-white" />
+              <div className="flex-shrink-0">
+                <svg 
+                  className="w-6 h-6 text-[#111E63]" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                >
+                  <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                  <circle fill="white" cx="9" cy="9.5" r="0.5"/>
+                  <circle fill="white" cx="15" cy="9.5" r="0.5"/>
+                </svg>
               </div>
               <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
             </div>
@@ -182,21 +190,15 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Ghost Animation Overlay */}
-        <div className="absolute inset-0 pointer-events-none z-10">
-          <GhostAnimation />
-        </div>
-        
-        <div className="container mx-auto relative z-20">
+        <div className="container mx-auto relative z-10">
+          {/* Ghost Animation Overlay - Brought to front */}
+          <div className="absolute inset-0 pointer-events-none z-50">
+            <GhostAnimation />
+          </div>
           {/* Centered Hero Content */}
           <div className="text-center max-w-4xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-4">
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                  <Zap className="w-3 h-3 mr-1" />
-                  AI-Powered Visibility
-                </Badge>
-                
                 <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                   Get Your Company{" "}
                   <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
@@ -245,23 +247,6 @@ const LandingPage = () => {
                 </Button>
               </div>
 
-              {/* Social Proof */}
-              <div className="flex items-center justify-center gap-6 pt-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">2,500+</div>
-                  <div className="text-sm text-muted-foreground">Companies Optimized</div>
-                </div>
-                <div className="w-px h-12 bg-border" />
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">89%</div>
-                  <div className="text-sm text-muted-foreground">See Increased Mentions</div>
-                </div>
-                <div className="w-px h-12 bg-border" />
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">5X</div>
-                  <div className="text-sm text-muted-foreground">Average ROI</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -271,10 +256,6 @@ const LandingPage = () => {
       <section id="features" className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 mb-4">
-              <Zap className="w-3 h-3 mr-1" />
-              Comprehensive AI Optimization
-            </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Everything You Need to{" "}
               <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
@@ -524,8 +505,16 @@ const LandingPage = () => {
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-ai rounded-lg">
-                <Brain className="w-6 h-6 text-white" />
+              <div className="flex-shrink-0">
+                <svg 
+                  className="w-6 h-6 text-[#111E63]" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                >
+                  <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                  <circle fill="white" cx="9" cy="9.5" r="0.5"/>
+                  <circle fill="white" cx="15" cy="9.5" r="0.5"/>
+                </svg>
               </div>
               <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
             </div>
