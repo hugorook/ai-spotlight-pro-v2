@@ -283,7 +283,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       <div className="flex-1 mr-4">
                         <div className="font-bold text-foreground">
                           {result.prompt}
-                          <div className="text-sm text-muted-foreground break-words font-normal">
+                          <div className="text-sm text-muted-foreground break-words font-normal leading-tight">
                             <strong>Summary:</strong> {displayContext}
                           </div>
                         </div>
