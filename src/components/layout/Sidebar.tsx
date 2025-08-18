@@ -80,13 +80,13 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 p-2">
-          <div className="space-y-1">
+          <div className="space-y-2">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none group",
+                  "w-full flex items-center gap-3 p-4 rounded-lg text-left transition-none group",
                   isActive(item.path)
                     ? "bg-[#111E63] text-white"
                     : "text-foreground hover:text-white hover:bg-[#111E63]"
@@ -112,7 +112,7 @@ const Sidebar = () => {
           <button
             onClick={() => navigate("/settings")}
             className={cn(
-              "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-none group",
+              "w-full flex items-center gap-3 p-4 rounded-lg text-left transition-none group",
               isActive("/settings")
                 ? "bg-[#111E63] text-white"
                 : "text-foreground hover:text-white hover:bg-[#111E63]"

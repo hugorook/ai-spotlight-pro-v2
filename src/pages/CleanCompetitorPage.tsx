@@ -553,7 +553,6 @@ const CleanCompetitorPage = () => {
             </div>
           </div>
         </div>
-      <CommandPalette />
     </AppShell>
   );
 };

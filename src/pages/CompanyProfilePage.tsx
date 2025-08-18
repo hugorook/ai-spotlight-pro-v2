@@ -350,7 +350,6 @@ const CompanyProfilePage = () => {
           </div>
         </div>
       </div>
-      <CommandPalette />
     </AppShell>
   );
 };

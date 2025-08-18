@@ -194,7 +194,6 @@ const MinimalContentPage = () => {
             )}
           </div>
       </div>
-      <CommandPalette />
     </AppShell>
   );
 };
