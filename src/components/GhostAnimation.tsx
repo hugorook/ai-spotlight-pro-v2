@@ -10,12 +10,12 @@ export default function GhostAnimation() {
     C -42 18, -58 -10, -54 -34
     C -48 -60, -26 -78, 0 -78 Z`;
 
-  // Three ghosts with different speeds / lanes
+  // Three ghosts with different speeds / lanes - positioned higher
   const ghosts = [
     {
       id: 1,
-      initial: { x: -260, y: 260, rotate: -4, opacity: 1 },
-      animate: { x: 1280, y: [260, 220, 260, 300, 260], rotate: [-4, 2, -4] },
+      initial: { x: -260, y: 160, rotate: -4, opacity: 1 },
+      animate: { x: 1280, y: [160, 120, 160, 200, 160], rotate: [-4, 2, -4] },
       transition: {
         x: { duration: 12, repeat: Infinity, ease: "linear" },
         y: { duration: 5.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
@@ -25,8 +25,8 @@ export default function GhostAnimation() {
     },
     {
       id: 2, // RIGHT-TO-LEFT ghost
-      initial: { x: 1280, y: 300, rotate: 2, opacity: 1 },
-      animate: { x: -280, y: [300, 340, 300, 260, 300], rotate: [2, -2, 2] },
+      initial: { x: 1280, y: 200, rotate: 2, opacity: 1 },
+      animate: { x: -280, y: [200, 240, 200, 160, 200], rotate: [2, -2, 2] },
       transition: {
         x: { duration: 16, repeat: Infinity, ease: "linear" },
         y: { duration: 6.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
@@ -36,8 +36,8 @@ export default function GhostAnimation() {
     },
     {
       id: 3,
-      initial: { x: -300, y: 340, rotate: -3, opacity: 1 },
-      animate: { x: 1280, y: [340, 300, 340, 380, 340], rotate: [-3, 3, -3] },
+      initial: { x: -300, y: 240, rotate: -3, opacity: 1 },
+      animate: { x: 1280, y: [240, 200, 240, 280, 240], rotate: [-3, 3, -3] },
       transition: {
         x: { duration: 20, repeat: Infinity, ease: "linear" },
         y: { duration: 7.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
@@ -48,9 +48,9 @@ export default function GhostAnimation() {
   ] as const;
 
   return (
-    <div className="relative w-full h-screen bg-white overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       <svg
-        viewBox="0 0 1200 600"
+        viewBox="0 0 1200 800"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 w-full h-full"
       >
