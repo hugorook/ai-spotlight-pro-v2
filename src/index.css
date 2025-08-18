@@ -61,7 +61,7 @@
 
     /* Design tokens updated for navy theme */
     --gradient-ai: #111E63; /* Navy blue instead of gradient */
-    --gradient-subtle-purple: linear-gradient(135deg, rgba(196, 181, 253, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
+    --gradient-subtle-purple: #E7E2F9;
     --shadow-glass: none;
     --shadow-glass-hover: 0 4px 20px rgba(31, 38, 135, 0.15);
     --blur-glass: blur(8px);
@@ -412,5 +412,17 @@
     color: white !important;
     fill: currentColor !important;
     stroke: currentColor !important;
+  }
+
+  /* Sidebar icon hover states - just turn white, no fill distortion */
+  .sidebar-icon {
+    color: currentColor;
+  }
+  
+  .sidebar-icon svg {
+    color: currentColor !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.5 !important;
   }
 }

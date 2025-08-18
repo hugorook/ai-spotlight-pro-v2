@@ -63,7 +63,9 @@ const Sidebar = () => {
                 viewBox="0 0 24 24" 
                 fill="currentColor"
               >
-                <path d="M12 2C10.89 2 10 2.89 10 4V6C8.89 6 8 6.89 8 8V14C8 15.11 8.89 16 10 16H14C15.11 16 16 15.11 16 14V8C16 6.89 15.11 6 14 6V4C14 2.89 13.11 2 12 2ZM12 4C12 4 12 4 12 4V6H12C12 6 12 6 12 6V4ZM10 8H14V14H10V8ZM6 18C6 19.11 6.89 20 8 20H16C17.11 20 18 19.11 18 18V17H16V18H8V17H6V18ZM4 21C4 21.55 4.45 22 5 22H19C19.55 22 20 21.55 20 21C20 20.45 19.55 20 19 20H5C4.45 20 4 20.45 4 21Z"/>
+                <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                <circle fill="white" cx="9" cy="9.5" r="0.5"/>
+                <circle fill="white" cx="15" cy="9.5" r="0.5"/>
               </svg>
             </div>
             {isExpanded && (
@@ -90,21 +92,13 @@ const Sidebar = () => {
                     : "text-foreground hover:text-white hover:bg-[#111E63]"
                 )}
               >
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 sidebar-icon group-hover:text-white">
                   {item.icon}
                 </div>
                 {isExpanded && (
                   <div className="overflow-hidden">
                     <div className="font-medium group-hover:text-white whitespace-nowrap">
                       {item.label}
-                    </div>
-                    <div className={cn(
-                      "text-xs group-hover:text-white whitespace-nowrap",
-                      isActive(item.path) 
-                        ? "text-white/80" 
-                        : "text-muted-foreground"
-                    )}>
-                      {item.subtitle}
                     </div>
                   </div>
                 )}
@@ -124,21 +118,13 @@ const Sidebar = () => {
                 : "text-foreground hover:text-white hover:bg-[#111E63]"
             )}
           >
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 sidebar-icon group-hover:text-white">
               <Settings className="w-5 h-5" />
             </div>
             {isExpanded && (
               <div className="overflow-hidden">
                 <div className="font-medium group-hover:text-white whitespace-nowrap">
                   Settings
-                </div>
-                <div className={cn(
-                  "text-xs group-hover:text-white whitespace-nowrap",
-                  isActive("/settings") 
-                    ? "text-white/80" 
-                    : "text-muted-foreground"
-                )}>
-                  Account & preferences
                 </div>
               </div>
             )}

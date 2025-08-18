@@ -19,19 +19,9 @@ const AppHeader = () => {
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "U";
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-white/20">
+    <header className="sticky top-0 z-40 glass border-b border-white/20">
       <div className="px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Command palette shortcut */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="hidden md:inline">Press</span>
-            <kbd className="inline-flex items-center gap-1 rounded border border-white/20 bg-white/20 backdrop-blur-sm px-1.5 py-0.5 font-mono text-[10px]">
-              <span className="hidden sm:inline">⌘</span>
-              <span className="sm:hidden">Ctrl</span>
-              <span>K</span>
-            </kbd>
-            <span>for commands</span>
-          </div>
+        <div className="flex items-center justify-end h-16">
 
           {/* User Menu */}
           <div className="flex items-center gap-2">
