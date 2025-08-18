@@ -22,9 +22,11 @@ import {
 } from "lucide-react";
 import heroImage from "@/assets/hero-ai-visibility.jpg";
 import GhostAnimation from "@/components/GhostAnimation";
+import FlashlightEffect from "@/components/FlashlightEffect";
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [flashlightActive, setFlashlightActive] = useState(true);
 
   const handleGetStarted = () => {
     window.location.href = '/auth';
@@ -139,6 +141,11 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Flashlight Effect */}
+      <FlashlightEffect 
+        isActive={flashlightActive} 
+        onToggle={setFlashlightActive} 
+      />
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4">
