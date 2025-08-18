@@ -40,7 +40,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         .dot {
           width: 12px;
           height: 12px;
-          background: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
+          background: rgba(17, 30, 99, 0.8);
           border-radius: 50%;
           margin: 0 2px;
         }
@@ -48,7 +48,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         .dash {
           width: 30px;
           height: 12px;
-          background: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
+          background: rgba(17, 30, 99, 0.8);
           border-radius: 6px;
           margin: 0 2px;
         }
@@ -113,7 +113,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
         }
 
         .letter {
-          background: linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%);
+          background: rgba(17, 30, 99, 0.8);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -211,7 +211,7 @@ const MorseLoader: React.FC<MorseLoaderProps> = ({ isActive, progress = 0 }) => 
     const textArea = document.createElement('div');
     textArea.style.fontSize = '1.5rem';
     textArea.style.fontWeight = 'bold';
-    textArea.style.background = 'linear-gradient(135deg, rgba(196, 181, 253, 0.8) 0%, rgba(147, 197, 253, 0.8) 100%)';
+    textArea.style.background = 'rgba(17, 30, 99, 0.8)';
     textArea.style.webkitBackgroundClip = 'text';
     textArea.style.webkitTextFillColor = 'transparent';
     textArea.style.backgroundClip = 'text';

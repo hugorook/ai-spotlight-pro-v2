@@ -48,8 +48,8 @@ const AnimatedPath: React.FC<AnimatedPathProps> = ({
         {/* Define gradient */}
         <defs>
           <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(196, 181, 253, 0.8)" />
-            <stop offset="100%" stopColor="rgba(147, 197, 253, 0.8)" />
+            <stop offset="0%" stopColor="rgba(17, 30, 99, 0.8)" />
+            <stop offset="100%" stopColor="rgba(17, 30, 99, 0.8)" />
           </linearGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -63,7 +63,7 @@ const AnimatedPath: React.FC<AnimatedPathProps> = ({
         {/* Background path (full route) */}
         <path
           d="M 50 50 L 50 150 L 400 150 L 400 250 L 750 250"
-          stroke="rgba(196, 181, 253, 0.2)"
+          stroke="rgba(17, 30, 99, 0.2)"
           strokeWidth="3"
           fill="none"
           strokeDasharray="5,5"
@@ -130,12 +130,12 @@ const AnimatedPath: React.FC<AnimatedPathProps> = ({
       >
         <div className={`glass-strong p-4 rounded-lg border-2 transition-all duration-500 ${
           showResults 
-            ? 'bg-gradient-ai text-white border-purple-400 shadow-lg animate-pulse' 
-            : 'border-purple-200'
+            ? 'bg-[#111E63] text-white border-[#111E63] shadow-lg animate-pulse' 
+            : 'border-[#111E63]/20'
         }`}>
           <div className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              showResults ? 'bg-white animate-pulse' : 'bg-purple-300'
+              showResults ? 'bg-white animate-pulse' : 'bg-[#111E63]/30'
             }`}></div>
             <span className="font-medium">Results</span>
           </div>
