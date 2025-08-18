@@ -28,8 +28,8 @@ interface CommandDialogProps extends DialogProps {
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-xl border border-white/20 glass-strong backdrop-blur-xl">
-        <Command className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-foreground [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-4 [&_[cmdk-item]_svg]:w-4">
+      <DialogContent className="overflow-hidden p-0 shadow-2xl border border-white/30 bg-white/90 backdrop-blur-xl">
+        <Command className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-gray-700 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-4 [&_[cmdk-item]_svg]:w-4">
           {children}
         </Command>
       </DialogContent>
@@ -41,12 +41,12 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b border-white/20 px-4 py-2" cmdk-input-wrapper="">
-    <Search className="mr-3 h-5 w-5 shrink-0 text-muted-foreground" />
+  <div className="flex items-center border-b border-gray-200/60 px-4 py-2" cmdk-input-wrapper="">
+    <Search className="mr-3 h-5 w-5 shrink-0 text-gray-500" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-12 w-full rounded-md bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-12 w-full rounded-md bg-transparent py-3 text-sm text-gray-900 outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
@@ -75,7 +75,7 @@ const CommandEmpty = React.forwardRef<
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-8 text-center text-sm text-muted-foreground"
+    className="py-8 text-center text-sm text-gray-500"
     {...props}
   />
 ))
@@ -89,7 +89,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider",
+      "overflow-hidden p-1 text-gray-900 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-gray-700 [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider",
       className
     )}
     {...props}
@@ -117,7 +117,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-lg mx-2 my-1 px-3 py-2.5 text-sm outline-none transition-all duration-300 data-[disabled=true]:pointer-events-none data-[selected='true']:bg-gradient-ai data-[selected=true]:text-white data-[selected='true']:shadow-md data-[disabled=true]:opacity-50 hover:bg-white/10",
+      "relative flex cursor-default select-none items-center rounded-lg mx-2 my-1 px-3 py-2.5 text-sm text-gray-700 outline-none transition-all duration-300 data-[disabled=true]:pointer-events-none data-[selected='true']:bg-gradient-to-r data-[selected='true']:from-purple-500 data-[selected='true']:to-blue-500 data-[selected=true]:text-white data-[selected='true']:shadow-lg data-[disabled=true]:opacity-50 hover:bg-gray-100/80",
       className
     )}
     {...props}
