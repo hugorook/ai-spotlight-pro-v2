@@ -347,7 +347,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'strategy' && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Strategy & Content</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Strategy Recommendations */}
               <div className="glass p-4 rounded-lg min-h-[400px] h-fit">
@@ -404,41 +403,41 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <button
                   onClick={() => generateContent()}
                   disabled={!contentTopic.trim() || isGenerating}
-                  className="inline-flex w-full items-center justify-center rounded-md bg-[#111E63] text-white px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#111E63] transition-none"
+                  className="inline-flex w-full items-center justify-center rounded-md bg-[#111E63] text-white px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#111E63] transition-none mb-6"
                 >
                   {isGenerating ? 'Generating…' : 'Generate Content'}
                 </button>
-              </div>
-            </div>
 
-            {/* Generated Content */}
-            <div className="glass p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-foreground">Generated Content</h3>
-                {generatedContent && (
-                  <button
-                    onClick={() => copyToClipboard(generatedContent)}
-                    className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#111E63] text-white px-3 py-1.5 text-xs font-medium hover:bg-[#111E63] transition-none"
-                  >
-                    Copy
-                  </button>
-                )}
-              </div>
-
-              {generatedContent ? (
-                <textarea
-                  value={generatedContent}
-                  onChange={(e) => setGeneratedContent(e.target.value)}
-                  className="w-full min-h-[400px] rounded-md border border-transparent bg-white text-black p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              ) : (
-                <div className="min-h-[400px] flex items-center justify-center text-muted-foreground text-center">
-                  <div>
-                    <p>Generated content will appear here</p>
-                    <p className="text-sm">Enter a topic and click generate to start</p>
+                {/* Generated Content - moved inside the same box */}
+                <div className="border-t border-white/20 pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-base font-semibold text-foreground">Generated Content</h4>
+                    {generatedContent && (
+                      <button
+                        onClick={() => copyToClipboard(generatedContent)}
+                        className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#111E63] text-white px-3 py-1.5 text-xs font-medium hover:bg-[#111E63] transition-none"
+                      >
+                        Copy
+                      </button>
+                    )}
                   </div>
+
+                  {generatedContent ? (
+                    <textarea
+                      value={generatedContent}
+                      onChange={(e) => setGeneratedContent(e.target.value)}
+                      className="w-full min-h-[300px] rounded-md border border-transparent bg-white text-black p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    />
+                  ) : (
+                    <div className="min-h-[300px] flex items-center justify-center text-muted-foreground text-center">
+                      <div>
+                        <p>Generated content will appear here</p>
+                        <p className="text-sm">Enter a topic and click generate to start</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         )}

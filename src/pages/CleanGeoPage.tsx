@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/types/supabase';
 import AppShell from '@/components/layout/AppShell';
-import CommandPalette from '@/components/CommandPalette';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { useToast } from '@/components/ui/use-toast';
 import PromptLibrary from '@/components/ai/PromptLibrary';
@@ -1540,7 +1539,6 @@ export default function CleanGeoPage() {
             <div className="h-64 bg-muted rounded" />
           </div>
         </LoadingOverlay>
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -1568,7 +1566,6 @@ export default function CleanGeoPage() {
             }} />
           </div>
         )}
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -1586,7 +1583,6 @@ export default function CleanGeoPage() {
           }}
           onCancel={() => setIsEditingProfile(false)}
         />
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -1606,7 +1602,7 @@ export default function CleanGeoPage() {
           <div className="rounded-2xl bg-card p-8 shadow-soft flex flex-col">
             <div className="mb-6 flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-2xl font-bold text-foreground">Run Automated Health Check</h2>
+                <h2 className="text-2xl font-bold text-foreground">Automated Health Check</h2>
                 <HelpTooltip content="We'll test 10 AI prompts relevant to your industry to see how often your company gets mentioned and at what position." />
               </div>
               <p className="text-muted-foreground">Click to run the automated health check. Results and strategies appear below.</p>
@@ -1764,7 +1760,6 @@ export default function CleanGeoPage() {
             </div>
           </div>
         )}
-        <CommandPalette />
     </AppShell>
   );
 }

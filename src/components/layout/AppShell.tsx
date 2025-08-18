@@ -10,7 +10,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import CopilotSidebar from "@/components/CopilotSidebar";
 
 type AppShellProps = PropsWithChildren<{
   title?: string;
@@ -32,20 +31,18 @@ export default function AppShell({ title, subtitle, right, children }: AppShellP
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Left Sidebar */}
       <Sidebar />
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="ml-16 flex flex-col">
         <AppHeader />
         
         <div className="flex-1 p-6">
           {children}
         </div>
       </div>
-      
-      <CopilotSidebar />
     </div>
   );
 }

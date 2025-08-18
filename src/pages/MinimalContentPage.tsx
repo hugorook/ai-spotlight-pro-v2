@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import AppShell from "@/components/layout/AppShell";
-import CommandPalette from "@/components/CommandPalette";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -89,7 +88,6 @@ const MinimalContentPage = () => {
             <div className="h-52 bg-muted rounded" />
           </div>
         </LoadingOverlay>
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -108,7 +106,6 @@ const MinimalContentPage = () => {
             Set Up Company Profile
           </button>
         </div>
-        <CommandPalette />
       </AppShell>
     );
   }

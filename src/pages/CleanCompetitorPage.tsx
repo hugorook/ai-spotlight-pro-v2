@@ -12,7 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Tables } from "@/types/supabase";
 import AppShell from "@/components/layout/AppShell";
-import CommandPalette from "@/components/CommandPalette";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { scheduleJob, logEvent } from "@/integrations/supabase/functions";
 import { downloadCsv } from "@/lib/export";
@@ -286,7 +285,6 @@ const CleanCompetitorPage = () => {
             <div className="h-64 bg-muted rounded" />
           </div>
         </LoadingOverlay>
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -305,7 +303,6 @@ const CleanCompetitorPage = () => {
             Set Up Company Profile
           </button>
         </div>
-        <CommandPalette />
       </AppShell>
     );
   }

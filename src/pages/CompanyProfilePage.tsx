@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import AppShell from "@/components/layout/AppShell";
-import CommandPalette from "@/components/CommandPalette";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import type { Tables } from '@/types/supabase';
@@ -218,7 +217,6 @@ const CompanyProfilePage = () => {
             <div className="h-52 bg-muted rounded" />
           </div>
         </LoadingOverlay>
-        <CommandPalette />
       </AppShell>
     );
   }

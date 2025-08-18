@@ -22,14 +22,14 @@
 
 @layer base {
   :root {
-    /* New Design System: Light purple background with navy text */
-    --background: 249 224 249; /* #E7E2F9 */
+    /* New Design System: White background with navy text */
+    --background: 255 255 255; /* #FFFFFF */
     --foreground: 218 61 39; /* #111E63 */
 
-    --card: 249 224 249;
+    --card: 231 226 249; /* #E7E2F9 - Pink boxes */
     --card-foreground: 218 61 39;
 
-    --popover: 249 224 249;
+    --popover: 231 226 249;
     --popover-foreground: 218 61 39;
 
     /* Primary color for buttons - navy */
@@ -92,7 +92,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased leading-relaxed;
-    background: #E7E2F9;
+    background: #FFFFFF;
     color: #111E63;
     min-height: 100vh;
   }

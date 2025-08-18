@@ -252,23 +252,26 @@ const PromptsPage = () => {
           {prompts.map((prompt, index) => (
             <div key={prompt.id} className="glass p-4 rounded-lg">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-1">
+                <div className="flex gap-4 flex-1">
+                  {/* Left side: Number and Tag */}
+                  <div className="flex flex-col items-start gap-1 min-w-[120px]">
                     <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
                     <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
                       {prompt.category}
                     </span>
-                    {!prompt.isEditing && (
-                      <>
-                        <p className="text-foreground font-medium ml-2">"{prompt.text}"</p>
-                      </>
-                    )}
                   </div>
-                  {!prompt.isEditing && prompt.intent && (
-                    <p className="text-xs text-muted-foreground">Intent: {prompt.intent}</p>
+                  
+                  {/* Right side: Prompt content */}
+                  {!prompt.isEditing && (
+                    <div className="flex-1">
+                      <p className="text-foreground font-medium">"{prompt.text}"</p>
+                      {prompt.intent && (
+                        <p className="text-xs text-muted-foreground mt-1">Intent: {prompt.intent}</p>
+                      )}
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                   {prompt.isEditing ? (
                     <>
                       <button

@@ -3,7 +3,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/types/supabase";
 import AppShell from "@/components/layout/AppShell";
-import CommandPalette from "@/components/CommandPalette";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import HeaderStrip from '@/components/dashboard/HeaderStrip';
@@ -176,7 +175,6 @@ const CleanDashboard = () => {
             <div className="h-64 bg-muted rounded" />
           </div>
         </LoadingOverlay>
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -195,7 +193,6 @@ const CleanDashboard = () => {
             Set Up Company Profile
           </button>
         </div>
-        <CommandPalette />
       </AppShell>
     );
   }
@@ -317,7 +314,6 @@ const CleanDashboard = () => {
         })()}
       </div>
 
-        <CommandPalette />
     </AppShell>
   );
 };
