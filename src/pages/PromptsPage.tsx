@@ -295,7 +295,7 @@ const PromptsPage = () => {
                 </div>
               </div>
 
-              {prompt.isEditing ? (
+              {prompt.isEditing && (
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-medium text-foreground mb-1">Search Query</label>
