@@ -22,41 +22,41 @@
 
 @layer base {
   :root {
-    /* v2.0 Glass Theme: pure white backgrounds with glassmorphism */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 15%;
+    /* New Design System: Light purple background with navy text */
+    --background: 249 224 249; /* #E7E2F9 */
+    --foreground: 218 61 39; /* #111E63 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 15%;
+    --card: 249 224 249;
+    --card-foreground: 218 61 39;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 15%;
+    --popover: 249 224 249;
+    --popover-foreground: 218 61 39;
 
-    /* Primary uses gradient for buttons */
-    --primary: 258 90% 66%;
+    /* Primary color for buttons - navy */
+    --primary: 218 61 39; /* #111E63 */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 258 90% 66%;
+    --primary-glow: 218 61 39;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 249 224 249;
+    --secondary-foreground: 218 61 39;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 240 5% 84%;
+    --muted-foreground: 218 30% 30%;
 
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 15%;
+    --accent: 249 224 249;
+    --accent-foreground: 218 61 39;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* UI Elements */
-    --border: 0 0% 90%;
-    --input: 0 0% 100%;
-    --ring: 258 90% 66%;
+    --border: 240 5% 84%;
+    --input: 249 224 249;
+    --ring: 218 61 39;
 
     --radius: 0.75rem;
-    /* Global font: Caladea */
-    --font-sans: "Caladea", Georgia, Cambria, "Times New Roman", Times, serif;
+    /* Global fonts: Syne */
+    --font-sans: "Syne", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Glassmorphism design tokens */
@@ -92,12 +92,28 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased leading-relaxed;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: #E7E2F9;
+    color: #111E63;
     min-height: 100vh;
   }
 
-  /* Use Caladea everywhere */
-  * { font-family: var(--font-sans), serif; }
+  /* Use Syne everywhere */
+  * { font-family: var(--font-sans), sans-serif; }
+  
+  /* Headers are Syne Bold and uppercase */
+  h1, h2, h3, h4, h5, h6, .heading {
+    font-family: var(--font-sans), sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111E63;
+  }
+  
+  /* Body text is Syne Regular */
+  p, span, div, a, li, button {
+    font-family: var(--font-sans), sans-serif;
+    font-weight: 400;
+    color: #111E63;
+  }
 
   /* Glassmorphism card styling with faint purple gradient */
   .bg-card, .bg-popover, .card, .panel, .box {
@@ -172,51 +188,54 @@
     background: var(--gradient-ai) !important;
   }
 
-  /* Glassmorphism button styling with instant transitions */
+  /* New button styling with navy hover */
   button {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    color: hsl(var(--foreground));
-    transition: all 0s !important;
+    color: #111E63;
+    transition: all 0.2s ease;
   }
   
   button:hover,
   button:focus,
   button:active {
-    background: var(--gradient-ai) !important;
+    background: #111E63 !important;
     color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(31, 38, 135, 0.15);
-    border-color: rgba(196, 181, 253, 0.3);
-    transition: all 0s !important;
+    border-color: #111E63;
+    box-shadow: none;
+    transform: none;
+    transition: all 0.2s ease;
   }
 
-  /* Instant hover for toggles and tabs */
+  /* Navy hover for toggles and tabs */
   [role="tab"], .toggle, .tab {
-    transition: all 0s !important;
+    transition: all 0.2s ease;
   }
 
   [role="tab"]:hover, .toggle:hover, .tab:hover {
-    box-shadow: 0 4px 20px rgba(31, 38, 135, 0.15);
-    transition: all 0s !important;
+    background: #111E63 !important;
+    color: white !important;
+    box-shadow: none;
+    transform: none;
+    transition: all 0.2s ease;
   }
 
-  /* Glassmorphism inputs */
+  /* Input styling with navy colors */
   input, select, textarea {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    color: hsl(var(--foreground));
+    color: #111E63;
     transition: all 0.3s ease;
   }
 
   input:focus, select:focus, textarea:focus {
     background: rgba(255, 255, 255, 0.3);
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px rgba(196, 181, 253, 0.1);
+    border-color: #111E63;
+    box-shadow: 0 0 0 3px rgba(17, 30, 99, 0.1);
   }
 
   /* Remove any leftover orange utility */
