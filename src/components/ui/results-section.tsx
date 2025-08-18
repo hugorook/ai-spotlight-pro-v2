@@ -279,9 +279,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 
                 return (
                   <div key={index} className="p-3 glass rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start justify-between mb-1">
                       <div className="flex-1 mr-4">
-                        <div className="font-medium text-foreground mb-1">
+                        <div className="font-medium text-foreground">
                           {result.prompt}
                         </div>
                       </div>
@@ -318,7 +318,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                     
                     {/* Always show context summary */}
-                    <div className="text-sm text-muted-foreground break-words mb-2">
+                    <div className="text-sm text-muted-foreground break-words">
                       <strong>Summary:</strong> {displayContext}
                     </div>
                     
