@@ -1125,12 +1125,15 @@ export default function CleanGeoPage() {
 
       // Ensure we have realistic prompts: try local cache -> edge function -> fallback
       const getRealisticPrompts = async (): Promise<string[]> => {
+        const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms/i.test(t) || /which\s+.*companies/i.test(t);
+        const isBanned = (t: string) => /^(how to|what|best practices|benefits|why)\b/i.test(t);
         try {
           const saved = localStorage.getItem(`prompts_${company.id}`);
           if (saved) {
             const parsed = JSON.parse(saved);
-            const texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-            if (texts.length > 0) {
+            let texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+            texts = texts.filter(t => !isBanned(t) && isListQuery(t));
+            if (texts.length >= 6) {
               console.log(`Using ${texts.length} cached prompts`);
               return texts;
             }
@@ -1148,16 +1151,19 @@ export default function CleanGeoPage() {
               websiteUrl: company.website_url,
             }
           });
-          if (!error) {
-            const generated = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-            if (generated.length > 0) {
-              try { localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); } catch {}
-              console.log(`Generated ${generated.length} prompts via website analysis`);
-              return generated;
-            }
+          if (error) throw error;
+          let generated = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+          generated = generated.filter(t => !isBanned(t) && isListQuery(t));
+          if (generated.length > 0) {
+            try { localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); } catch {}
+            console.log(`Generated ${generated.length} prompts via website analysis`);
+            return generated;
+          } else {
+            toast({ title: 'No realistic prompts returned', description: 'Website analyzer did not yield list-style queries. Using fallback.', variant: 'destructive' });
           }
-        } catch (e) {
+        } catch (e: any) {
           console.warn('generate-prompts failed, using fallback', e);
+          toast({ title: 'Prompt generation failed', description: e?.message || 'Falling back to basics.', variant: 'destructive' });
         }
 
         return [
