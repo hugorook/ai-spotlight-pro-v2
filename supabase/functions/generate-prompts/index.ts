@@ -111,10 +111,28 @@ Return JSON only with keys:
     .map(ensureListStyle)
     .filter(t => !/^(how to|what|best practices|benefits|why)\b/i.test(t));
 
+  // Add highly specific, successful prompts that are more likely to mention the company
+  const highValuePrompts: string[] = [];
+  
+  // Create ultra-specific prompts using exact company name and location context
+  if (companyInfo.companyName && segments[0]) {
+    highValuePrompts.push(`Companies like ${companyInfo.companyName} for ${segments[0]}`);
+  }
+  if (companyInfo.companyName && services[0]) {
+    highValuePrompts.push(`${companyInfo.companyName} competitors in ${services[0]}`);
+    highValuePrompts.push(`Alternative companies to ${companyInfo.companyName}`);
+  }
+  if (companyInfo.companyName && useCases[0]) {
+    highValuePrompts.push(`Best companies for ${useCases[0]} similar to ${companyInfo.companyName}`);
+  }
+  
+  // Add these high-value prompts to the programmatic list
+  programmatic = [...highValuePrompts, ...programmatic];
+  
   // If we already got enough programmatic prompts, return those
   if (programmatic.length >= 8) {
-    programmatic = programmatic.slice(0, 10);
-    return programmatic.map((t, i) => make(t, i, i < 4 ? 'easy-win' : i < 8 ? 'moderate' : 'challenging'));
+    programmatic = programmatic.slice(0, 12); // Increased to 12 to include high-value prompts
+    return programmatic.map((t, i) => make(t, i, i < 2 ? 'easy-win' : i < 6 ? 'moderate' : 'challenging'));
   }
 
   const promptGenerationRequest = `ANALYZE THIS COMPANY AND GENERATE SEARCH PROMPTS:
@@ -125,47 +143,48 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the company information above, understand what this company SPECIFICALLY does and create 10 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists.
+TASK: Based on the company information above, create 12 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists. Make some prompts HIGHLY SPECIFIC to increase success rate.
 
-CRITICAL: Use the provided company information to understand:
-- What specific services they offer
-- What types of clients they serve  
-- What problems they solve
-- What makes them unique
+STRATEGY: Mix broad category searches with ultra-specific queries:
+- Include competitor comparison prompts ("alternatives to [company]", "companies like [company]")
+- Use exact company name in some prompts for direct comparison requests
+- Target their specific customer segments and use cases
+- Include geographic context when available
 
 MANDATORY: Every prompt must generate a numbered list of companies:
 - "Best [specific service] companies for [specific need]"
 - "Top [number] [specific solution] providers in [location/industry]"
-- "Leading companies that [specific capability]"
-- "Most recommended [service] for [use case]"
+- "Companies like ${companyInfo.companyName} for [specific use case]"
+- "${companyInfo.companyName} competitors in [specific market]"
+- "Alternative companies to ${companyInfo.companyName}"
 - "Which companies offer [specific solution] for [specific problem]"
 
 CATEGORIES (exact spelling):
-- "easy-win": Broad service category (4 prompts)
-- "moderate": Specific use case/problem (4 prompts)  
-- "challenging": Very specific/niche requirement (2 prompts)
+- "easy-win": Broad category + competitor comparison prompts (4 prompts)
+- "moderate": Specific use case + targeted industry prompts (6 prompts)  
+- "challenging": Ultra-specific niche requirements (2 prompts)
 
-EXAMPLES (based on what they ACTUALLY do):
-- If they do cold storage: "Best cold storage companies for pharmaceutical distribution"
-- If they do logistics: "Top 10 last-mile delivery providers for food retailers"
-- If they do consulting: "Leading supply chain consultants for manufacturing companies"
+EXAMPLES of HIGH-SUCCESS prompts:
+- "Companies like ${companyInfo.companyName} for [their target market]"
+- "${companyInfo.companyName} alternatives for [specific use case]"
+- "Best [their service] providers similar to ${companyInfo.companyName}"
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
-JSON FORMAT (EXACT):
+JSON FORMAT (EXACTLY 12 prompts):
 {
   "prompts": [
     {
       "id": "prompt-1",
-      "text": "[company list question]",
+      "text": "Companies like ${companyInfo.companyName} for [target market]",
       "category": "easy-win",
-      "intent": "Generate list of top providers in category"
+      "intent": "Find direct competitors and alternatives"
     },
     {
       "id": "prompt-2", 
-      "text": "[company list question]",
-      "category": "moderate",
-      "intent": "Generate list for specific use case"
+      "text": "${companyInfo.companyName} competitors in [industry/service]",
+      "category": "easy-win",
+      "intent": "Generate competitive landscape list"
     }
   ]
 }`;
@@ -211,8 +230,8 @@ JSON FORMAT (EXACT):
     const parsed = JSON.parse(responseText);
     let prompts = parsed.prompts || [];
 
-    // Normalize + validate
-    let validatedPrompts: GeneratedPrompt[] = prompts.slice(0, 20).map((prompt: any, index: number) => ({
+    // Normalize + validate (expect 12 prompts)
+    let validatedPrompts: GeneratedPrompt[] = prompts.slice(0, 24).map((prompt: any, index: number) => ({
       id: prompt.id || `prompt-${index + 1}`,
       text: String(prompt.text || '').trim(),
       category: ['easy-win', 'moderate', 'challenging'].includes(prompt.category)
@@ -225,10 +244,17 @@ JSON FORMAT (EXACT):
     validatedPrompts = validatedPrompts.filter(p => p.text && !isBanned(p.text) && isListQuery(p.text));
 
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
-    if (validatedPrompts.length < 8) {
+    if (validatedPrompts.length < 10) {
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
-      const strictPrompt = `Rewrite and return EXACTLY 10 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies for ${companyInfo.companyName}. 
-They MUST start with 'Best', 'Top', 'Leading', or 'Which companies', and MUST include words like companies/providers/vendors/consultants/agencies/firms. 
+      const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies for ${companyInfo.companyName}. 
+
+INCLUDE HIGH-SUCCESS PROMPTS:
+- "Companies like ${companyInfo.companyName} for [use case]"
+- "${companyInfo.companyName} competitors in [market]"
+- "Alternative companies to ${companyInfo.companyName}"
+- "Best [service] providers similar to ${companyInfo.companyName}"
+
+And traditional list prompts starting with 'Best', 'Top', 'Leading', or 'Which companies'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
 Use the provided company information and avoid any 'how to', 'what', or advisory phrasing.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -272,8 +298,8 @@ Use the provided company information and avoid any 'how to', 'what', or advisory
       }
     }
 
-    // Cap to 10
-    validatedPrompts = validatedPrompts.slice(0, 10);
+    // Cap to 12 for more variety and higher success rate
+    validatedPrompts = validatedPrompts.slice(0, 12);
     console.log(`Returning ${validatedPrompts.length} validated prompts`);
     return validatedPrompts;
 
