@@ -197,8 +197,8 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="pt-48 pb-20 px-4 relative overflow-hidden">
-        {/* Ghost Animation Overlay - Full screen */}
-        <div className="fixed inset-0 pointer-events-none z-50">
+        {/* Ghost Animation Overlay - Hero section only */}
+        <div className="absolute inset-0 pointer-events-none z-50">
           <GhostAnimation />
         </div>
         
@@ -207,9 +207,8 @@ const LandingPage = () => {
           <div className="text-center max-w-4xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-4">
-                <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                  Your Audience is searching
-                  <br />
+                <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+                  Your Audience is searching{" "}
                   <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                     Can they Find You?
                   </span>

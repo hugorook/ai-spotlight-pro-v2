@@ -48,7 +48,7 @@ export default function GhostAnimation() {
   ] as const;
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
       <svg
         viewBox="0 0 1200 800"
         preserveAspectRatio="xMidYMid slice"
