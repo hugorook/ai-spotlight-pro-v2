@@ -163,17 +163,31 @@ Return JSON only with SHORT terms:
   const markets = uniq(cleanExtracted.markets).slice(0, 4);
   const useCases = uniq(cleanExtracted.useCases).slice(0, 6);
 
-  for (const s of services) {
-    candidates.push(`${listPhr[0]} ${s} providers`);
-    if (segments[0]) candidates.push(`${listPhr[1]} ${s} companies for ${segments[0]}`);
-    if (useCases[0]) candidates.push(`${listPhr[2]} companies that provide ${s} for ${useCases[0]}`);
-    if (markets[0]) candidates.push(`${listPhr[1]} ${s} vendors in ${markets[0]}`);
+  // Create business-specific combinations that show market understanding
+  for (const service of services.slice(0, 3)) {
+    if (segments[0]) {
+      candidates.push(`Companies providing ${service} for ${segments[0]}`);
+      candidates.push(`${service} specialists serving ${segments[0]}`);
+    }
+    if (useCases[0]) {
+      candidates.push(`Companies offering ${service} to solve ${useCases[0]}`);
+    }
   }
-  for (const seg of segments.slice(0, 3)) {
-    candidates.push(`${listPhr[0]} providers for ${seg}`);
+  
+  // Create customer-focused prompts
+  for (const segment of segments.slice(0, 3)) {
+    if (services[0]) {
+      candidates.push(`${services[0]} companies specializing in ${segment}`);
+    }
+    candidates.push(`Specialized service providers for ${segment}`);
   }
-  for (const uc of useCases.slice(0, 2)) {
-    candidates.push(`Which companies offer solutions for ${uc}?`);
+  
+  // Create problem-solution focused prompts
+  for (const useCase of useCases.slice(0, 2)) {
+    candidates.push(`Companies solving ${useCase} challenges`);
+    if (segments[0]) {
+      candidates.push(`Which companies help ${segments[0]} with ${useCase}`);
+    }
   }
 
   let programmatic = uniq(candidates)
@@ -192,43 +206,37 @@ Return JSON only with SHORT terms:
   // Filter out location-specific prompts if geographic focus is "Global"
   const useLocationSpecific = currentGeo !== 'Global' && currentGeo.toLowerCase() !== 'global';
   
-  // Strategy 1: ULTRA-NICHE queries (so specific only a few companies would qualify)
+  // Strategy 1: Business-model specific queries that show market understanding
   for (const niche of niches.slice(0, 2)) {
-    if (useLocationSpecific && locations[0]) {
-      specificPrompts.push(`${niche} companies in ${locations[0]}`);
+    if (segments[0]) {
+      specificPrompts.push(`Companies specializing in ${niche} for ${segments[0]}`);
+      if (useLocationSpecific && locations[0]) {
+        specificPrompts.push(`${niche} specialists in ${locations[0]} serving ${segments[0]}`);
+      }
     } else {
       specificPrompts.push(`Leading ${niche} specialists`);
     }
-    if (segments[0] && useLocationSpecific && locations[1]) {
-      specificPrompts.push(`Top ${niche} specialists in ${locations[1]} for ${segments[0]}`);
-    } else if (segments[0]) {
-      specificPrompts.push(`Top ${niche} specialists for ${segments[0]}`);
-    }
   }
   
-  // Strategy 2: Technology + Geographic + Customer combinations (very narrow)
+  // Strategy 2: Value proposition + Customer combinations
   for (const tech of techs.slice(0, 2)) {
-    if (useLocationSpecific && locations[0] && segments[0]) {
-      specificPrompts.push(`${tech} companies in ${locations[0]} serving ${segments[0]}`);
+    if (segments[0] && useCases[0]) {
+      specificPrompts.push(`Companies using ${tech} to help ${segments[0]} with ${useCases[0]}`);
     } else if (segments[0]) {
-      specificPrompts.push(`${tech} companies serving ${segments[0]}`);
+      specificPrompts.push(`${tech} specialists serving ${segments[0]}`);
     }
-    if (useLocationSpecific && useCases[0] && locations[1]) {
-      specificPrompts.push(`Best ${tech} providers for ${useCases[0]} in ${locations[1]}`);
-    } else if (useCases[0]) {
-      specificPrompts.push(`Best ${tech} providers for ${useCases[0]}`);
+    if (services[0]) {
+      specificPrompts.push(`${services[0]} companies with ${tech} capabilities`);
     }
   }
   
-  // Strategy 3: Service + Multiple Qualifiers (maximum specificity)
+  // Strategy 3: Customer-problem-solution combinations
   for (const service of services.slice(0, 2)) {
-    if (useLocationSpecific && locations[0] && compSizes[0]) {
-      specificPrompts.push(`${service} companies in ${locations[0]} specializing in ${compSizes[0]}`);
-    } else if (compSizes[0]) {
-      specificPrompts.push(`${service} companies specializing in ${compSizes[0]}`);
+    if (compSizes[0] && useCases[0]) {
+      specificPrompts.push(`${service} companies helping ${compSizes[0]} with ${useCases[0]}`);
     }
-    if (segments[0] && techs[0]) {
-      specificPrompts.push(`${service} providers using ${techs[0]} for ${segments[0]}`);
+    if (segments[0] && niches[0]) {
+      specificPrompts.push(`${service} specialists in ${niches[0]} for ${segments[0]}`);
     }
   }
   
@@ -291,41 +299,51 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the detailed company information above, create 12 ULTRA-SPECIFIC search prompts that are genuine "easy wins" - so niche that only a handful of companies (including ${companyInfo.companyName}) would qualify. NO company name mentions allowed.
+TASK: Based on the company information above, create 12 HIGHLY SPECIFIC search prompts that reflect deep understanding of their actual business model and unique market position. NO company name mentions allowed.
 
-STRATEGY: Create queries so specific they're almost like describing the company without naming them:
-- Use UNIQUE combinations that few companies have: [rare specialization] + [specific geography] + [exact customer type] + [unique methodology]
-- Example: "blockchain supply chain companies in Singapore specializing in luxury goods authentication for mid-market retailers"
-- Include award/recognition language: "most recognized", "award-winning", "leading experts in"
-- Use problem-specific queries: "companies solving [exact problem] in [specific market]"
-- Target their exact unique selling points and rare combinations
-- Make prompts so niche that generic competitors wouldn't qualify
-- Each prompt should describe a market where they'd naturally be mentioned
+STRATEGY: Create prompts that show you understand EXACTLY what they do and how they're different:
+- Focus on their SPECIFIC business model, not generic industry categories
+- Use their ACTUAL customer types, commodity focuses, and unique approaches
+- Include their SPECIFIC value proposition and methodology
+- Target the EXACT problems they solve for their specific customers
+- Example: Instead of "commodity trading companies" → "companies providing structured finance and risk management for family-owned sugar mills in Brazil"
+- Example: Instead of "supply chain companies" → "direct-trade coffee sourcing companies with farmer partnership programs serving specialty roasters"
+- Make each prompt reflect their specific competitive advantage and market positioning
+- Think: "What would someone search for who specifically needs what this company uniquely offers?"
 
-MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions). Use ULTRA-SPECIFIC structures:
-- "Award-winning [niche service] companies in [city] specializing in [exact problem] for [precise customer type]"
-- "Most recognized [technology + methodology] providers in [market] serving [specific industry vertical]"
-- "Companies solving [exact challenge] in [geographic region] using [specific approach]"
-- "Leading experts in [super-niche specialization] for [detailed customer segment] in [location]"
-- "[Rare technology combination] companies in [specific market] focusing on [unique use case]"
-- "Top-rated [service] specialists in [location] with [specific certification/capability]"
-- "Which companies offer [ultra-specific solution] for [precise problem] in [niche market]"
-- "Best [methodology] providers specializing in [industry niche] + [geography] + [customer size]"
+MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions). Use BUSINESS-SPECIFIC structures that reflect actual market understanding:
+- "Companies providing [specific business model/approach] for [exact customer type] in [specific market context]"
+- "[Specific commodity/product] trading firms with [unique capability] serving [actual customer profile]"
+- "[Service type] companies specializing in [specific market segment] with [unique value proposition]"
+- "Which companies offer [specific business solution] for [exact customer challenge] in [particular market]"
+- "[Industry] specialists with [unique approach/methodology] for [specific customer type]"
+- "Companies with [specific expertise/relationships] serving [particular market segment]"
+- "[Service] providers with [specific competitive advantage] in [particular geographic/sector focus]"
+- "Leading [specific specialization] companies with [unique capability] for [exact customer needs]"
 
 CATEGORIES (exact spelling):
 - "easy-win": Broad category + competitor comparison prompts (4 prompts)
 - "moderate": Specific use case + targeted industry prompts (6 prompts)  
 - "challenging": Ultra-specific niche requirements (2 prompts)
 
-EXAMPLES of ULTRA-SPECIFIC "easy win" prompts:
-- "Award-winning algorithmic sugar commodity trading companies in London specializing in hedge fund risk management" 
-- "Machine learning supply chain optimization companies in Germany serving automotive Tier 1 suppliers"
-- "Pharmaceutical temperature-controlled logistics specialists in European markets with IoT monitoring capabilities"
-- "Blockchain supply chain tracking companies in Singapore focusing on luxury goods authentication for mid-market retailers"
-- "Most recognized Series A SaaS marketing automation platforms for B2B tech startups with AI-powered lead scoring"
-- "Companies solving renewable energy project finance challenges in Southeast Asia emerging markets"
-- "Leading experts in cryptocurrency exchange security infrastructure for institutional trading platforms"
-- "AI-powered fraud detection companies specializing in cross-border e-commerce transactions for fintech startups"
+EXAMPLES of BUSINESS-SPECIFIC prompts that show deep understanding:
+
+For a sugar trading company like Czarnikow:
+- "Companies providing structured finance and risk management for sugar mills in Brazil and Central America"
+- "Sugar trading firms with direct producer relationships and price risk mitigation services"
+- "Commodity trading houses specializing in sugar ethanol complex with logistics integration"
+- "Agricultural commodity finance companies serving family-owned mills in Latin America"
+
+For a coffee sourcing company:
+- "Direct-trade coffee sourcing companies with farmer partnership programs serving specialty roasters"
+- "Coffee supply chain companies providing quality premiums and sustainability certification"
+- "Specialty coffee importers with origin relationships and cupping expertise"
+
+For a tech company:
+- "B2B SaaS platforms with API-first architecture serving mid-market e-commerce companies"
+- "Marketing automation tools with advanced segmentation for subscription business models"
+
+These show ACTUAL BUSINESS UNDERSTANDING, not generic industry terms.
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
