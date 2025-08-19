@@ -20,34 +20,98 @@ interface GeneratedPrompt {
   intent: string;
 }
 
+async function analyzeWebsiteForPrompts(url: string): Promise<string> {
+  try {
+    // Ensure URL has protocol
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AI-Visibility-Bot/1.0)',
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const html = await response.text();
+    
+    // Basic HTML parsing to extract text content
+    let cleanHtml = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    cleanHtml = cleanHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+    
+    // Extract text from common content tags
+    const contentRegex = /<(?:p|h[1-6]|div|span|article|section)[^>]*>(.*?)<\/(?:p|h[1-6]|div|span|article|section)>/gi;
+    const matches = [...cleanHtml.matchAll(contentRegex)];
+    
+    let textContent = matches
+      .map(match => match[1].replace(/<[^>]*>/g, ' ').trim())
+      .filter(text => text.length > 10)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+      
+    // Limit content size
+    if (textContent.length > 3000) {
+      textContent = textContent.substring(0, 3000) + '...';
+    }
+    
+    return textContent;
+  } catch (error) {
+    console.error('Website analysis failed:', error);
+    return '';
+  }
+}
+
 async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Promise<GeneratedPrompt[]> {
   if (!OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not set');
   }
 
-  const promptGenerationRequest = `COMPANY: ${companyInfo.companyName} in ${companyInfo.industry}
+  // Analyze website to understand what company actually does
+  let websiteContent = '';
+  if (companyInfo.websiteUrl) {
+    console.log('Analyzing website:', companyInfo.websiteUrl);
+    websiteContent = await analyzeWebsiteForPrompts(companyInfo.websiteUrl);
+  }
 
-TARGET: Generate 10 search prompts that result in AI models listing ${companyInfo.companyName} among company recommendations.
+  const promptGenerationRequest = `ANALYZE THIS COMPANY AND GENERATE SEARCH PROMPTS:
 
-MANDATORY FORMAT: Every prompt must ask for company lists using phrases like:
-- "Best [X] companies for [Y]"
-- "Top 10 [X] providers in [Y]" 
-- "Leading [X] companies that [Y]"
-- "Most recommended [X] solutions for [Y]"
-- "Which [X] companies should I choose for [Y]"
+Company: ${companyInfo.companyName}
+Website Content: ${websiteContent || 'No website provided'}
+Industry: ${companyInfo.industry}
+Description: ${companyInfo.description || 'Not provided'}
 
-CATEGORIES (use exactly these):
-- "easy-win": Broad industry searches (4 prompts)
-- "moderate": Specific use cases (4 prompts)  
-- "challenging": Very niche/competitive (2 prompts)
+TASK: Based on the actual website content above, understand what this company SPECIFICALLY does and create 10 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists.
 
-EXAMPLES FOR ${companyInfo.industry}:
-✅ "Best ${companyInfo.industry} companies for small businesses under $1M revenue"
-✅ "Top 10 ${companyInfo.industry} providers for international shipping"
-✅ "Which ${companyInfo.industry} companies offer the fastest delivery times"
-✅ "Most reliable ${companyInfo.industry} partners for food manufacturers"
+CRITICAL: Ignore generic industry labels. Use the WEBSITE CONTENT to understand:
+- What specific services they offer
+- What types of clients they serve  
+- What problems they solve
+- What makes them unique
 
-❌ NEVER CREATE: "How to", "What are", "Best practices for", "Strategies to"
+MANDATORY: Every prompt must generate a numbered list of companies:
+- "Best [specific service] companies for [specific need]"
+- "Top [number] [specific solution] providers in [location/industry]"
+- "Leading companies that [specific capability]"
+- "Most recommended [service] for [use case]"
+- "Which companies offer [specific solution] for [specific problem]"
+
+CATEGORIES (exact spelling):
+- "easy-win": Broad service category (4 prompts)
+- "moderate": Specific use case/problem (4 prompts)  
+- "challenging": Very specific/niche requirement (2 prompts)
+
+EXAMPLES (based on what they ACTUALLY do):
+- If they do cold storage: "Best cold storage companies for pharmaceutical distribution"
+- If they do logistics: "Top 10 last-mile delivery providers for food retailers"
+- If they do consulting: "Leading supply chain consultants for manufacturing companies"
+
+❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
 JSON FORMAT (EXACT):
 {
