@@ -13,6 +13,7 @@ const CompanyProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState<Company | null>(null);
   const [saving, setSaving] = useState(false);
+  const [analyzingWebsite, setAnalyzingWebsite] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -208,6 +209,61 @@ const CompanyProfilePage = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const analyzeWebsite = async () => {
+    if (!formData.website.trim()) {
+      toast({ 
+        title: 'Website Required', 
+        description: 'Please enter a website URL first.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setAnalyzingWebsite(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
+        body: { url: formData.website }
+      });
+
+      if (error) {
+        console.error('Website analysis error:', error);
+        toast({ 
+          title: 'Analysis Failed', 
+          description: 'Failed to analyze website. Please fill in the fields manually.', 
+          variant: 'destructive' 
+        });
+        return;
+      }
+
+      if (data?.fields) {
+        const fields = data.fields;
+        setFormData(prev => ({
+          ...prev,
+          companyName: fields.companyName || prev.companyName,
+          industry: fields.industry || prev.industry,
+          description: fields.description || prev.description,
+          targetCustomers: fields.targetCustomers || prev.targetCustomers,
+          differentiators: fields.keyDifferentiators || prev.differentiators,
+          geography: fields.geographicFocus || prev.geography
+        }));
+        
+        toast({ 
+          title: 'Analysis Complete', 
+          description: 'Website analyzed successfully! Fields have been populated. You can edit them as needed.' 
+        });
+      }
+    } catch (error) {
+      console.error('Website analysis error:', error);
+      toast({ 
+        title: 'Analysis Failed', 
+        description: 'Failed to analyze website. Please fill in the fields manually.', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setAnalyzingWebsite(false);
+    }
+  };
+
   if (loading) {
     return (
       <AppShell>
@@ -251,13 +307,26 @@ const CompanyProfilePage = () => {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Website URL *
                 </label>
-                <input
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => updateFormData('website', e.target.value)}
-                  className="w-full p-3 bg-white text-black border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="https://www.yourcompany.com"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => updateFormData('website', e.target.value)}
+                    className="flex-1 p-3 bg-white text-black border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="https://www.yourcompany.com"
+                  />
+                  <button
+                    type="button"
+                    onClick={analyzeWebsite}
+                    disabled={analyzingWebsite || !formData.website.trim()}
+                    className="px-4 py-3 bg-[#111E63] text-white rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity whitespace-nowrap"
+                  >
+                    {analyzingWebsite ? 'Analyzing...' : 'Auto-Fill'}
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Click "Auto-Fill" to analyze your website and populate the form fields automatically
+                </p>
               </div>
             </div>
 
