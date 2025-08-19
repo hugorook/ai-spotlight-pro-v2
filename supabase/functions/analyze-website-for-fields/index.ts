@@ -20,6 +20,7 @@ interface ExtractedFields {
   technologies: string[];
   companySizes: string[];
   locations: string[];
+  uniqueCombinations: string[];
 }
 
 async function fetchWebsiteContent(url: string): Promise<string> {
@@ -98,44 +99,55 @@ Extract the following fields with MAXIMUM DETAIL and SPECIFICITY:
    - Industry verticals they focus on
    - Company size ranges with specifics
 
-5. Key Differentiators: List specific competitive advantages:
-   - Unique methodologies or frameworks
-   - Proprietary technology or IP
-   - Industry awards or certifications
-   - Years of experience in specific niches
-   - Notable clients or case studies
-   - Specific expertise areas
+5. Key Differentiators: Extract ultra-specific competitive advantages that make them unique:
+   - Exact proprietary methodologies or frameworks (with names/terms they use)
+   - Specific patents, certifications, or industry awards (with names/years)
+   - Notable client names, case studies, or partnership announcements
+   - Unique technical capabilities or rare specializations
+   - Specific years of experience in ultra-niche areas
+   - Industry recognition, thought leadership, or media mentions
+   - Rare combinations of services/expertise that few others have
 
 6. Geographic Focus: Specific locations where they operate or serve clients
 
-7. Specific Services: Detailed array of exact services (not generic categories):
-   - Example: ["algorithmic commodity trading", "sugar futures hedging", "agricultural supply chain financing"] NOT ["commodity trading"]
+7. Specific Services: Ultra-detailed array of exact services with unique qualifiers:
+   - Example: ["algorithmic sugar commodity trading with risk management", "pharmaceutical cold chain logistics with IoT monitoring", "luxury goods blockchain authentication"] NOT ["trading", "logistics"]
+   - Include any proprietary service names or methodologies they mention
 
-8. Industry Niches: Very specific sub-industries or specializations:
-   - Example: ["pharmaceutical temperature-controlled logistics", "automotive just-in-time supply chain", "luxury goods authentication"] NOT ["logistics"]
+8. Industry Niches: Extremely specific sub-industries with unique angles:
+   - Example: ["pharmaceutical temperature-controlled logistics for clinical trials", "automotive Tier 1 supplier just-in-time delivery", "luxury goods authentication for mid-market retailers"] NOT ["logistics"]
+   - Capture the exact customer types within each niche
 
-9. Technologies: Specific technologies, methodologies, or approaches:
-   - Example: ["machine learning price prediction", "blockchain supply chain tracking", "IoT temperature monitoring"] NOT ["technology solutions"]
+9. Technologies: Specific technologies with implementation details:
+   - Example: ["machine learning price prediction for commodity trading", "blockchain supply chain tracking for luxury goods", "AI-powered fraud detection for cross-border payments"] NOT ["AI solutions"]
+   - Include exact use cases or applications mentioned
 
-10. Company Sizes: Specific company size segments they serve:
-    - Example: ["Series A-B startups (10-50 employees)", "mid-market companies ($50-500M revenue)", "Fortune 1000 enterprises"]
+10. Company Sizes: Ultra-specific company size segments with context:
+    - Example: ["Series A SaaS startups with 10-50 employees", "mid-market manufacturers with $50-500M revenue in automotive sector", "Fortune 500 financial services companies"]
+    - Include industry context for each size segment
 
-11. Locations: Specific geographic markets, cities, regions:
-    - Example: ["London financial district", "New York tri-state area", "California Central Valley", "Southeast Asia emerging markets"]
+11. Locations: Hyper-specific geographic markets with context:
+    - Example: ["London financial district fintech companies", "Singapore luxury retail market", "California Central Valley agricultural technology", "Southeast Asia emerging fintech markets"]
+    - Include the business context for each location
 
-Return ONLY valid JSON with MAXIMUM DETAIL:
+12. Unique Combinations: Rare service/market combinations that few competitors have:
+    - Example: ["blockchain + luxury goods + Singapore", "AI + commodity trading + hedge funds", "IoT + pharmaceutical + cold chain"]
+    - These ultra-specific combinations will create the best "easy win" prompts
+
+Return ONLY valid JSON with ULTRA-SPECIFIC DETAILS for creating "easy win" prompts:
 {
   "companyName": "extracted company name",
-  "industry": "highly specific industry niche",
-  "description": "detailed 4-5 sentence description of exactly what they do, how they do it, what problems they solve, and what makes them unique",
-  "targetCustomers": "very specific customer segments with company types, sizes, roles, and industries - include examples like 'Series A SaaS companies' or 'Fortune 500 manufacturers'", 
-  "keyDifferentiators": "specific competitive advantages, unique methodologies, awards, certifications, notable clients, years of experience in niches",
-  "geographicFocus": "specific geographic markets where they operate",
-  "specificServices": ["highly detailed service 1", "specific service 2", "exact offering 3"],
-  "industryNiches": ["very specific niche 1", "detailed specialization 2"],
-  "technologies": ["specific technology/methodology 1", "exact approach 2"],
-  "companySizes": ["specific size range 1", "detailed segment 2"],
-  "locations": ["specific location 1", "detailed market 2"]
+  "industry": "hyper-specific industry niche with unique angle",
+  "description": "detailed 4-5 sentence description of exactly what they do, their proprietary approach, specific problems they solve, and what makes them uniquely positioned",
+  "targetCustomers": "ultra-specific customer segments with exact company types, sizes, roles, industries, and contexts - like 'Series A fintech startups in Southeast Asia' or 'Fortune 500 automotive Tier 1 suppliers'", 
+  "keyDifferentiators": "rare competitive advantages, proprietary methodologies with names, specific awards/certifications, notable client names, exact years of niche experience, unique capability combinations",
+  "geographicFocus": "hyper-specific geographic markets with business context",
+  "specificServices": ["ultra-detailed service with unique qualifiers", "proprietary service name/approach", "service + technology + market combination"],
+  "industryNiches": ["extremely specific niche with customer context", "rare specialization few others have"],
+  "technologies": ["specific technology + exact use case", "proprietary methodology + application"],
+  "companySizes": ["specific size + industry context", "detailed segment + use case"],
+  "locations": ["specific location + business context", "niche market + geography"],
+  "uniqueCombinations": ["rare service+market+tech combination 1", "unique positioning few competitors have"]
 }`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -182,7 +194,8 @@ Return ONLY valid JSON with MAXIMUM DETAIL:
       industryNiches: Array.isArray(parsed.industryNiches) ? parsed.industryNiches : [],
       technologies: Array.isArray(parsed.technologies) ? parsed.technologies : [],
       companySizes: Array.isArray(parsed.companySizes) ? parsed.companySizes : [],
-      locations: Array.isArray(parsed.locations) ? parsed.locations : []
+      locations: Array.isArray(parsed.locations) ? parsed.locations : [],
+      uniqueCombinations: Array.isArray(parsed.uniqueCombinations) ? parsed.uniqueCombinations : []
     };
     
     return fields;
