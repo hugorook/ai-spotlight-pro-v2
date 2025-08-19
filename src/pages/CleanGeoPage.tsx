@@ -1123,42 +1123,59 @@ export default function CleanGeoPage() {
         description: company.description
       });
 
-      // Load saved prompts or use fallback
-      const savedPrompts = localStorage.getItem(`prompts_${company.id}`);
-      let prompts: string[] = [];
-      
-      if (savedPrompts) {
+      // Ensure we have realistic prompts: try local cache -> edge function -> fallback
+      const getRealisticPrompts = async (): Promise<string[]> => {
         try {
-          const parsedPrompts = JSON.parse(savedPrompts);
-          prompts = parsedPrompts.map((p: any) => p.text).filter((text: string) => text && text.trim());
-          console.log(`Using ${prompts.length} saved prompts for health check`);
+          const saved = localStorage.getItem(`prompts_${company.id}`);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            const texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+            if (texts.length > 0) {
+              console.log(`Using ${texts.length} cached prompts`);
+              return texts;
+            }
+          }
+        } catch {}
+
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-prompts', {
+            body: {
+              companyName: company.company_name,
+              industry: company.industry,
+              description: company.description,
+              targetCustomers: company.target_customers,
+              keyDifferentiators: company.key_differentiators,
+              websiteUrl: company.website_url,
+            }
+          });
+          if (!error) {
+            const generated = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+            if (generated.length > 0) {
+              try { localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); } catch {}
+              console.log(`Generated ${generated.length} prompts via website analysis`);
+              return generated;
+            }
+          }
         } catch (e) {
-          console.error('Error parsing saved prompts:', e);
+          console.warn('generate-prompts failed, using fallback', e);
         }
-      }
-      
-      // Fallback to basic prompts if no saved prompts found
-      if (prompts.length === 0) {
-        prompts = [
+
+        return [
           `Best ${company.industry} providers for ${company.target_customers || 'SMBs'}`,
           `Top ${company.industry} companies`,
-          `${company.industry} comparison guide`,
-          `How to choose a ${company.industry} partner`,
-          `${company.industry} implementation checklist`,
+          `Leading ${company.industry} consultants`,
+          `Which companies offer ${company.industry} solutions for ${company.target_customers || 'SMBs'}?`,
+          `Top ${company.industry} platforms`,
+          `Best ${company.industry} services in ${company.geographic_focus?.[0] || 'your region'}`,
           `Most recommended ${company.industry} vendors`,
-          `Case studies in ${company.industry}`,
-          `ROI of ${company.industry} solutions`,
-          `${company.industry} trends and leaders`,
-          `${company.industry} alternatives to market leaders`
+          `${company.industry} case studies`,
+          `Top-rated ${company.industry} providers for ${company.description?.split(' ')?.slice(0,3)?.join(' ') || 'common needs'}`,
+          `Leading companies that provide ${company.key_differentiators || company.industry}`
         ];
-        console.log('No saved prompts found, using fallback prompts. Visit the Prompts page to generate better ones.');
-        toast({ 
-          title: 'Using Basic Prompts', 
-          description: 'Visit the Prompts page to generate more realistic test queries for better results.',
-          variant: 'default'
-        });
-      }
-      
+      };
+
+      const prompts = await getRealisticPrompts();
+
       setTestProgress({ current: 0, total: prompts.length });
 
       console.log('Using prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
