@@ -1126,7 +1126,30 @@ export default function CleanGeoPage() {
       // Ensure we have realistic prompts: try local cache -> edge function -> fallback
       const getRealisticPrompts = async (): Promise<string[]> => {
         const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms/i.test(t) || /which\s+.*companies/i.test(t);
-        const isBanned = (t: string) => /^(how to|what|best practices|benefits|why)\b/i.test(t);
+        const isBanned = (t: string) => /^(how\s*to|what\b|what\s+are\b|best\s*practices|benefits\b|why\b|how\s+can\s+i\b)/i.test(t);
+        const ensureMin = (arr: string[], min = 10) => {
+          const out = [...arr];
+          const industry = company.industry || 'services';
+          const audience = company.target_customers || 'SMBs';
+          const region = (company.geographic_focus && company.geographic_focus[0]) || 'your region';
+          const seed: string[] = [
+            `Best ${industry} providers for ${audience}`,
+            `Top 10 ${industry} vendors in ${region}`,
+            `Leading ${industry} consultants for ${audience}`,
+            `Which companies offer ${industry} solutions for ${audience}?`,
+            `Top ${industry} agencies for ${audience}`,
+            `Best-rated ${industry} firms in ${region}`,
+            `Top ${industry} platforms for ${audience}`,
+            `Most recommended ${industry} companies for ${audience}`,
+            `Leading companies that provide ${industry} services`,
+            `Top ${industry} solution providers for ${audience}`,
+          ];
+          for (const s of seed) {
+            if (out.length >= min) break;
+            if (!out.some(x => x.toLowerCase() === s.toLowerCase())) out.push(s);
+          }
+          return out.slice(0, min);
+        };
         try {
           const saved = localStorage.getItem(`prompts_${company.id}`);
           if (saved) {
@@ -1135,7 +1158,7 @@ export default function CleanGeoPage() {
             texts = texts.filter(t => !isBanned(t) && isListQuery(t));
             if (texts.length >= 6) {
               console.log(`Using ${texts.length} cached prompts`);
-              return texts;
+              return ensureMin(texts);
             }
           }
         } catch {}
@@ -1157,7 +1180,7 @@ export default function CleanGeoPage() {
           if (generated.length > 0) {
             try { localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); } catch {}
             console.log(`Generated ${generated.length} prompts via website analysis`);
-            return generated;
+            return ensureMin(generated);
           } else {
             toast({ title: 'No realistic prompts returned', description: 'Website analyzer did not yield list-style queries. Using fallback.', variant: 'destructive' });
           }
@@ -1166,7 +1189,7 @@ export default function CleanGeoPage() {
           toast({ title: 'Prompt generation failed', description: e?.message || 'Falling back to basics.', variant: 'destructive' });
         }
 
-        return [
+        return ensureMin([
           `Best ${company.industry} providers for ${company.target_customers || 'SMBs'}`,
           `Top ${company.industry} companies`,
           `Leading ${company.industry} consultants`,
@@ -1177,7 +1200,7 @@ export default function CleanGeoPage() {
           `${company.industry} case studies`,
           `Top-rated ${company.industry} providers for ${company.description?.split(' ')?.slice(0,3)?.join(' ') || 'common needs'}`,
           `Leading companies that provide ${company.key_differentiators || company.industry}`
-        ];
+        ]);
       };
 
       const prompts = await getRealisticPrompts();
@@ -1185,6 +1208,7 @@ export default function CleanGeoPage() {
       setTestProgress({ current: 0, total: prompts.length });
 
       console.log('Using prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
+      toast({ title: `Testing ${prompts.length} prompts`, description: 'We try list-style company queries first.' });
 
       const results: TestResult[] = [];
       const errors: string[] = [];
