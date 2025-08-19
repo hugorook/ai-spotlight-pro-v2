@@ -168,13 +168,13 @@ const LandingPage = () => {
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#features" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
                 Features
               </a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#pricing" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
                 Pricing
               </a>
-              <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#testimonials" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
                 Testimonials
               </a>
             </nav>
@@ -208,9 +208,10 @@ const LandingPage = () => {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                  Your Audience is searching{" "}
+                  Your Audience is searching
+                  <br />
                   <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                    *Can they Find You?*
+                    Can they Find You?
                   </span>
                 </h1>
                 
@@ -223,15 +224,15 @@ const LandingPage = () => {
               {/* Value Props */}
               <div className="space-y-3 max-w-2xl mx-auto">
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
+                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
                   <span className="text-foreground">Monitor mentions across all major AI models</span>
                 </div>
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
+                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
                   <span className="text-foreground">Identify gaps in your current digital presence</span>
                 </div>
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
+                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
                   <span className="text-foreground">Automate content to Increase AI recommendations</span>
                 </div>
               </div>
@@ -392,7 +393,7 @@ const LandingPage = () => {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`relative p-8 ${plan.highlighted ? 'border-primary shadow-glow bg-primary/5' : ''}`}>
+              <Card key={index} className={`relative p-8 flex flex-col ${plan.highlighted ? 'border-primary shadow-glow bg-primary/5' : ''}`}>
                 {plan.highlighted && (
                   <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-ai text-white">
                     Most Popular
@@ -410,8 +411,8 @@ const LandingPage = () => {
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="p-0">
-                  <ul className="space-y-3 mb-8">
+                <CardContent className="p-0 flex flex-col flex-1">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center gap-3">
                         <Check className="w-4 h-4 text-success flex-shrink-0" />
@@ -421,7 +422,7 @@ const LandingPage = () => {
                   </ul>
 
                   <Button 
-                    className="w-full bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+                    className="w-full bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none mt-auto"
                     onClick={handleGetStarted}
                   >
                     {plan.buttonText}
@@ -454,7 +455,7 @@ const LandingPage = () => {
                 <CardContent className="p-0">
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-warning text-warning" />
+                      <Star key={i} className="w-4 h-4 fill-[#E7E2F9] text-[#E7E2F9]" />
                     ))}
                   </div>
                   
