@@ -8,7 +8,7 @@ import { Wand2, Save, RefreshCw, MessageSquare, Edit2, Check, X, Plus } from 'lu
 interface Prompt {
   id: string;
   text: string;
-  category: 'problem-solving' | 'comparison' | 'recommendation' | 'how-to' | 'best-practices';
+  category: 'easy-win' | 'moderate' | 'challenging';
   intent: string;
   isEditing?: boolean;
 }
@@ -162,7 +162,7 @@ const PromptsPage = () => {
     const newPrompt: Prompt = {
       id: `prompt-${Date.now()}`,
       text: '',
-      category: 'problem-solving',
+      category: 'moderate',
       intent: '',
       isEditing: true
     };
@@ -175,11 +175,9 @@ const PromptsPage = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'problem-solving': return 'bg-red-100 text-red-700';
-      case 'comparison': return 'bg-blue-100 text-blue-700';
-      case 'recommendation': return 'bg-green-100 text-green-700';
-      case 'how-to': return 'bg-purple-100 text-purple-700';
-      case 'best-practices': return 'bg-orange-100 text-orange-700';
+      case 'easy-win': return 'bg-green-100 text-green-700';
+      case 'moderate': return 'bg-blue-100 text-blue-700';
+      case 'challenging': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -318,11 +316,9 @@ const PromptsPage = () => {
                         onChange={(e) => updatePrompt(prompt.id, 'category', e.target.value)}
                         className="w-full p-2 bg-white text-black rounded border text-sm"
                       >
-                        <option value="problem-solving">Problem Solving</option>
-                        <option value="comparison">Comparison</option>
-                        <option value="recommendation">Recommendation</option>
-                        <option value="how-to">How To</option>
-                        <option value="best-practices">Best Practices</option>
+                        <option value="easy-win">Easy Win</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="challenging">Challenging</option>
                       </select>
                     </div>
                     <div>

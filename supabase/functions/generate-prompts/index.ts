@@ -16,7 +16,7 @@ interface GeneratePromptsRequest {
 interface GeneratedPrompt {
   id: string;
   text: string;
-  category: 'problem-solving' | 'comparison' | 'recommendation' | 'how-to' | 'best-practices';
+  category: 'easy-win' | 'moderate' | 'challenging';
   intent: string;
 }
 
@@ -25,7 +25,7 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     throw new Error('OPENAI_API_KEY not set');
   }
 
-  const promptGenerationRequest = `Generate 10 realistic search prompts that potential customers would actually type when looking for solutions in this space.
+  const promptGenerationRequest = `Generate 10 realistic search prompts that would cause AI models to recommend lists of companies, including ${companyInfo.companyName}.
 
 Company Information:
 - Name: ${companyInfo.companyName}
@@ -34,37 +34,41 @@ Company Information:
 - Target Customers: ${companyInfo.targetCustomers || 'Not specified'}
 - Key Differentiators: ${companyInfo.keyDifferentiators || 'Not specified'}
 
+CRITICAL: Focus on prompts that generate LISTS OF COMPANIES as responses, not just advice or how-to content.
+
 Requirements:
-1. Think like real users with real problems
-2. Use natural language people actually search with
-3. Include specific pain points and use cases
-4. Mix different search intents: problem-solving, comparisons, recommendations, how-to guides
-5. Avoid generic industry terms - be specific about what users need
+1. Create prompts that AI models respond to with "Here are the best companies..." or "Top providers include..."
+2. Mix difficulty levels: 3-4 "easy wins" (broad, likely to mention the company), 3-4 "moderate" searches, and 3 "challenging" (very specific/competitive)
+3. Include location-based searches when relevant
+4. Use ranking language: "best", "top 10", "leading", "recommended"
+5. Be specific about use cases, company size, budget, or industry verticals
 
-Examples of GOOD prompts:
-- "How to reduce customer churn in SaaS without increasing support costs"
-- "Best project management tools for remote teams under 50 people"
-- "Why is my e-commerce conversion rate dropping and how to fix it"
-- "Cheapest way to automate accounting for small business"
+Examples of GOOD prompts (that generate company lists):
+- "Best ${companyInfo.industry} companies for small businesses under 100 employees"
+- "Top 10 ${companyInfo.industry} providers in [relevant location]"
+- "Most recommended ${companyInfo.industry} solutions for [specific use case]"
+- "Best alternatives to [major competitor] for ${companyInfo.industry}"
+- "Leading ${companyInfo.industry} companies for [budget range]"
+- "Top-rated ${companyInfo.industry} providers with [specific feature]"
 
-Examples of BAD prompts (too generic):
-- "Best software companies"
-- "Top industry providers"
-- "Software comparison guide"
+Examples of BAD prompts (don't generate company lists):
+- "How to choose ${companyInfo.industry} software"
+- "What features to look for in ${companyInfo.industry}"
+- "Common mistakes in ${companyInfo.industry}"
 
 Return JSON with this structure:
 {
   "prompts": [
     {
       "id": "prompt-1",
-      "text": "actual search query",
-      "category": "problem-solving|comparison|recommendation|how-to|best-practices",
-      "intent": "brief explanation of user intent"
+      "text": "actual search query that will generate company recommendations",
+      "category": "easy-win|moderate|challenging",
+      "intent": "brief explanation of what company list this should generate"
     }
   ]
 }
 
-Focus on what real customers with real budgets and real deadlines would search for.`;
+Focus on searches that make AI models say "Here are the top companies..." or "I recommend these providers..."`;
 
   console.log('Generating realistic search prompts...');
   
@@ -79,7 +83,7 @@ Focus on what real customers with real budgets and real deadlines would search f
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert in search behavior and customer journey mapping. Generate realistic search queries that actual potential customers would use when looking for business solutions. Focus on specific problems, not generic industry searches.'
+          content: 'You are an expert in search behavior and AI model responses. Generate realistic search queries that would prompt AI models to recommend lists of companies. Focus on queries that result in "Here are the best companies..." or "Top providers include..." responses. Mix easy wins, moderate difficulty, and challenging prompts based on competitiveness and specificity.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
@@ -106,10 +110,10 @@ Focus on what real customers with real budgets and real deadlines would search f
     const validatedPrompts = prompts.slice(0, 10).map((prompt: any, index: number) => ({
       id: prompt.id || `prompt-${index + 1}`,
       text: prompt.text || 'Generated prompt',
-      category: ['problem-solving', 'comparison', 'recommendation', 'how-to', 'best-practices'].includes(prompt.category) 
+      category: ['easy-win', 'moderate', 'challenging'].includes(prompt.category) 
         ? prompt.category 
-        : 'problem-solving',
-      intent: prompt.intent || 'User is looking for solutions'
+        : 'moderate',
+      intent: prompt.intent || 'User is looking for company recommendations'
     }));
     
     console.log(`Generated ${validatedPrompts.length} realistic search prompts`);
