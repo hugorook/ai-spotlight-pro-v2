@@ -57,7 +57,7 @@ export default function FlashlightEffect({ isActive, onToggle }: FlashlightEffec
   const distanceRatio = Math.min(distance / maxDistance, 1);
   
   // Base radius that shrinks with distance (perspective)
-  const baseRadius = 280 - (distanceRatio * 80);
+  const baseRadius = 350 - (distanceRatio * 100);
   
   // Create elliptical distortion based on angle from center
   const horizontalStretch = 1 + (distanceRatio * Math.abs(Math.cos(angle)) * 1.2);
