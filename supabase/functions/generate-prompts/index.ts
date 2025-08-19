@@ -11,6 +11,7 @@ interface GeneratePromptsRequest {
   targetCustomers?: string;
   keyDifferentiators?: string;
   websiteUrl?: string;
+  geographicFocus?: string;
   specificServices?: string[];
   industryNiches?: string[];
   technologies?: string[];
@@ -42,6 +43,7 @@ Industry: ${companyInfo.industry}
 Description: ${companyInfo.description ?? ''}
 Target Customers: ${companyInfo.targetCustomers ?? ''}
 Key Differentiators: ${companyInfo.keyDifferentiators ?? ''}
+Geographic Focus: ${companyInfo.geographicFocus ?? 'Global'}
 Specific Services: ${JSON.stringify(companyInfo.specificServices || [])}
 Industry Niches: ${JSON.stringify(companyInfo.industryNiches || [])}
 Technologies: ${JSON.stringify(companyInfo.technologies || [])}
@@ -129,33 +131,48 @@ Return JSON only with keys:
   const specificPrompts: string[] = [];
   const niches = uniq(extracted.niches || []).slice(0, 6);
   const techs = uniq(extracted.technologies || []).slice(0, 5);
-  const locations = uniq((companyInfo.locations || []).concat(markets)).slice(0, 5);
+  // Prioritize current geographic focus over cached locations
+  const currentGeo = companyInfo.geographicFocus || 'Global';
+  const locations = uniq([currentGeo].concat(companyInfo.locations || []).concat(markets)).slice(0, 5);
   const compSizes = uniq((companyInfo.companySizes || [])).slice(0, 4);
+  
+  // Filter out location-specific prompts if geographic focus is "Global"
+  const useLocationSpecific = currentGeo !== 'Global' && currentGeo.toLowerCase() !== 'global';
   
   // Strategy 1: ULTRA-NICHE queries (so specific only a few companies would qualify)
   for (const niche of niches.slice(0, 2)) {
-    if (locations[0]) {
+    if (useLocationSpecific && locations[0]) {
       specificPrompts.push(`${niche} companies in ${locations[0]}`);
+    } else {
+      specificPrompts.push(`Leading ${niche} specialists`);
     }
-    if (segments[0] && locations[1]) {
+    if (segments[0] && useLocationSpecific && locations[1]) {
       specificPrompts.push(`Top ${niche} specialists in ${locations[1]} for ${segments[0]}`);
+    } else if (segments[0]) {
+      specificPrompts.push(`Top ${niche} specialists for ${segments[0]}`);
     }
   }
   
   // Strategy 2: Technology + Geographic + Customer combinations (very narrow)
   for (const tech of techs.slice(0, 2)) {
-    if (locations[0] && segments[0]) {
+    if (useLocationSpecific && locations[0] && segments[0]) {
       specificPrompts.push(`${tech} companies in ${locations[0]} serving ${segments[0]}`);
+    } else if (segments[0]) {
+      specificPrompts.push(`${tech} companies serving ${segments[0]}`);
     }
-    if (useCases[0] && locations[1]) {
+    if (useLocationSpecific && useCases[0] && locations[1]) {
       specificPrompts.push(`Best ${tech} providers for ${useCases[0]} in ${locations[1]}`);
+    } else if (useCases[0]) {
+      specificPrompts.push(`Best ${tech} providers for ${useCases[0]}`);
     }
   }
   
   // Strategy 3: Service + Multiple Qualifiers (maximum specificity)
   for (const service of services.slice(0, 2)) {
-    if (locations[0] && compSizes[0]) {
+    if (useLocationSpecific && locations[0] && compSizes[0]) {
       specificPrompts.push(`${service} companies in ${locations[0]} specializing in ${compSizes[0]}`);
+    } else if (compSizes[0]) {
+      specificPrompts.push(`${service} companies specializing in ${compSizes[0]}`);
     }
     if (segments[0] && techs[0]) {
       specificPrompts.push(`${service} providers using ${techs[0]} for ${segments[0]}`);
@@ -163,15 +180,22 @@ Return JSON only with keys:
   }
   
   // Strategy 4: Award/Recognition-style queries (implies expertise)
-  if (services[0] && locations[0]) {
-    specificPrompts.push(`Most recognized ${services[0]} firms in ${locations[0]}`);
-    specificPrompts.push(`Award-winning ${services[0]} companies in ${locations[0]}`);
+  if (services[0]) {
+    if (useLocationSpecific && locations[0]) {
+      specificPrompts.push(`Most recognized ${services[0]} firms in ${locations[0]}`);
+      specificPrompts.push(`Award-winning ${services[0]} companies in ${locations[0]}`);
+    } else {
+      specificPrompts.push(`Most recognized ${services[0]} firms`);
+      specificPrompts.push(`Award-winning ${services[0]} companies`);
+    }
   }
   
   // Strategy 5: Problem-specific queries (very targeted)
   for (const useCase of useCases.slice(0, 2)) {
-    if (locations[0]) {
+    if (useLocationSpecific && locations[0]) {
       specificPrompts.push(`Companies solving ${useCase} in ${locations[0]}`);
+    } else {
+      specificPrompts.push(`Companies solving ${useCase}`);
     }
     if (techs[0]) {
       specificPrompts.push(`${techs[0]} companies specializing in ${useCase}`);
@@ -189,8 +213,12 @@ Return JSON only with keys:
   if (niches[0] && techs[0]) {
     specificPrompts.push(`Award-winning ${niches[0]} companies using ${techs[0]}`);
   }
-  if (services[0] && niches[0] && locations[0]) {
-    specificPrompts.push(`Most recognized ${services[0]} experts in ${niches[0]} based in ${locations[0]}`);
+  if (services[0] && niches[0]) {
+    if (useLocationSpecific && locations[0]) {
+      specificPrompts.push(`Most recognized ${services[0]} experts in ${niches[0]} based in ${locations[0]}`);
+    } else {
+      specificPrompts.push(`Most recognized ${services[0]} experts in ${niches[0]}`);
+    }
   }
   
   // Add these ultra-specific prompts to the programmatic list

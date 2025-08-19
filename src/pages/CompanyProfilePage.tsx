@@ -164,7 +164,7 @@ const CompanyProfilePage = () => {
     try {
       console.log('Generating prompts for updated company profile...');
       
-      // Load enhanced analysis data if available
+      // Load enhanced analysis data if available, but prioritize current company profile
       let enhancedData = {};
       try {
         const stored = localStorage.getItem('website_analysis_enhanced');
@@ -175,6 +175,9 @@ const CompanyProfilePage = () => {
         console.log('No enhanced analysis data available');
       }
       
+      // Always use current geographic focus from company profile, not cached data
+      const geographicFocus = (company.geographic_focus && company.geographic_focus[0]) || 'Global';
+      
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: company.company_name,
@@ -183,7 +186,10 @@ const CompanyProfilePage = () => {
           targetCustomers: company.target_customers,
           keyDifferentiators: company.key_differentiators,
           websiteUrl: company.website_url,
-          ...enhancedData
+          geographicFocus: geographicFocus,
+          ...enhancedData,
+          // Override any cached locations with current geographic focus
+          locations: enhancedData.locations ? [geographicFocus, ...enhancedData.locations].slice(0, 3) : [geographicFocus]
         }
       });
 
