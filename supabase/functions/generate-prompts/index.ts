@@ -11,6 +11,11 @@ interface GeneratePromptsRequest {
   targetCustomers?: string;
   keyDifferentiators?: string;
   websiteUrl?: string;
+  specificServices?: string[];
+  industryNiches?: string[];
+  technologies?: string[];
+  companySizes?: string[];
+  locations?: string[];
 }
 
 interface GeneratedPrompt {
@@ -36,6 +41,11 @@ Industry: ${companyInfo.industry}
 Description: ${companyInfo.description ?? ''}
 Target Customers: ${companyInfo.targetCustomers ?? ''}
 Key Differentiators: ${companyInfo.keyDifferentiators ?? ''}
+Specific Services: ${JSON.stringify(companyInfo.specificServices || [])}
+Industry Niches: ${JSON.stringify(companyInfo.industryNiches || [])}
+Technologies: ${JSON.stringify(companyInfo.technologies || [])}
+Company Sizes Served: ${JSON.stringify(companyInfo.companySizes || [])}
+Locations: ${JSON.stringify(companyInfo.locations || [])}
 
 Return JSON only with keys:
 {
@@ -43,7 +53,9 @@ Return JSON only with keys:
   "segments": ["types of customers/industries they serve"],
   "markets": ["geographies if any"],
   "useCases": ["specific problems solved / use cases"],
-  "keywords": ["short keywords relevant for search prompts"]
+  "keywords": ["short keywords relevant for search prompts"],
+  "niches": ["specific industry niches or specializations"],
+  "technologies": ["specific technologies or methodologies"]
 }`;
 
   let extracted: { services: string[]; segments: string[]; markets: string[]; useCases: string[]; keywords: string[] } = { services: [], segments: [], markets: [], useCases: [], keywords: [] };
@@ -111,23 +123,39 @@ Return JSON only with keys:
     .map(ensureListStyle)
     .filter(t => !/^(how to|what|best practices|benefits|why)\b/i.test(t));
 
-  // Add highly specific, successful prompts that are more likely to mention the company
-  const highValuePrompts: string[] = [];
+  // Add highly specific, fair prompts using granular details (NO company name mentions)
+  const specificPrompts: string[] = [];
+  const niches = uniq(extracted.niches || []).slice(0, 4);
+  const techs = uniq(extracted.technologies || []).slice(0, 3);
+  const locations = uniq((companyInfo.locations || []).concat(markets)).slice(0, 3);
   
-  // Create ultra-specific prompts using exact company name and location context
-  if (companyInfo.companyName && segments[0]) {
-    highValuePrompts.push(`Companies like ${companyInfo.companyName} for ${segments[0]}`);
-  }
-  if (companyInfo.companyName && services[0]) {
-    highValuePrompts.push(`${companyInfo.companyName} competitors in ${services[0]}`);
-    highValuePrompts.push(`Alternative companies to ${companyInfo.companyName}`);
-  }
-  if (companyInfo.companyName && useCases[0]) {
-    highValuePrompts.push(`Best companies for ${useCases[0]} similar to ${companyInfo.companyName}`);
+  // Create specific but fair prompts combining service + location + segment
+  for (const service of services.slice(0, 3)) {
+    if (locations[0]) {
+      specificPrompts.push(`Best ${service} companies in ${locations[0]}`);
+    }
+    if (segments[0]) {
+      specificPrompts.push(`Top ${service} providers for ${segments[0]}`);
+    }
   }
   
-  // Add these high-value prompts to the programmatic list
-  programmatic = [...highValuePrompts, ...programmatic];
+  // Add niche-specific prompts
+  for (const niche of niches.slice(0, 2)) {
+    specificPrompts.push(`Leading ${niche} specialists`);
+    if (locations[0]) {
+      specificPrompts.push(`Best ${niche} companies in ${locations[0]}`);
+    }
+  }
+  
+  // Add technology-specific prompts
+  for (const tech of techs.slice(0, 2)) {
+    if (segments[0]) {
+      specificPrompts.push(`Top ${tech} providers for ${segments[0]}`);
+    }
+  }
+  
+  // Add these specific prompts to the programmatic list
+  programmatic = [...specificPrompts, ...programmatic];
   
   // If we already got enough programmatic prompts, return those
   if (programmatic.length >= 8) {
@@ -143,20 +171,21 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the company information above, create 12 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists. Make some prompts HIGHLY SPECIFIC to increase success rate.
+TASK: Based on the company information above, create 12 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists. Make prompts SPECIFIC but FAIR - NO company name mentions allowed.
 
-STRATEGY: Mix broad category searches with ultra-specific queries:
-- Include competitor comparison prompts ("alternatives to [company]", "companies like [company]")
-- Use exact company name in some prompts for direct comparison requests
-- Target their specific customer segments and use cases
-- Include geographic context when available
+STRATEGY: Create specific but realistic queries like "best sugar commodity traders in UK" instead of "best commodity traders":
+- Combine specific services + geographic locations + customer segments
+- Use industry niches and specializations for targeted queries  
+- Include technology/methodology specifics when available
+- Target their exact customer segments and company sizes served
+- Make them specific enough to be "easy wins" but fair tests of AI visibility
 
-MANDATORY: Every prompt must generate a numbered list of companies:
-- "Best [specific service] companies for [specific need]"
-- "Top [number] [specific solution] providers in [location/industry]"
-- "Companies like ${companyInfo.companyName} for [specific use case]"
-- "${companyInfo.companyName} competitors in [specific market]"
-- "Alternative companies to ${companyInfo.companyName}"
+MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions):
+- "Best [specific service] companies in [specific location]"
+- "Top [number] [specific solution] providers for [specific industry]"
+- "Leading [industry niche] specialists in [location]"
+- "Best [technology/methodology] providers for [specific use case]"
+- "Top [specific service] companies for [company size] businesses"
 - "Which companies offer [specific solution] for [specific problem]"
 
 CATEGORIES (exact spelling):
@@ -164,10 +193,11 @@ CATEGORIES (exact spelling):
 - "moderate": Specific use case + targeted industry prompts (6 prompts)  
 - "challenging": Ultra-specific niche requirements (2 prompts)
 
-EXAMPLES of HIGH-SUCCESS prompts:
-- "Companies like ${companyInfo.companyName} for [their target market]"
-- "${companyInfo.companyName} alternatives for [specific use case]"
-- "Best [their service] providers similar to ${companyInfo.companyName}"
+EXAMPLES of SPECIFIC but FAIR prompts:
+- "Best sugar commodity trading companies in London" (not "best commodity traders")
+- "Top AI-powered analytics providers for manufacturing" (not "best analytics companies")
+- "Leading pharmaceutical cold chain specialists in Europe" (not "best logistics companies")
+- "Best blockchain supply chain companies for mid-market retailers" (not "best supply chain companies")
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
@@ -176,15 +206,15 @@ JSON FORMAT (EXACTLY 12 prompts):
   "prompts": [
     {
       "id": "prompt-1",
-      "text": "Companies like ${companyInfo.companyName} for [target market]",
+      "text": "Best [specific service] companies in [location]",
       "category": "easy-win",
-      "intent": "Find direct competitors and alternatives"
+      "intent": "Find specialized providers in specific geography"
     },
     {
       "id": "prompt-2", 
-      "text": "${companyInfo.companyName} competitors in [industry/service]",
+      "text": "Top [industry niche] specialists for [customer segment]",
       "category": "easy-win",
-      "intent": "Generate competitive landscape list"
+      "intent": "Generate niche provider list"
     }
   ]
 }`;
@@ -246,15 +276,16 @@ JSON FORMAT (EXACTLY 12 prompts):
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
     if (validatedPrompts.length < 10) {
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
-      const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies for ${companyInfo.companyName}. 
+      const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies. NO COMPANY NAME MENTIONS ALLOWED.
 
-INCLUDE HIGH-SUCCESS PROMPTS:
-- "Companies like ${companyInfo.companyName} for [use case]"
-- "${companyInfo.companyName} competitors in [market]"
-- "Alternative companies to ${companyInfo.companyName}"
-- "Best [service] providers similar to ${companyInfo.companyName}"
+CREATE SPECIFIC but FAIR prompts like:
+- "Best [specific service] companies in [specific location]" 
+- "Top [industry niche] specialists for [customer type]"
+- "Leading [technology] providers for [specific use case]"
+- "Best [service + location + customer segment] companies"
 
-And traditional list prompts starting with 'Best', 'Top', 'Leading', or 'Which companies'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
+Must start with 'Best', 'Top', 'Leading', or 'Which companies'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
+Be SPECIFIC (like "sugar commodity traders in UK" not "commodity traders") but FAIR (no company names). 
 Use the provided company information and avoid any 'how to', 'what', or advisory phrasing.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {

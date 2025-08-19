@@ -164,6 +164,17 @@ const CompanyProfilePage = () => {
     try {
       console.log('Generating prompts for updated company profile...');
       
+      // Load enhanced analysis data if available
+      let enhancedData = {};
+      try {
+        const stored = localStorage.getItem('website_analysis_enhanced');
+        if (stored) {
+          enhancedData = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.log('No enhanced analysis data available');
+      }
+      
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: company.company_name,
@@ -171,7 +182,8 @@ const CompanyProfilePage = () => {
           description: company.description,
           targetCustomers: company.target_customers,
           keyDifferentiators: company.key_differentiators,
-          websiteUrl: company.website_url
+          websiteUrl: company.website_url,
+          ...enhancedData
         }
       });
 
@@ -246,6 +258,16 @@ const CompanyProfilePage = () => {
           differentiators: fields.keyDifferentiators || prev.differentiators,
           geography: fields.geographicFocus || prev.geography
         }));
+        
+        // Store enhanced analysis data for prompt generation
+        const enhancedData = {
+          specificServices: fields.specificServices || [],
+          industryNiches: fields.industryNiches || [],
+          technologies: fields.technologies || [],
+          companySizes: fields.companySizes || [],
+          locations: fields.locations || []
+        };
+        localStorage.setItem('website_analysis_enhanced', JSON.stringify(enhancedData));
         
         toast({ 
           title: 'Analysis Complete', 

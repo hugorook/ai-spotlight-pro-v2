@@ -15,6 +15,11 @@ interface ExtractedFields {
   targetCustomers: string;
   keyDifferentiators: string;
   geographicFocus: string;
+  specificServices: string[];
+  industryNiches: string[];
+  technologies: string[];
+  companySizes: string[];
+  locations: string[];
 }
 
 async function fetchWebsiteContent(url: string): Promise<string> {
@@ -82,6 +87,11 @@ Extract the following fields based on the website content:
 4. Target Customers: Who they serve (be specific about company size, industry, roles, e.g., "SMB retailers", "Enterprise manufacturers", "Marketing teams at SaaS companies")
 5. Key Differentiators: What makes them unique/better than competitors (awards, unique features, expertise)
 6. Geographic Focus: Where they operate (if mentioned - could be "Global", "North America", "San Francisco Bay Area", etc.)
+7. Specific Services: Array of specific services/products they offer (e.g., ["sugar trading", "rice commodity trading"] not just "commodity trading")
+8. Industry Niches: Array of specific industry sub-segments (e.g., ["pharmaceutical cold chain", "automotive logistics"] not just "logistics")
+9. Technologies: Array of specific technologies/methodologies they use (e.g., ["AI-powered analytics", "blockchain supply chain"])
+10. Company Sizes: Array of company sizes they serve (e.g., ["startups", "mid-market", "enterprise"])
+11. Locations: Array of specific geographic locations mentioned (e.g., ["London", "UK", "Europe"])
 
 Return ONLY valid JSON:
 {
@@ -90,7 +100,12 @@ Return ONLY valid JSON:
   "description": "what they do and value prop",
   "targetCustomers": "specific customer segments they serve", 
   "keyDifferentiators": "what makes them unique",
-  "geographicFocus": "where they operate or serve customers"
+  "geographicFocus": "where they operate or serve customers",
+  "specificServices": ["service1", "service2"],
+  "industryNiches": ["niche1", "niche2"],
+  "technologies": ["tech1", "tech2"],
+  "companySizes": ["size1", "size2"],
+  "locations": ["location1", "location2"]
 }`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -132,7 +147,12 @@ Return ONLY valid JSON:
       description: parsed.description || 'Description of what the company does',
       targetCustomers: parsed.targetCustomers || 'Small to medium businesses',
       keyDifferentiators: parsed.keyDifferentiators || 'Unique value proposition',
-      geographicFocus: parsed.geographicFocus || 'North America'
+      geographicFocus: parsed.geographicFocus || 'North America',
+      specificServices: Array.isArray(parsed.specificServices) ? parsed.specificServices : [],
+      industryNiches: Array.isArray(parsed.industryNiches) ? parsed.industryNiches : [],
+      technologies: Array.isArray(parsed.technologies) ? parsed.technologies : [],
+      companySizes: Array.isArray(parsed.companySizes) ? parsed.companySizes : [],
+      locations: Array.isArray(parsed.locations) ? parsed.locations : []
     };
     
     return fields;

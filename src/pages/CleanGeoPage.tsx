@@ -166,6 +166,16 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
           geography: fields.geographicFocus || prev.geography
         }));
         
+        // Store enhanced analysis data for prompt generation
+        const enhancedData = {
+          specificServices: fields.specificServices || [],
+          industryNiches: fields.industryNiches || [],
+          technologies: fields.technologies || [],
+          companySizes: fields.companySizes || [],
+          locations: fields.locations || []
+        };
+        localStorage.setItem('website_analysis_enhanced', JSON.stringify(enhancedData));
+        
         alert('Website analyzed successfully! Fields have been populated. You can edit them as needed.');
       }
     } catch (error) {

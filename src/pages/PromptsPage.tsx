@@ -87,6 +87,17 @@ const PromptsPage = () => {
     try {
       setGenerating(true);
       
+      // Load enhanced analysis data if available
+      let enhancedData = {};
+      try {
+        const stored = localStorage.getItem('website_analysis_enhanced');
+        if (stored) {
+          enhancedData = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.log('No enhanced analysis data available');
+      }
+      
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: companyData.company_name,
@@ -94,7 +105,8 @@ const PromptsPage = () => {
           description: companyData.description,
           targetCustomers: companyData.target_customers,
           keyDifferentiators: companyData.key_differentiators,
-          websiteUrl: companyData.website_url
+          websiteUrl: companyData.website_url,
+          ...enhancedData
         }
       });
 
