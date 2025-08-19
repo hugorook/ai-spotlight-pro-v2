@@ -35,8 +35,8 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
 
   console.log('Generating prompts from saved company fields only...');
 
-  // Step A: Extract structured capabilities from saved company fields only
-  const extractPrompt = `Extract structured JSON fields from the following company information.
+  // Step A: Extract clean, specific capabilities from saved company fields only
+  const extractPrompt = `Extract clean, specific JSON fields from the following company information. IMPORTANT: Return only SHORT, CLEAN terms - no full sentences or company descriptions.
 
 Company: ${companyInfo.companyName}
 Industry: ${companyInfo.industry}
@@ -50,16 +50,23 @@ Technologies: ${JSON.stringify(companyInfo.technologies || [])}
 Company Sizes Served: ${JSON.stringify(companyInfo.companySizes || [])}
 Locations: ${JSON.stringify(companyInfo.locations || [])}
 
-Return JSON only with keys:
+RETURN ONLY SHORT, CLEAN TERMS (2-4 words max each):
+
+Examples:
+- Services: ["commodity trading", "risk management", "supply chain finance"] NOT ["physical commodity sourcing solutions with tailored procurement strategies"]
+- Segments: ["agricultural producers", "food processors", "hedge funds"] NOT ["mid-market agricultural producers with $10M-$100M revenue"]
+- Niches: ["sugar trading", "coffee sourcing", "grain logistics"] NOT full descriptions
+
+Return JSON only with SHORT terms:
 {
-  "services": ["specific services they offer"],
-  "segments": ["types of customers/industries they serve"],
-  "markets": ["geographies if any"],
-  "useCases": ["specific problems solved / use cases"],
-  "keywords": ["short keywords relevant for search prompts"],
-  "niches": ["specific industry niches or specializations"],
-  "technologies": ["specific technologies or methodologies"],
-  "uniqueCombos": ["rare service+market+tech combinations"]
+  "services": ["short service 1", "short service 2"],
+  "segments": ["customer type 1", "customer type 2"],
+  "markets": ["geography 1", "geography 2"],
+  "useCases": ["use case 1", "use case 2"],
+  "keywords": ["keyword1", "keyword2"],
+  "niches": ["niche 1", "niche 2"],
+  "technologies": ["tech 1", "tech 2"],
+  "uniqueCombos": ["combo 1", "combo 2"]
 }`;
 
   let extracted: { services: string[]; segments: string[]; markets: string[]; useCases: string[]; keywords: string[] } = { services: [], segments: [], markets: [], useCases: [], keywords: [] };
@@ -84,14 +91,37 @@ Return JSON only with keys:
         const exText = exData?.choices?.[0]?.message?.content ?? '{}';
         try {
           const parsed = JSON.parse(exText);
-          extracted = {
-            services: Array.isArray(parsed.services) ? parsed.services : [],
-            segments: Array.isArray(parsed.segments) ? parsed.segments : [],
-            markets: Array.isArray(parsed.markets) ? parsed.markets : [],
-            useCases: Array.isArray(parsed.useCases) ? parsed.useCases : [],
-            keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+          // Clean and filter extracted data to remove corrupted entries
+          const cleanArray = (arr: any[], companyName: string) => {
+            if (!Array.isArray(arr)) return [];
+            return arr
+              .filter(item => typeof item === 'string' && item.length < 100) // Filter out overly long corrupted entries
+              .map(item => item.trim())
+              .filter(item => 
+                item.length > 0 && 
+                !item.toLowerCase().includes(companyName.toLowerCase()) && // Remove entries containing company name
+                !item.includes(' in ') && // Remove entries with location phrases
+                !item.includes(' operates ') && // Remove operational descriptions
+                !item.includes('companies') && // Remove entries that already contain 'companies'
+                !item.includes('providers') &&
+                !item.includes('firms')
+              )
+              .slice(0, 8); // Limit to prevent bloat
           };
-        } catch {}
+          
+          extracted = {
+            services: cleanArray(parsed.services || [], companyInfo.companyName),
+            segments: cleanArray(parsed.segments || [], companyInfo.companyName),
+            markets: cleanArray(parsed.markets || [], companyInfo.companyName),
+            useCases: cleanArray(parsed.useCases || [], companyInfo.companyName),
+            keywords: cleanArray(parsed.keywords || [], companyInfo.companyName),
+            niches: cleanArray(parsed.niches || [], companyInfo.companyName),
+            technologies: cleanArray(parsed.technologies || [], companyInfo.companyName),
+            uniqueCombos: cleanArray(parsed.uniqueCombos || [], companyInfo.companyName),
+          };
+        } catch (parseError) {
+          console.warn('Failed to parse extraction result:', parseError);
+        }
       }
     } catch (e) {
       console.warn('Capability extraction failed', e);
@@ -100,15 +130,38 @@ Return JSON only with keys:
 
   const make = (text: string, idx: number, category: GeneratedPrompt['category'] = 'moderate'): GeneratedPrompt => ({ id: `prompt-${idx + 1}`, text, category, intent: 'User is looking for company recommendations' });
   const uniq = (arr: string[]) => Array.from(new Set(arr.map(s => s.trim()))).filter(Boolean);
+  
+  // Clean extracted data to remove any corrupted entries
+  const cleanExtracted = {
+    ...extracted,
+    services: (extracted.services || []).filter(s => 
+      s.length < 50 && 
+      !s.toLowerCase().includes(companyInfo.companyName.toLowerCase()) &&
+      !s.includes(' in ') &&
+      !s.includes('operates')
+    ),
+    segments: (extracted.segments || []).filter(s => 
+      s.length < 50 && 
+      !s.toLowerCase().includes(companyInfo.companyName.toLowerCase())
+    ),
+    niches: (extracted.niches || []).filter(s => 
+      s.length < 50 && 
+      !s.toLowerCase().includes(companyInfo.companyName.toLowerCase())
+    ),
+    technologies: (extracted.technologies || []).filter(s => 
+      s.length < 50 && 
+      !s.toLowerCase().includes(companyInfo.companyName.toLowerCase())
+    )
+  };
 
   const listPhr = ['Best', 'Top 10', 'Leading'];
   const ensureListStyle = (t: string) => (/companies|providers|vendors|consultants|agencies|firms/i.test(t) ? t : `${t} companies`);
 
   const candidates: string[] = [];
-  const services = uniq(extracted.services).slice(0, 6);
-  const segments = uniq(extracted.segments).slice(0, 6);
-  const markets = uniq(extracted.markets).slice(0, 4);
-  const useCases = uniq(extracted.useCases).slice(0, 6);
+  const services = uniq(cleanExtracted.services).slice(0, 6);
+  const segments = uniq(cleanExtracted.segments).slice(0, 6);
+  const markets = uniq(cleanExtracted.markets).slice(0, 4);
+  const useCases = uniq(cleanExtracted.useCases).slice(0, 6);
 
   for (const s of services) {
     candidates.push(`${listPhr[0]} ${s} providers`);
@@ -129,8 +182,8 @@ Return JSON only with keys:
 
   // Create ULTRA-SPECIFIC "easy win" prompts using detailed analysis (NO company name mentions)
   const specificPrompts: string[] = [];
-  const niches = uniq(extracted.niches || []).slice(0, 6);
-  const techs = uniq(extracted.technologies || []).slice(0, 5);
+  const niches = uniq(cleanExtracted.niches || []).slice(0, 6);
+  const techs = uniq(cleanExtracted.technologies || []).slice(0, 5);
   // Prioritize current geographic focus over cached locations
   const currentGeo = companyInfo.geographicFocus || 'Global';
   const locations = uniq([currentGeo].concat(companyInfo.locations || []).concat(markets)).slice(0, 5);
@@ -203,7 +256,7 @@ Return JSON only with keys:
   }
   
   // Strategy 6: Use unique combinations for maximum specificity 
-  const uniqueCombos = uniq(extracted.uniqueCombos || []).concat(companyInfo.uniqueCombinations || []).slice(0, 3);
+  const uniqueCombos = uniq(cleanExtracted.uniqueCombos || []).concat(companyInfo.uniqueCombinations || []).slice(0, 3);
   for (const combo of uniqueCombos) {
     specificPrompts.push(`Companies specializing in ${combo}`);
     specificPrompts.push(`Leading providers of ${combo}`);
