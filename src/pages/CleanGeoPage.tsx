@@ -54,6 +54,7 @@ interface CompanySetupFormProps {
 const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [analyzingWebsite, setAnalyzingWebsite] = useState(false);
   const [formData, setFormData] = useState({
     companyName: '',
     website: '',
@@ -133,6 +134,46 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
 
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const analyzeWebsite = async () => {
+    if (!formData.website.trim()) {
+      alert('Please enter a website URL first.');
+      return;
+    }
+
+    setAnalyzingWebsite(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
+        body: { url: formData.website }
+      });
+
+      if (error) {
+        console.error('Website analysis error:', error);
+        alert('Failed to analyze website. Please fill in the fields manually.');
+        return;
+      }
+
+      if (data?.fields) {
+        const fields = data.fields;
+        setFormData(prev => ({
+          ...prev,
+          companyName: fields.companyName || prev.companyName,
+          industry: fields.industry || prev.industry,
+          description: fields.description || prev.description,
+          targetCustomers: fields.targetCustomers || prev.targetCustomers,
+          differentiators: fields.keyDifferentiators || prev.differentiators,
+          geography: fields.geographicFocus || prev.geography
+        }));
+        
+        alert('Website analyzed successfully! Fields have been populated. You can edit them as needed.');
+      }
+    } catch (error) {
+      console.error('Website analysis error:', error);
+      alert('Failed to analyze website. Please fill in the fields manually.');
+    } finally {
+      setAnalyzingWebsite(false);
+    }
   };
 
   return (
@@ -253,22 +294,44 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
                   <label style={{ display: 'block', fontSize: '14px', color: '#ccc', marginBottom: '8px' }}>
                     Website URL *
                   </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => updateFormData('website', e.target.value)}
-                    placeholder="https://www.yourcompany.com"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      background: '#1a1a1a',
-                      border: '1px solid #333',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                    <input
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => updateFormData('website', e.target.value)}
+                      placeholder="https://www.yourcompany.com"
+                      style={{
+                        flex: 1,
+                        padding: '12px',
+                        background: '#1a1a1a',
+                        border: '1px solid #333',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        fontSize: '14px',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={analyzeWebsite}
+                      disabled={analyzingWebsite || !formData.website.trim()}
+                      style={{
+                        padding: '12px 16px',
+                        background: analyzingWebsite || !formData.website.trim() ? '#333' : '#111E63',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: analyzingWebsite || !formData.website.trim() ? 'not-allowed' : 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {analyzingWebsite ? 'Analyzing...' : 'Auto-Fill'}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                    Click "Auto-Fill" to analyze your website and populate the form fields automatically
+                  </p>
                 </div>
 
                 <div>

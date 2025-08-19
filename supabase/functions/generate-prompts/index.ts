@@ -20,75 +20,22 @@ interface GeneratedPrompt {
   intent: string;
 }
 
-async function analyzeWebsiteForPrompts(url: string): Promise<string> {
-  try {
-    // Ensure URL has protocol
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
-    }
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AI-Visibility-Bot/1.0)',
-      },
-      signal: AbortSignal.timeout(10000),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    
-    const html = await response.text();
-    
-    // Basic HTML parsing to extract text content
-    let cleanHtml = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    cleanHtml = cleanHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-    
-    // Extract text from common content tags
-    const contentRegex = /<(?:p|h[1-6]|div|span|article|section)[^>]*>(.*?)<\/(?:p|h[1-6]|div|span|article|section)>/gi;
-    const matches = [...cleanHtml.matchAll(contentRegex)];
-    
-    let textContent = matches
-      .map(match => match[1].replace(/<[^>]*>/g, ' ').trim())
-      .filter(text => text.length > 10)
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-      
-    // Limit content size
-    if (textContent.length > 3000) {
-      textContent = textContent.substring(0, 3000) + '...';
-    }
-    
-    return textContent;
-  } catch (error) {
-    console.error('Website analysis failed:', error);
-    return '';
-  }
-}
 
 async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Promise<GeneratedPrompt[]> {
   if (!OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not set');
   }
 
-  // Analyze website to understand what company actually does
-  let websiteContent = '';
-  if (companyInfo.websiteUrl) {
-    console.log('Analyzing website:', companyInfo.websiteUrl);
-    websiteContent = await analyzeWebsiteForPrompts(companyInfo.websiteUrl);
-  }
+  console.log('Generating prompts from saved company fields only...');
 
-  // Step A: Extract structured capabilities first, then synthesize prompts programmatically
-  const extractPrompt = `Extract structured JSON fields from the following company information + website content.
+  // Step A: Extract structured capabilities from saved company fields only
+  const extractPrompt = `Extract structured JSON fields from the following company information.
 
 Company: ${companyInfo.companyName}
 Industry: ${companyInfo.industry}
 Description: ${companyInfo.description ?? ''}
-TargetCustomers: ${companyInfo.targetCustomers ?? ''}
-Differentiators: ${companyInfo.keyDifferentiators ?? ''}
-
-WEBSITE CONTENT (truncated):\n${websiteContent || 'No website provided'}
+Target Customers: ${companyInfo.targetCustomers ?? ''}
+Key Differentiators: ${companyInfo.keyDifferentiators ?? ''}
 
 Return JSON only with keys:
 {
@@ -173,13 +120,14 @@ Return JSON only with keys:
   const promptGenerationRequest = `ANALYZE THIS COMPANY AND GENERATE SEARCH PROMPTS:
 
 Company: ${companyInfo.companyName}
-Website Content: ${websiteContent || 'No website provided'}
 Industry: ${companyInfo.industry}
 Description: ${companyInfo.description || 'Not provided'}
+Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
+Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the actual website content above, understand what this company SPECIFICALLY does and create 10 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists.
+TASK: Based on the company information above, understand what this company SPECIFICALLY does and create 10 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists.
 
-CRITICAL: Ignore generic industry labels. Use the WEBSITE CONTENT to understand:
+CRITICAL: Use the provided company information to understand:
 - What specific services they offer
 - What types of clients they serve  
 - What problems they solve
@@ -281,7 +229,7 @@ JSON FORMAT (EXACT):
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
       const strictPrompt = `Rewrite and return EXACTLY 10 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies for ${companyInfo.companyName}. 
 They MUST start with 'Best', 'Top', 'Leading', or 'Which companies', and MUST include words like companies/providers/vendors/consultants/agencies/firms. 
-Use the WEBSITE CONTENT context and avoid any 'how to', 'what', or advisory phrasing.`;
+Use the provided company information and avoid any 'how to', 'what', or advisory phrasing.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
