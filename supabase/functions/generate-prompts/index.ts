@@ -25,48 +25,44 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     throw new Error('OPENAI_API_KEY not set');
   }
 
-  const promptGenerationRequest = `You are ${companyInfo.companyName}, a company in ${companyInfo.industry}. Generate 10 search prompts that would cause AI models to recommend YOUR company in a list of providers/solutions.
+  const promptGenerationRequest = `COMPANY: ${companyInfo.companyName} in ${companyInfo.industry}
 
-Company Details:
-- Name: ${companyInfo.companyName}
-- Industry: ${companyInfo.industry}
-- Description: ${companyInfo.description || 'Not provided'}
-- Target Customers: ${companyInfo.targetCustomers || 'Not specified'}
-- Key Differentiators: ${companyInfo.keyDifferentiators || 'Not specified'}
+TARGET: Generate 10 search prompts that result in AI models listing ${companyInfo.companyName} among company recommendations.
 
-CRITICAL OBJECTIVE: Create prompts where AI models would naturally list ${companyInfo.companyName} among recommended companies.
+MANDATORY FORMAT: Every prompt must ask for company lists using phrases like:
+- "Best [X] companies for [Y]"
+- "Top 10 [X] providers in [Y]" 
+- "Leading [X] companies that [Y]"
+- "Most recommended [X] solutions for [Y]"
+- "Which [X] companies should I choose for [Y]"
 
-Requirements:
-1. Each prompt MUST generate a numbered list of companies as the response
-2. Think like a customer who needs what ${companyInfo.companyName} offers
-3. Use specific business scenarios, company sizes, budgets, locations where relevant
-4. Mix difficulty: 4 "easy wins" (broad category), 4 "moderate" (specific needs), 2 "challenging" (very niche/competitive)
-5. Include terms that force list responses: "best", "top 5", "leading", "recommended companies"
+CATEGORIES (use exactly these):
+- "easy-win": Broad industry searches (4 prompts)
+- "moderate": Specific use cases (4 prompts)  
+- "challenging": Very niche/competitive (2 prompts)
 
-GOOD prompt examples that generate company lists:
-- "Top 10 ${companyInfo.industry} companies for startups in 2024"
-- "Best ${companyInfo.industry} providers for companies with $1M+ revenue"  
-- "Most recommended ${companyInfo.industry} companies in [specific region]"
-- "Leading ${companyInfo.industry} solutions for [specific industry vertical]"
-- "Best alternatives to [major competitor] for ${companyInfo.industry}"
-- "Top-rated ${companyInfo.industry} companies with [specific feature]"
-- "Which ${companyInfo.industry} companies should I consider for [use case]?"
+EXAMPLES FOR ${companyInfo.industry}:
+✅ "Best ${companyInfo.industry} companies for small businesses under $1M revenue"
+✅ "Top 10 ${companyInfo.industry} providers for international shipping"
+✅ "Which ${companyInfo.industry} companies offer the fastest delivery times"
+✅ "Most reliable ${companyInfo.industry} partners for food manufacturers"
 
-BAD examples (generate advice, not company lists):
-- "How to choose ${companyInfo.industry} software" ❌
-- "What to look for in ${companyInfo.industry}" ❌  
-- "Benefits of ${companyInfo.industry}" ❌
+❌ NEVER CREATE: "How to", "What are", "Best practices for", "Strategies to"
 
-Think: "If someone searched this, would ChatGPT respond with a numbered list that includes ${companyInfo.companyName}?"
-
-Return JSON:
+JSON FORMAT (EXACT):
 {
   "prompts": [
     {
-      "id": "prompt-1", 
-      "text": "search query that generates a list including ${companyInfo.companyName}",
-      "category": "easy-win|moderate|challenging",
-      "intent": "what type of company list this should generate"
+      "id": "prompt-1",
+      "text": "[company list question]",
+      "category": "easy-win",
+      "intent": "Generate list of top providers in category"
+    },
+    {
+      "id": "prompt-2", 
+      "text": "[company list question]",
+      "category": "moderate",
+      "intent": "Generate list for specific use case"
     }
   ]
 }`;
@@ -88,7 +84,7 @@ Return JSON:
         },
         { role: 'user', content: promptGenerationRequest },
       ],
-      temperature: 0.7,
+      temperature: 0.3,
       max_tokens: 1500,
       response_format: { type: 'json_object' },
     }),
@@ -103,9 +99,13 @@ Return JSON:
   const data = await response.json();
   const responseText = data?.choices?.[0]?.message?.content ?? '{}';
   
+  console.log('Raw AI response:', responseText);
+  
   try {
     const parsed = JSON.parse(responseText);
     const prompts = parsed.prompts || [];
+    
+    console.log('Parsed prompts:', JSON.stringify(prompts, null, 2));
     
     // Validate and clean up prompts
     const validatedPrompts = prompts.slice(0, 10).map((prompt: any, index: number) => ({
