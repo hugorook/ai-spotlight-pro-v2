@@ -24,7 +24,7 @@ const AuthPage = () => {
             <div className="p-2 bg-gradient-ai rounded-lg">
               <Brain className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
+            <span className="text-xl font-bold text-foreground">Ghost AI</span>
           </div>
           
           <Button variant="ghost" onClick={handleBackToHome}>
@@ -47,7 +47,7 @@ const AuthPage = () => {
 
       {/* Footer */}
       <footer className="p-4 text-center text-sm text-muted-foreground border-t border-border">
-        © 2024 AI Visibility Hub. All rights reserved.
+        © 2024 Ghost AI. All rights reserved.
       </footer>
     </div>
   );

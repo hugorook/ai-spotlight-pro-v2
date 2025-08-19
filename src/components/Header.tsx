@@ -14,7 +14,7 @@ const Header = ({ onStartSetup }: { onStartSetup?: () => void }) => {
             <div className="p-2 bg-gradient-ai rounded-lg">
               <Brain className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
+            <span className="text-xl font-bold text-foreground">Ghost AI</span>
           </div>
 
           {/* Navigation */}

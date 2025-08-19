@@ -76,7 +76,7 @@ const Sidebar = () => {
             {isExpanded && (
               <div className="overflow-hidden">
                 <span className="text-base font-bold text-foreground whitespace-nowrap">
-                  AI Visibility Hub
+                  Ghost AI
                 </span>
               </div>
             )}

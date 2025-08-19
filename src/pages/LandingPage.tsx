@@ -163,7 +163,7 @@ const LandingPage = () => {
                   <circle fill="white" cx="15" cy="9.5" r="0.5"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
+              <span className="text-xl font-bold text-foreground">Ghost AI</span>
             </div>
 
             {/* Navigation */}
@@ -526,7 +526,7 @@ const LandingPage = () => {
                   <circle fill="white" cx="15" cy="9.5" r="0.5"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold text-foreground">AI Visibility Hub</span>
+              <span className="text-xl font-bold text-foreground">Ghost AI</span>
             </div>
             
             <div className="flex gap-6 text-sm text-muted-foreground">
@@ -537,7 +537,7 @@ const LandingPage = () => {
           </div>
           
           <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2024 AI Visibility Hub. All rights reserved.
+            © 2024 Ghost AI. All rights reserved.
           </div>
         </div>
       </footer>
