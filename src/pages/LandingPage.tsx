@@ -197,19 +197,20 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="pt-48 pb-20 px-4 relative overflow-hidden">
+        {/* Ghost Animation Overlay - Full screen */}
+        <div className="fixed inset-0 pointer-events-none z-50">
+          <GhostAnimation />
+        </div>
+        
         <div className="container mx-auto relative z-10">
-          {/* Ghost Animation Overlay - Brought to front */}
-          <div className="absolute inset-0 pointer-events-none z-50">
-            <GhostAnimation />
-          </div>
           {/* Centered Hero Content */}
           <div className="text-center max-w-4xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                  Get Your Company{" "}
+                  Your Audience is searching{" "}
                   <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                    Mentioned by AI
+                    *Can they Find You?*
                   </span>
                 </h1>
                 
@@ -223,15 +224,15 @@ const LandingPage = () => {
               <div className="space-y-3 max-w-2xl mx-auto">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="text-foreground">Increase AI recommendations by 300%</span>
-                </div>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-foreground">Monitor mentions across all major AI models</span>
                 </div>
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="text-foreground">Generate AI-optimized content automatically</span>
+                  <span className="text-foreground">Identify gaps in your current digital presence</span>
+                </div>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-2 h-2 bg-success rounded-full" />
+                  <span className="text-foreground">Automate content to Increase AI recommendations</span>
                 </div>
               </div>
 
@@ -349,19 +350,21 @@ const LandingPage = () => {
               ].map((step, index) => {
                 const IconComponent = step.icon;
                 return (
-                  <div key={index} className="text-center group">
-                    <div className="relative mb-6">
-                      <div className="w-16 h-16 bg-gradient-ai rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="w-7 h-7 text-white" />
+                  <div key={index} className="text-left group">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-[#E7E2F9] rounded-lg flex items-center justify-center group-hover:bg-[#111E63] group-hover:text-white transition-none">
+                          <IconComponent className="w-6 h-6" />
+                        </div>
                       </div>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                        {step.step}
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-[#111E63] mb-1">STEP {step.step}</div>
+                        <h4 className="text-lg font-semibold text-foreground mb-2">
+                          {step.title}
+                        </h4>
                       </div>
                     </div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">
-                      {step.title}
-                    </h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground text-sm ml-16">
                       {step.description}
                     </p>
                   </div>
@@ -418,7 +421,7 @@ const LandingPage = () => {
                   </ul>
 
                   <Button 
-                    className={`w-full ${plan.highlighted ? 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none' : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none'}`}
+                    className="w-full bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
                     onClick={handleGetStarted}
                   >
                     {plan.buttonText}
