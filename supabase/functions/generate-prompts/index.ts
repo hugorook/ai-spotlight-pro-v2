@@ -79,6 +79,97 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     websiteContent = await analyzeWebsiteForPrompts(companyInfo.websiteUrl);
   }
 
+  // Step A: Extract structured capabilities first, then synthesize prompts programmatically
+  const extractPrompt = `Extract structured JSON fields from the following company information + website content.
+
+Company: ${companyInfo.companyName}
+Industry: ${companyInfo.industry}
+Description: ${companyInfo.description ?? ''}
+TargetCustomers: ${companyInfo.targetCustomers ?? ''}
+Differentiators: ${companyInfo.keyDifferentiators ?? ''}
+
+WEBSITE CONTENT (truncated):\n${websiteContent || 'No website provided'}
+
+Return JSON only with keys:
+{
+  "services": ["specific services they offer"],
+  "segments": ["types of customers/industries they serve"],
+  "markets": ["geographies if any"],
+  "useCases": ["specific problems solved / use cases"],
+  "keywords": ["short keywords relevant for search prompts"]
+}`;
+
+  let extracted: { services: string[]; segments: string[]; markets: string[]; useCases: string[]; keywords: string[] } = { services: [], segments: [], markets: [], useCases: [], keywords: [] };
+
+  if (OPENAI_API_KEY) {
+    try {
+      const exRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'Return ONLY strict JSON with the requested keys.' },
+            { role: 'user', content: extractPrompt },
+          ],
+          temperature: 0.1,
+          response_format: { type: 'json_object' },
+        }),
+      });
+      if (exRes.ok) {
+        const exData = await exRes.json();
+        const exText = exData?.choices?.[0]?.message?.content ?? '{}';
+        try {
+          const parsed = JSON.parse(exText);
+          extracted = {
+            services: Array.isArray(parsed.services) ? parsed.services : [],
+            segments: Array.isArray(parsed.segments) ? parsed.segments : [],
+            markets: Array.isArray(parsed.markets) ? parsed.markets : [],
+            useCases: Array.isArray(parsed.useCases) ? parsed.useCases : [],
+            keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+          };
+        } catch {}
+      }
+    } catch (e) {
+      console.warn('Capability extraction failed', e);
+    }
+  }
+
+  const make = (text: string, idx: number, category: GeneratedPrompt['category'] = 'moderate'): GeneratedPrompt => ({ id: `prompt-${idx + 1}`, text, category, intent: 'User is looking for company recommendations' });
+  const uniq = (arr: string[]) => Array.from(new Set(arr.map(s => s.trim()))).filter(Boolean);
+
+  const listPhr = ['Best', 'Top 10', 'Leading'];
+  const ensureListStyle = (t: string) => (/companies|providers|vendors|consultants|agencies|firms/i.test(t) ? t : `${t} companies`);
+
+  const candidates: string[] = [];
+  const services = uniq(extracted.services).slice(0, 6);
+  const segments = uniq(extracted.segments).slice(0, 6);
+  const markets = uniq(extracted.markets).slice(0, 4);
+  const useCases = uniq(extracted.useCases).slice(0, 6);
+
+  for (const s of services) {
+    candidates.push(`${listPhr[0]} ${s} providers`);
+    if (segments[0]) candidates.push(`${listPhr[1]} ${s} companies for ${segments[0]}`);
+    if (useCases[0]) candidates.push(`${listPhr[2]} companies that provide ${s} for ${useCases[0]}`);
+    if (markets[0]) candidates.push(`${listPhr[1]} ${s} vendors in ${markets[0]}`);
+  }
+  for (const seg of segments.slice(0, 3)) {
+    candidates.push(`${listPhr[0]} providers for ${seg}`);
+  }
+  for (const uc of useCases.slice(0, 2)) {
+    candidates.push(`Which companies offer solutions for ${uc}?`);
+  }
+
+  let programmatic = uniq(candidates)
+    .map(ensureListStyle)
+    .filter(t => !/^(how to|what|best practices|benefits|why)\b/i.test(t));
+
+  // If we already got enough programmatic prompts, return those
+  if (programmatic.length >= 8) {
+    programmatic = programmatic.slice(0, 10);
+    return programmatic.map((t, i) => make(t, i, i < 4 ? 'easy-win' : i < 8 ? 'moderate' : 'challenging'));
+  }
+
   const promptGenerationRequest = `ANALYZE THIS COMPANY AND GENERATE SEARCH PROMPTS:
 
 Company: ${companyInfo.companyName}
