@@ -25,50 +25,51 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     throw new Error('OPENAI_API_KEY not set');
   }
 
-  const promptGenerationRequest = `Generate 10 realistic search prompts that would cause AI models to recommend lists of companies, including ${companyInfo.companyName}.
+  const promptGenerationRequest = `You are ${companyInfo.companyName}, a company in ${companyInfo.industry}. Generate 10 search prompts that would cause AI models to recommend YOUR company in a list of providers/solutions.
 
-Company Information:
+Company Details:
 - Name: ${companyInfo.companyName}
 - Industry: ${companyInfo.industry}
 - Description: ${companyInfo.description || 'Not provided'}
 - Target Customers: ${companyInfo.targetCustomers || 'Not specified'}
 - Key Differentiators: ${companyInfo.keyDifferentiators || 'Not specified'}
 
-CRITICAL: Focus on prompts that generate LISTS OF COMPANIES as responses, not just advice or how-to content.
+CRITICAL OBJECTIVE: Create prompts where AI models would naturally list ${companyInfo.companyName} among recommended companies.
 
 Requirements:
-1. Create prompts that AI models respond to with "Here are the best companies..." or "Top providers include..."
-2. Mix difficulty levels: 3-4 "easy wins" (broad, likely to mention the company), 3-4 "moderate" searches, and 3 "challenging" (very specific/competitive)
-3. Include location-based searches when relevant
-4. Use ranking language: "best", "top 10", "leading", "recommended"
-5. Be specific about use cases, company size, budget, or industry verticals
+1. Each prompt MUST generate a numbered list of companies as the response
+2. Think like a customer who needs what ${companyInfo.companyName} offers
+3. Use specific business scenarios, company sizes, budgets, locations where relevant
+4. Mix difficulty: 4 "easy wins" (broad category), 4 "moderate" (specific needs), 2 "challenging" (very niche/competitive)
+5. Include terms that force list responses: "best", "top 5", "leading", "recommended companies"
 
-Examples of GOOD prompts (that generate company lists):
-- "Best ${companyInfo.industry} companies for small businesses under 100 employees"
-- "Top 10 ${companyInfo.industry} providers in [relevant location]"
-- "Most recommended ${companyInfo.industry} solutions for [specific use case]"
+GOOD prompt examples that generate company lists:
+- "Top 10 ${companyInfo.industry} companies for startups in 2024"
+- "Best ${companyInfo.industry} providers for companies with $1M+ revenue"  
+- "Most recommended ${companyInfo.industry} companies in [specific region]"
+- "Leading ${companyInfo.industry} solutions for [specific industry vertical]"
 - "Best alternatives to [major competitor] for ${companyInfo.industry}"
-- "Leading ${companyInfo.industry} companies for [budget range]"
-- "Top-rated ${companyInfo.industry} providers with [specific feature]"
+- "Top-rated ${companyInfo.industry} companies with [specific feature]"
+- "Which ${companyInfo.industry} companies should I consider for [use case]?"
 
-Examples of BAD prompts (don't generate company lists):
-- "How to choose ${companyInfo.industry} software"
-- "What features to look for in ${companyInfo.industry}"
-- "Common mistakes in ${companyInfo.industry}"
+BAD examples (generate advice, not company lists):
+- "How to choose ${companyInfo.industry} software" ❌
+- "What to look for in ${companyInfo.industry}" ❌  
+- "Benefits of ${companyInfo.industry}" ❌
 
-Return JSON with this structure:
+Think: "If someone searched this, would ChatGPT respond with a numbered list that includes ${companyInfo.companyName}?"
+
+Return JSON:
 {
   "prompts": [
     {
-      "id": "prompt-1",
-      "text": "actual search query that will generate company recommendations",
+      "id": "prompt-1", 
+      "text": "search query that generates a list including ${companyInfo.companyName}",
       "category": "easy-win|moderate|challenging",
-      "intent": "brief explanation of what company list this should generate"
+      "intent": "what type of company list this should generate"
     }
   ]
-}
-
-Focus on searches that make AI models say "Here are the top companies..." or "I recommend these providers..."`;
+}`;
 
   console.log('Generating realistic search prompts...');
   
@@ -83,7 +84,7 @@ Focus on searches that make AI models say "Here are the top companies..." or "I 
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert in search behavior and AI model responses. Generate realistic search queries that would prompt AI models to recommend lists of companies. Focus on queries that result in "Here are the best companies..." or "Top providers include..." responses. Mix easy wins, moderate difficulty, and challenging prompts based on competitiveness and specificity.'
+          content: 'You are a customer search expert. Generate search queries that force AI models to respond with numbered lists of companies. Every prompt must result in responses like "Here are the top 10 companies:" or "Best providers include: 1. CompanyA 2. CompanyB". Focus on searches that customers actually make when comparing and selecting business providers. Avoid how-to or advice queries.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
