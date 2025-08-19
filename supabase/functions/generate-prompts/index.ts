@@ -165,25 +165,79 @@ JSON FORMAT (EXACT):
   
   console.log('Raw AI response:', responseText);
   
+  const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms/i.test(t) || /which\s+.*companies/i.test(t) || /^(best|top|leading)\b/i.test(t);
+  const isBanned = (t: string) => /^(how to|what|best practices|benefits|why)\b/i.test(t);
+
   try {
     const parsed = JSON.parse(responseText);
-    const prompts = parsed.prompts || [];
-    
-    console.log('Parsed prompts:', JSON.stringify(prompts, null, 2));
-    
-    // Validate and clean up prompts
-    const validatedPrompts = prompts.slice(0, 10).map((prompt: any, index: number) => ({
+    let prompts = parsed.prompts || [];
+
+    // Normalize + validate
+    let validatedPrompts: GeneratedPrompt[] = prompts.slice(0, 20).map((prompt: any, index: number) => ({
       id: prompt.id || `prompt-${index + 1}`,
-      text: prompt.text || 'Generated prompt',
-      category: ['easy-win', 'moderate', 'challenging'].includes(prompt.category) 
-        ? prompt.category 
+      text: String(prompt.text || '').trim(),
+      category: ['easy-win', 'moderate', 'challenging'].includes(prompt.category)
+        ? prompt.category
         : 'moderate',
-      intent: prompt.intent || 'User is looking for company recommendations'
+      intent: String(prompt.intent || 'User is looking for company recommendations')
     }));
-    
-    console.log(`Generated ${validatedPrompts.length} realistic search prompts`);
+
+    // Filter out generic prompts; require list-style queries
+    validatedPrompts = validatedPrompts.filter(p => p.text && !isBanned(p.text) && isListQuery(p.text));
+
+    // If too few remain, run a second strictly constrained pass to rewrite into list queries
+    if (validatedPrompts.length < 8) {
+      console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
+      const strictPrompt = `Rewrite and return EXACTLY 10 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies for ${companyInfo.companyName}. 
+They MUST start with 'Best', 'Top', 'Leading', or 'Which companies', and MUST include words like companies/providers/vendors/consultants/agencies/firms. 
+Use the WEBSITE CONTENT context and avoid any 'how to', 'what', or advisory phrasing.`;
+
+      const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'Return ONLY valid JSON in the provided schema.' },
+            { role: 'user', content: `${promptGenerationRequest}\n\n${strictPrompt}` },
+          ],
+          temperature: 0.2,
+          max_tokens: 1200,
+          response_format: { type: 'json_object' },
+        }),
+      });
+
+      if (strictRes.ok) {
+        const strictData = await strictRes.json();
+        const strictText = strictData?.choices?.[0]?.message?.content ?? '{}';
+        try {
+          const strictParsed = JSON.parse(strictText);
+          let strictPrompts: GeneratedPrompt[] = (strictParsed.prompts || []).map((p: any, i: number) => ({
+            id: p.id || `prompt-${i + 1}`,
+            text: String(p.text || '').trim(),
+            category: ['easy-win', 'moderate', 'challenging'].includes(p.category) ? p.category : 'moderate',
+            intent: String(p.intent || 'User is looking for company recommendations')
+          }));
+          strictPrompts = strictPrompts.filter(p => p.text && !isBanned(p.text) && isListQuery(p.text));
+          if (strictPrompts.length >= validatedPrompts.length) {
+            validatedPrompts = strictPrompts;
+          }
+        } catch (e) {
+          console.warn('Strict rewrite parse failed:', e);
+        }
+      } else {
+        console.warn('Strict rewrite request failed');
+      }
+    }
+
+    // Cap to 10
+    validatedPrompts = validatedPrompts.slice(0, 10);
+    console.log(`Returning ${validatedPrompts.length} validated prompts`);
     return validatedPrompts;
-    
+
   } catch (parseError) {
     console.error('Failed to parse prompt generation response:', responseText);
     throw new Error(`Invalid prompt generation response: ${parseError.message}`);
