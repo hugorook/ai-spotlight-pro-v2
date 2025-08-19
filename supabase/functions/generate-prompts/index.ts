@@ -123,38 +123,54 @@ Return JSON only with keys:
     .map(ensureListStyle)
     .filter(t => !/^(how to|what|best practices|benefits|why)\b/i.test(t));
 
-  // Add highly specific, fair prompts using granular details (NO company name mentions)
+  // Create highly specific, diverse prompts using detailed analysis (NO company name mentions)
   const specificPrompts: string[] = [];
-  const niches = uniq(extracted.niches || []).slice(0, 4);
-  const techs = uniq(extracted.technologies || []).slice(0, 3);
-  const locations = uniq((companyInfo.locations || []).concat(markets)).slice(0, 3);
+  const niches = uniq(extracted.niches || []).slice(0, 5);
+  const techs = uniq(extracted.technologies || []).slice(0, 4);
+  const locations = uniq((companyInfo.locations || []).concat(markets)).slice(0, 4);
+  const compSizes = uniq((companyInfo.companySizes || [])).slice(0, 3);
   
-  // Create specific but fair prompts combining service + location + segment
-  for (const service of services.slice(0, 3)) {
-    if (locations[0]) {
-      specificPrompts.push(`Best ${service} companies in ${locations[0]}`);
-    }
-    if (segments[0]) {
-      specificPrompts.push(`Top ${service} providers for ${segments[0]}`);
+  // Strategy 1: Service + Location combinations
+  for (const service of services.slice(0, 2)) {
+    for (const location of locations.slice(0, 2)) {
+      specificPrompts.push(`Best ${service} companies in ${location}`);
     }
   }
   
-  // Add niche-specific prompts
-  for (const niche of niches.slice(0, 2)) {
+  // Strategy 2: Niche + Customer Segment combinations  
+  for (const niche of niches.slice(0, 3)) {
     specificPrompts.push(`Leading ${niche} specialists`);
-    if (locations[0]) {
-      specificPrompts.push(`Best ${niche} companies in ${locations[0]}`);
-    }
-  }
-  
-  // Add technology-specific prompts
-  for (const tech of techs.slice(0, 2)) {
     if (segments[0]) {
-      specificPrompts.push(`Top ${tech} providers for ${segments[0]}`);
+      specificPrompts.push(`Top ${niche} providers for ${segments[0]}`);
     }
   }
   
-  // Add these specific prompts to the programmatic list
+  // Strategy 3: Technology + Use Case combinations
+  for (const tech of techs.slice(0, 2)) {
+    if (useCases[0]) {
+      specificPrompts.push(`Best ${tech} companies for ${useCases[0]}`);
+    }
+    if (segments[0]) {
+      specificPrompts.push(`${tech} providers specializing in ${segments[0]}`);
+    }
+  }
+  
+  // Strategy 4: Service + Company Size combinations
+  for (const service of services.slice(0, 2)) {
+    for (const size of compSizes.slice(0, 2)) {
+      specificPrompts.push(`Best ${service} providers for ${size}`);
+    }
+  }
+  
+  // Strategy 5: Cross-combinations for maximum specificity
+  if (services[0] && locations[0] && segments[0]) {
+    specificPrompts.push(`Top ${services[0]} companies in ${locations[0]} serving ${segments[0]}`);
+  }
+  if (niches[0] && locations[0]) {
+    specificPrompts.push(`${niches[0]} companies in ${locations[0]}`);
+  }
+  
+  // Add these diverse specific prompts to the programmatic list
   programmatic = [...specificPrompts, ...programmatic];
   
   // If we already got enough programmatic prompts, return those
@@ -171,33 +187,38 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the company information above, create 12 search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists. Make prompts SPECIFIC but FAIR - NO company name mentions allowed.
+TASK: Based on the detailed company information above, create 12 DIVERSE and HIGHLY SPECIFIC search prompts that would result in AI models recommending ${companyInfo.companyName} in company lists. Make prompts SPECIFIC but FAIR - NO company name mentions allowed.
 
-STRATEGY: Create specific but realistic queries like "best sugar commodity traders in UK" instead of "best commodity traders":
-- Combine specific services + geographic locations + customer segments
-- Use industry niches and specializations for targeted queries  
-- Include technology/methodology specifics when available
-- Target their exact customer segments and company sizes served
-- Make them specific enough to be "easy wins" but fair tests of AI visibility
+STRATEGY: Create laser-focused queries using multiple data points:
+- COMBINE 2-3 elements: [specific service] + [geographic location] + [customer segment]
+- Example: "best algorithmic commodity trading companies in London for hedge funds" NOT "best commodity traders"
+- Use exact industry niches, specific technologies, precise customer types
+- Avoid repetitive patterns - vary the query structures
+- Target their exact specializations and unique combinations
+- Make each prompt distinctly different from others
 
-MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions):
-- "Best [specific service] companies in [specific location]"
-- "Top [number] [specific solution] providers for [specific industry]"
-- "Leading [industry niche] specialists in [location]"
-- "Best [technology/methodology] providers for [specific use case]"
-- "Top [specific service] companies for [company size] businesses"
-- "Which companies offer [specific solution] for [specific problem]"
+MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions). Use DIVERSE structures:
+- "Best [specific service] companies in [specific location] for [customer type]"
+- "Top [specific technology] providers specializing in [industry niche]"
+- "Leading [detailed specialization] companies serving [specific segment]"
+- "Which companies offer [specific solution] for [detailed use case] in [location]"
+- "Best [service + methodology] providers for [company size] in [industry]"
+- "Top [niche specialization] firms in [geographic market]"
+- "[Specific technology] companies focused on [precise customer need]"
+- "Leading [service] providers with [specific capability] for [customer type]"
 
 CATEGORIES (exact spelling):
 - "easy-win": Broad category + competitor comparison prompts (4 prompts)
 - "moderate": Specific use case + targeted industry prompts (6 prompts)  
 - "challenging": Ultra-specific niche requirements (2 prompts)
 
-EXAMPLES of SPECIFIC but FAIR prompts:
-- "Best sugar commodity trading companies in London" (not "best commodity traders")
-- "Top AI-powered analytics providers for manufacturing" (not "best analytics companies")
-- "Leading pharmaceutical cold chain specialists in Europe" (not "best logistics companies")
-- "Best blockchain supply chain companies for mid-market retailers" (not "best supply chain companies")
+EXAMPLES of HIGHLY SPECIFIC but FAIR prompts:
+- "Best algorithmic sugar commodity trading companies in London for hedge funds" (not "commodity traders")
+- "Top machine learning supply chain optimization providers for automotive manufacturers" (not "analytics companies")
+- "Leading pharmaceutical temperature-controlled logistics specialists in European markets" (not "logistics companies")
+- "Which blockchain supply chain tracking companies serve mid-market luxury retailers" (not "supply chain companies")
+- "Best Series A SaaS marketing automation platforms for B2B tech startups" (not "marketing software")
+- "Top renewable energy project finance specialists in Southeast Asia" (not "finance companies")
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
@@ -278,15 +299,16 @@ JSON FORMAT (EXACTLY 12 prompts):
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
       const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies. NO COMPANY NAME MENTIONS ALLOWED.
 
-CREATE SPECIFIC but FAIR prompts like:
-- "Best [specific service] companies in [specific location]" 
-- "Top [industry niche] specialists for [customer type]"
-- "Leading [technology] providers for [specific use case]"
-- "Best [service + location + customer segment] companies"
+CREATE HIGHLY SPECIFIC and DIVERSE prompts combining multiple elements:
+- "Best [specific service] companies in [location] for [customer type]" 
+- "Top [technology + methodology] providers specializing in [industry niche]"
+- "Leading [detailed specialization] companies serving [specific segment] in [market]"
+- "Which [specific solution] companies focus on [precise use case] for [customer size]"
+- "[Specific technology] specialists for [industry vertical] in [geographic area]"
 
-Must start with 'Best', 'Top', 'Leading', or 'Which companies'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
-Be SPECIFIC (like "sugar commodity traders in UK" not "commodity traders") but FAIR (no company names). 
-Use the provided company information and avoid any 'how to', 'what', or advisory phrasing.`;
+Must start with 'Best', 'Top', 'Leading', 'Which companies', or '[Technology] specialists'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
+Be ULTRA-SPECIFIC combining service + location + customer segment (like "algorithmic sugar commodity trading companies in London for hedge funds" not "commodity traders"). 
+MAKE EACH PROMPT UNIQUE - avoid repetitive patterns. Use ALL the detailed company information provided.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',

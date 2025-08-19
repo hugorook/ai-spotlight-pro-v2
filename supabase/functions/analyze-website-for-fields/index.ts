@@ -74,38 +74,68 @@ async function extractFieldsFromWebsite(websiteContent: string, url: string): Pr
     throw new Error('OPENAI_API_KEY not configured');
   }
 
-  const extractionPrompt = `Analyze this website content and extract structured company information.
+  const extractionPrompt = `Analyze this website content and extract highly detailed, specific company information for generating targeted search prompts.
 
 Website URL: ${url}
 Website Content: ${websiteContent}
 
-Extract the following fields based on the website content:
+Extract the following fields with MAXIMUM DETAIL and SPECIFICITY:
 
 1. Company Name: The actual company name (from headers, titles, etc.)
-2. Industry: What industry/sector they operate in (be specific, e.g., "SaaS Analytics", "Food Delivery", "B2B Marketing")
-3. Description: What the company does and their main value proposition (2-3 sentences)
-4. Target Customers: Who they serve (be specific about company size, industry, roles, e.g., "SMB retailers", "Enterprise manufacturers", "Marketing teams at SaaS companies")
-5. Key Differentiators: What makes them unique/better than competitors (awards, unique features, expertise)
-6. Geographic Focus: Where they operate (if mentioned - could be "Global", "North America", "San Francisco Bay Area", etc.)
-7. Specific Services: Array of specific services/products they offer (e.g., ["sugar trading", "rice commodity trading"] not just "commodity trading")
-8. Industry Niches: Array of specific industry sub-segments (e.g., ["pharmaceutical cold chain", "automotive logistics"] not just "logistics")
-9. Technologies: Array of specific technologies/methodologies they use (e.g., ["AI-powered analytics", "blockchain supply chain"])
-10. Company Sizes: Array of company sizes they serve (e.g., ["startups", "mid-market", "enterprise"])
-11. Locations: Array of specific geographic locations mentioned (e.g., ["London", "UK", "Europe"])
 
-Return ONLY valid JSON:
+2. Industry: Be very specific about their industry niche (e.g., "B2B SaaS Marketing Automation", "Pharmaceutical Cold Chain Logistics", "Renewable Energy Project Finance")
+
+3. Description: Write a detailed 4-5 sentence description covering:
+   - EXACTLY what services/products they offer
+   - HOW they deliver value (methodology, process, approach)
+   - WHAT specific problems they solve
+   - WHAT their key value propositions are
+   - WHAT makes their offering unique
+
+4. Target Customers: Be extremely specific about WHO they serve:
+   - Exact company types (e.g., "Series A SaaS startups", "Fortune 500 manufacturing companies", "Mid-market e-commerce retailers with $10-100M revenue")
+   - Specific roles/departments (e.g., "CMOs at B2B tech companies", "Supply chain directors at automotive manufacturers")
+   - Industry verticals they focus on
+   - Company size ranges with specifics
+
+5. Key Differentiators: List specific competitive advantages:
+   - Unique methodologies or frameworks
+   - Proprietary technology or IP
+   - Industry awards or certifications
+   - Years of experience in specific niches
+   - Notable clients or case studies
+   - Specific expertise areas
+
+6. Geographic Focus: Specific locations where they operate or serve clients
+
+7. Specific Services: Detailed array of exact services (not generic categories):
+   - Example: ["algorithmic commodity trading", "sugar futures hedging", "agricultural supply chain financing"] NOT ["commodity trading"]
+
+8. Industry Niches: Very specific sub-industries or specializations:
+   - Example: ["pharmaceutical temperature-controlled logistics", "automotive just-in-time supply chain", "luxury goods authentication"] NOT ["logistics"]
+
+9. Technologies: Specific technologies, methodologies, or approaches:
+   - Example: ["machine learning price prediction", "blockchain supply chain tracking", "IoT temperature monitoring"] NOT ["technology solutions"]
+
+10. Company Sizes: Specific company size segments they serve:
+    - Example: ["Series A-B startups (10-50 employees)", "mid-market companies ($50-500M revenue)", "Fortune 1000 enterprises"]
+
+11. Locations: Specific geographic markets, cities, regions:
+    - Example: ["London financial district", "New York tri-state area", "California Central Valley", "Southeast Asia emerging markets"]
+
+Return ONLY valid JSON with MAXIMUM DETAIL:
 {
   "companyName": "extracted company name",
-  "industry": "specific industry",
-  "description": "what they do and value prop",
-  "targetCustomers": "specific customer segments they serve", 
-  "keyDifferentiators": "what makes them unique",
-  "geographicFocus": "where they operate or serve customers",
-  "specificServices": ["service1", "service2"],
-  "industryNiches": ["niche1", "niche2"],
-  "technologies": ["tech1", "tech2"],
-  "companySizes": ["size1", "size2"],
-  "locations": ["location1", "location2"]
+  "industry": "highly specific industry niche",
+  "description": "detailed 4-5 sentence description of exactly what they do, how they do it, what problems they solve, and what makes them unique",
+  "targetCustomers": "very specific customer segments with company types, sizes, roles, and industries - include examples like 'Series A SaaS companies' or 'Fortune 500 manufacturers'", 
+  "keyDifferentiators": "specific competitive advantages, unique methodologies, awards, certifications, notable clients, years of experience in niches",
+  "geographicFocus": "specific geographic markets where they operate",
+  "specificServices": ["highly detailed service 1", "specific service 2", "exact offering 3"],
+  "industryNiches": ["very specific niche 1", "detailed specialization 2"],
+  "technologies": ["specific technology/methodology 1", "exact approach 2"],
+  "companySizes": ["specific size range 1", "detailed segment 2"],
+  "locations": ["specific location 1", "detailed market 2"]
 }`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
