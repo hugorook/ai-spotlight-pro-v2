@@ -224,22 +224,22 @@ Examples of REALISTIC searches:
 - "Best commodity traders in Brazil" (not "leading trading specialists serving producers")
 - "Largest sugar trading houses globally" (not "established firms with market reputation")
 
-CATEGORIES (exact spelling):
-- "easy-win": Broad category + competitor comparison prompts (4 prompts)
-- "moderate": Specific use case + targeted industry prompts (6 prompts)  
-- "challenging": Ultra-specific niche requirements (2 prompts)
+CATEGORIES (exact spelling) - FOCUS ON SPECIFICITY FOR SUCCESS:
+- "easy-win": ULTRA-SPECIFIC prompts that naturally lead to this company (4 prompts) - These should be so specific that only 3-5 companies globally would qualify
+- "moderate": Specific but broader market queries (4 prompts)  
+- "challenging": General industry category searches (4 prompts)
 
 EXAMPLES of REALISTIC prompts that real people would search for:
 
-For Czarnikow (major sugar trading house):
-- "Largest sugar trading companies in the world"
-- "Sugar trading houses that provide mill financing"
-- "Best sugar commodity traders with Brazilian operations"
-- "Sugar trading companies with price risk management services"
-- "Major commodity traders specializing in sugar and ethanol"
-- "Sugar trading firms with direct mill relationships"
-- "Companies that trade sugar and provide working capital"
-- "Global sugar trading houses with logistics capabilities"
+For Czarnikow (major sugar trading house) - ULTRA-SPECIFIC "easy wins":
+- "Sugar trading companies founded in the 1800s" (they're from 1861)
+- "Commodity trading houses with over 160 years in sugar business"
+- "Sugar traders with offices in both London and Brazil"
+- "Private sugar trading companies with integrated ethanol operations"
+- "Sugar trading houses that own refining assets"
+- "Commodity traders specializing in Brazilian sugar-ethanol complex"
+- "Sugar trading firms with their own logistics and storage facilities"
+- "Independent sugar trading houses not owned by agribusiness giants"
 
 For a SaaS company:
 - "Best marketing automation platforms for B2B companies"
@@ -250,7 +250,12 @@ For a consulting firm:
 - "Top supply chain consulting firms"
 - "Management consultants specializing in operations"
 
-Key: Think like a REAL PERSON who needs their services and would Google for solutions.
+Key: For EASY-WIN prompts, be SO SPECIFIC that only major established players like this company would appear. Think historical context, unique market position, specific capabilities that few others have.
+
+EASY-WIN SPECIFICITY EXAMPLES:
+- Instead of "sugar trading companies" → "sugar trading houses with over 150 years of experience"
+- Instead of "commodity traders" → "private commodity trading firms with integrated logistics and storage"
+- Instead of "Brazilian sugar traders" → "sugar trading companies with ethanol complex operations in Brazil"
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
@@ -285,7 +290,7 @@ JSON FORMAT (EXACTLY 12 prompts):
       messages: [
         { 
           role: 'system', 
-          content: 'You are a customer search expert. Generate search queries that force AI models to respond with numbered lists of companies. Every prompt must result in responses like "Here are the top 10 companies:" or "Best providers include: 1. CompanyA 2. CompanyB". Focus on searches that customers actually make when comparing and selecting business providers. Avoid how-to or advice queries.'
+          content: 'You are an expert at creating search queries for maximum company mention rates. Your goal: create prompts so specific to the target company\'s unique position that AI models naturally mention them. For "easy-win" prompts, be ULTRA-SPECIFIC using historical context, ownership structure, geographic specificity, operational details, or scale indicators that narrow results to very few companies globally. Every prompt must result in numbered company lists.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
@@ -329,30 +334,31 @@ JSON FORMAT (EXACTLY 12 prompts):
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
     if (validatedPrompts.length < 10) {
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
-      const strictPrompt = `Create EXACTLY 12 realistic search prompts that real people would type into Google when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate. NO COMPANY NAME MENTIONS.
+      const strictPrompt = `Create EXACTLY 12 search prompts for ${companyInfo.companyName} with 4 ULTRA-SPECIFIC "easy win" prompts designed for 50%+ mention rate. NO COMPANY NAME MENTIONS.
 
-CRITICAL: Think like a REAL PERSON with a genuine business need.
+CRITICAL STRATEGY:
 
-For ${companyInfo.companyName} specifically:
-- What would their customers actually search for?
-- What problems do they solve that people would Google?
-- What makes them notable in their industry?
-- What would procurement managers, analysts, or competitors search for?
+4 EASY-WIN prompts (must be ULTRA-SPECIFIC):
+- Use multiple qualifiers that narrow down to very few global companies
+- Target their unique historical, geographic, operational, or scale position
+- Make so specific that AI naturally lists major established players like them
+- Examples: "[service] companies founded in 1800s", "private [industry] firms with [specific assets]", "[service] companies with [very specific geographic + operational combo]"
 
-CREATE REALISTIC SEARCH QUERIES:
-- "Best [their main service] companies" 
-- "[Their industry] companies with [specific capability they're known for]"
-- "Largest [their market] companies globally"
-- "[Service] providers with [geographic focus]"
-- "Companies that [specific thing they do well]"
+4 MODERATE prompts:
+- Specific to their main services but broader market
+- Include geographic or capability specificity but not ultra-narrow
 
-NO MORE FORMULAIC PATTERNS. Each prompt should sound like genuine human search behavior.
+4 CHALLENGING prompts:
+- General industry category searches
+- Broader competitive landscape queries
 
-Example transformation:
-❌ "Established supply chain solutions firms with market reputation"
-✅ "Best sugar trading companies with mill financing"
+For Czarnikow example - EASY-WIN specificity:
+❌ "Sugar trading companies" (too broad, hundreds of results)
+✅ "Sugar trading companies founded in the 1800s" (maybe 5-10 companies globally)
+✅ "Private sugar trading houses with Brazilian ethanol operations" (very few qualify)
+✅ "Independent commodity trading firms with over 160 years in sugar business" (extremely specific)
 
-Make prompts so specific to what they actually do that AI naturally thinks of them.`;
+The easy-wins should be SO SPECIFIC that they almost describe the company without naming it.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
