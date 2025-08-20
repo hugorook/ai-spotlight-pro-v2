@@ -281,9 +281,9 @@ const PromptsPage = () => {
         {/* Prompts List */}
         <div className="space-y-3">
           {prompts.map((prompt, index) => (
-            <div key={prompt.id} className="glass p-3 rounded-lg">
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4 flex-1">
+            <div key={prompt.id} className="glass px-3 py-2 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-4 flex-1 items-center">
                   {/* Left side: Number and Tag */}
                   <div className="flex items-center gap-2 min-w-[100px]">
                     <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
@@ -299,28 +299,28 @@ const PromptsPage = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   {prompt.isEditing ? (
                     <>
                       <button
                         onClick={() => toggleEdit(prompt.id)}
-                        className="p-1 text-green-600 hover:bg-[#111E63] hover:text-white rounded transition-none"
+                        className="p-1 text-green-600 hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
                       >
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3 h-3" />
                       </button>
                       <button
                         onClick={() => removePrompt(prompt.id)}
-                        className="p-1 text-red-600 hover:bg-[#111E63] hover:text-white rounded transition-none"
+                        className="p-1 text-red-600 hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => toggleEdit(prompt.id)}
-                      className="p-1 text-muted-foreground hover:bg-[#111E63] hover:text-white rounded transition-none"
+                      className="p-1 text-muted-foreground hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -338,29 +338,17 @@ const PromptsPage = () => {
                       placeholder="What would users actually search for?"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-foreground mb-1">Category</label>
-                      <select
-                        value={prompt.category}
-                        onChange={(e) => updatePrompt(prompt.id, 'category', e.target.value)}
-                        className="w-full p-2 bg-white text-black rounded border text-sm"
-                      >
-                        <option value="easy-win">Easy Win</option>
-                        <option value="moderate">Moderate</option>
-                        <option value="challenging">Challenging</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-foreground mb-1">User Intent</label>
-                      <input
-                        type="text"
-                        value={prompt.intent}
-                        onChange={(e) => updatePrompt(prompt.id, 'intent', e.target.value)}
-                        className="w-full p-2 bg-white text-black rounded border text-sm"
-                        placeholder="What is the user trying to achieve?"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-xs font-medium text-foreground mb-1">Category</label>
+                    <select
+                      value={prompt.category}
+                      onChange={(e) => updatePrompt(prompt.id, 'category', e.target.value)}
+                      className="w-full p-2 bg-white text-black rounded border text-sm"
+                    >
+                      <option value="easy-win">Easy Win</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="challenging">Challenging</option>
+                    </select>
                   </div>
                 </div>
               )}

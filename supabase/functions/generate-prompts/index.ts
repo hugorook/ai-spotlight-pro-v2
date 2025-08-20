@@ -196,10 +196,10 @@ For Czarnikow specifically (major sugar trading house):
 
 CUSTOMER-PERSPECTIVE PROMPTS (KEY STRATEGY):
 Think from the perspective of their ACTUAL customers - what would these people realistically search for?
-- "What would a procurement manager at Coca Cola search for when sourcing sugar?"
-- "What would a beverage company sourcing director search for?"
-- "What would a sugar mill owner in Brazil search for when needing financing?"
-- "What would a food manufacturer search for when needing sugar supply security?"
+- "What would a procurement manager at Coca Cola search for when sourcing sugar globally?"
+- "What would a beverage company sourcing director search for when needing international sugar supply?"
+- "What would a sugar mill owner search for when needing financing and trading partnerships?"
+- "What would a food manufacturer search for when needing sugar supply security and risk management?"
 
 KEY PRINCIPLES:
 1. What would their ACTUAL CUSTOMERS search for when they need their SPECIFIC value proposition?
@@ -240,15 +240,22 @@ CATEGORIES (exact spelling) - REALISTIC but TARGETED:
 
 EXAMPLES of REALISTIC prompts that real people would search for:
 
-For Czarnikow (major sugar trading house) - REALISTIC searches targeting their USPs:
-- "Sugar trading companies that provide mill financing" (targets their financing USP)
-- "Sugar trading companies with integrated logistics" (targets their logistics USP)
-- "Sugar and ethanol trading companies" (targets their integrated complex USP)
-- "Sugar trading firms with price risk management" (targets their risk services USP)
-- "Sugar trading companies with storage facilities" (targets their physical assets USP)
-- "Major sugar trading companies in Brazil" (geographic + scale)
-- "Sugar traders that provide working capital" (financing service USP)
-- "Commodity trading companies with sugar-ethanol operations" (integrated business USP)
+For Czarnikow (major sugar trading house) - REALISTIC but DETAILED searches targeting their USPs:
+
+BETTER VERSION - More detailed and globally-focused:
+- "Leading sugar trading and supply chain companies offering mill financing and advisory services" (targets their financing USP with more detail)
+- "Major international sugar trading and supply chain firms with global mill relationships" (targets their worldwide presence, not just Brazil)
+- "Top global sugar trading and supply chain management companies with financing capabilities" (targets their global scale + multiple capabilities)
+- "International sugar and ethanol trading companies with integrated supply chain operations" (targets their integrated complex USP)
+- "Major sugar commodity trading houses with risk management and hedging services" (targets their risk services USP with more detail)
+- "Leading sugar trading companies providing working capital and structured finance to mills globally" (targets their mill financing worldwide)
+- "Global sugar trading and supply chain firms with physical storage and logistics capabilities" (targets their physical assets USP)
+- "International commodity trading companies with worldwide sugar-ethanol complex operations" (targets their integrated business USP with global scope)
+
+AVOID SIMPLE VERSIONS like:
+- "Sugar trading companies that provide mill financing" (too simple)
+- "Sugar trading companies in Brazil" (too geographically narrow for a global company)
+- "Major sugar trading companies globally" (lacks specificity about capabilities)
 
 For a SaaS company:
 - "Best marketing automation platforms for B2B companies"
@@ -269,11 +276,17 @@ ADAPT CUSTOMER EXAMPLES TO EACH COMPANY:
 
 Key: EASY-WIN prompts should target their specific USPs/differentiators while being realistic searches.
 
-EASY-WIN USP TARGETING:
-- Instead of "sugar trading companies" → "sugar trading companies that provide mill financing" (targets their financing USP)
-- Instead of "commodity traders" → "sugar and ethanol trading companies" (targets their integrated complex USP)
-- Instead of "sugar suppliers" → "sugar trading companies with integrated logistics" (targets their logistics USP)
-- Instead of "trading firms" → "sugar trading firms with price risk management" (targets their risk services USP)
+EASY-WIN USP TARGETING - USE DETAILED, MULTI-LAYERED DESCRIPTIONS:
+- Instead of "sugar trading companies" → "Leading sugar trading and supply chain companies offering mill financing and advisory services"
+- Instead of "commodity traders" → "International sugar and ethanol trading companies with integrated supply chain operations"
+- Instead of "sugar suppliers" → "Major sugar trading and supply chain firms with physical storage and logistics capabilities"
+- Instead of "trading firms" → "Top global sugar commodity trading houses with risk management and hedging services"
+
+KEY: Add multiple layers of detail that naturally describe established major players:
+- Scale indicators: "Leading", "Major", "Top global", "International"
+- Service combinations: "trading and supply chain", "financing and advisory services"
+- Capability depth: "integrated operations", "physical storage and logistics", "risk management and hedging"
+- Geographic scope: "international", "global", "worldwide", "with global mill relationships" (avoid being too specific to one region - these are global companies)
 
 Think: What would a sugar mill owner search for when they need both trading AND financing?
 Or: What would a food manufacturer search for when they need sugar AND risk management?
@@ -311,7 +324,7 @@ JSON FORMAT (EXACTLY 12 prompts):
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert at creating realistic search queries that maximize company mention rates. Create searches that real people (procurement managers, analysts, competitors) would actually make. INCLUDE customer-perspective prompts like "What would a procurement manager at [realistic customer company] search for when [specific need]?". For "easy-win" prompts, use realistic terms that naturally favor major established players - like "major [service] companies", "largest [commodity] traders", "[service] companies in [key market]". Adapt customer examples to the specific company industry. Avoid artificial specificity. Every prompt must result in numbered company lists.'
+          content: 'You are an expert at creating realistic search queries that maximize company mention rates. Create detailed, multi-layered search terms that naturally describe established major players. Use combinations like "Leading sugar trading and supply chain companies offering mill financing and advisory services" rather than simple terms like "sugar trading companies". INCLUDE customer-perspective prompts. For "easy-win" prompts, layer multiple capabilities, scale indicators, and geographic scope to create searches that naturally favor major established players. Adapt customer examples to the specific company industry. Every prompt must result in numbered company lists.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
