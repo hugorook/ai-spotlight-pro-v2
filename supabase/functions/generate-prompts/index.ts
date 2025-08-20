@@ -184,22 +184,22 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Create 12 INTELLIGENT, REALISTIC search prompts that people would actually search for when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate. NO company name mentions.
+TASK: Create 12 REALISTIC search prompts that actual customers would search for when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate on easy-wins. NO company name mentions.
 
-CRITICAL: FORGET FORMULAS. Think like a human who needs this company's services.
+CRITICAL: Balance REALISTIC human searches with enough SPECIFICITY to favor established players.
 
 For Czarnikow specifically (major sugar trading house):
-- Someone at a sugar mill might search: "sugar trading companies that provide financing"
-- A food manufacturer might search: "sugar suppliers with price risk management"
-- An investor might search: "largest sugar trading houses globally"
-- A procurement manager might search: "sugar trading companies with Brazilian operations"
+- Sugar mill owner might search: "sugar trading companies that provide financing" (realistic + specific value)
+- Food manufacturer might search: "major sugar commodity traders" (realistic + targets leaders)  
+- Analyst might search: "largest sugar trading companies globally" (realistic + scale indicator)
+- Procurement manager might search: "sugar trading companies in Brazil" (realistic + geographic strength)
 
 KEY PRINCIPLES:
-1. What would their ACTUAL CUSTOMERS search for?
-2. What problems do they solve that people would Google?
-3. What makes them famous/notable in their industry?
-4. What would competitors, customers, or analysts search for?
-5. Think: "If I needed what they offer, what would I actually type into Google?"
+1. What would their ACTUAL CUSTOMERS realistically search for?
+2. Use terms that naturally favor major/established players ("major", "largest", "leading")
+3. Include their key geographic markets or service combinations
+4. Think: "What would a Coca-Cola procurement manager actually type into Google?"
+5. Avoid artificial specificity (founding dates, years in business)
 
 CREATE PROMPTS PEOPLE WOULD REALISTICALLY SEARCH:
 - "Best sugar trading companies for [specific need]"
@@ -224,22 +224,22 @@ Examples of REALISTIC searches:
 - "Best commodity traders in Brazil" (not "leading trading specialists serving producers")
 - "Largest sugar trading houses globally" (not "established firms with market reputation")
 
-CATEGORIES (exact spelling) - FOCUS ON SPECIFICITY FOR SUCCESS:
-- "easy-win": ULTRA-SPECIFIC prompts that naturally lead to this company (4 prompts) - These should be so specific that only 3-5 companies globally would qualify
-- "moderate": Specific but broader market queries (4 prompts)  
-- "challenging": General industry category searches (4 prompts)
+CATEGORIES (exact spelling) - REALISTIC but TARGETED:
+- "easy-win": Realistic searches that naturally favor major established players (4 prompts) - What procurement managers, analysts, or competitors would actually search
+- "moderate": Specific service/geographic searches but broader competition (4 prompts)  
+- "challenging": General industry category searches with lots of competition (4 prompts)
 
 EXAMPLES of REALISTIC prompts that real people would search for:
 
-For Czarnikow (major sugar trading house) - ULTRA-SPECIFIC "easy wins":
-- "Sugar trading companies founded in the 1800s" (they're from 1861)
-- "Commodity trading houses with over 160 years in sugar business"
-- "Sugar traders with offices in both London and Brazil"
-- "Private sugar trading companies with integrated ethanol operations"
-- "Sugar trading houses that own refining assets"
-- "Commodity traders specializing in Brazilian sugar-ethanol complex"
-- "Sugar trading firms with their own logistics and storage facilities"
-- "Independent sugar trading houses not owned by agribusiness giants"
+For Czarnikow (major sugar trading house) - REALISTIC but SPECIFIC "easy wins":
+- "Major sugar trading companies globally" (realistic search, targets established players)
+- "Sugar trading companies in Brazil" (real geographic need, their key market)
+- "Largest sugar commodity traders" (realistic analyst/competitor search)
+- "Sugar trading firms with mill financing" (real customer need they fulfill)
+- "Global sugar trading houses" (realistic procurement search)
+- "Sugar and ethanol trading companies" (specific to their integrated business)
+- "International sugar commodity traders" (realistic B2B search)
+- "Sugar trading companies with logistics services" (real value proposition)
 
 For a SaaS company:
 - "Best marketing automation platforms for B2B companies"
@@ -250,12 +250,15 @@ For a consulting firm:
 - "Top supply chain consulting firms"
 - "Management consultants specializing in operations"
 
-Key: For EASY-WIN prompts, be SO SPECIFIC that only major established players like this company would appear. Think historical context, unique market position, specific capabilities that few others have.
+Key: EASY-WIN prompts should be realistic searches that naturally favor established major players.
 
-EASY-WIN SPECIFICITY EXAMPLES:
-- Instead of "sugar trading companies" → "sugar trading houses with over 150 years of experience"
-- Instead of "commodity traders" → "private commodity trading firms with integrated logistics and storage"
-- Instead of "Brazilian sugar traders" → "sugar trading companies with ethanol complex operations in Brazil"
+EASY-WIN REALISTIC SPECIFICITY:
+- Instead of "sugar trading companies" → "major sugar trading companies globally" (realistic + targets leaders)
+- Instead of "commodity traders" → "largest sugar commodity traders" (realistic analyst search)
+- Instead of "sugar companies" → "sugar trading companies in Brazil" (realistic geographic + their strength)
+- Instead of "trading firms" → "sugar trading firms with mill financing" (realistic customer need)
+
+Think: What would a procurement manager at Coca-Cola actually search for?
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
@@ -290,7 +293,7 @@ JSON FORMAT (EXACTLY 12 prompts):
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert at creating search queries for maximum company mention rates. Your goal: create prompts so specific to the target company\'s unique position that AI models naturally mention them. For "easy-win" prompts, be ULTRA-SPECIFIC using historical context, ownership structure, geographic specificity, operational details, or scale indicators that narrow results to very few companies globally. Every prompt must result in numbered company lists.'
+          content: 'You are an expert at creating realistic search queries that maximize company mention rates. Create searches that real people (procurement managers, analysts, competitors) would actually make. For "easy-win" prompts, use realistic terms that naturally favor major established players - like "major [service] companies", "largest [commodity] traders", "[service] companies in [key market]". Avoid artificial specificity. Every prompt must result in numbered company lists.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
@@ -338,11 +341,11 @@ JSON FORMAT (EXACTLY 12 prompts):
 
 CRITICAL STRATEGY:
 
-4 EASY-WIN prompts (must be ULTRA-SPECIFIC):
-- Use multiple qualifiers that narrow down to very few global companies
-- Target their unique historical, geographic, operational, or scale position
-- Make so specific that AI naturally lists major established players like them
-- Examples: "[service] companies founded in 1800s", "private [industry] firms with [specific assets]", "[service] companies with [very specific geographic + operational combo]"
+4 EASY-WIN prompts (must be REALISTIC but TARGETED):
+- Realistic searches that procurement managers, analysts, or competitors would actually make
+- Focus on their key markets, scale indicators, or service combinations that favor major players
+- Target searches where established companies naturally rank high
+- Examples: "Major [service] companies globally", "[service] companies in [key geographic market]", "Largest [commodity] traders", "[service] firms with [key capability]"
 
 4 MODERATE prompts:
 - Specific to their main services but broader market
@@ -352,13 +355,14 @@ CRITICAL STRATEGY:
 - General industry category searches
 - Broader competitive landscape queries
 
-For Czarnikow example - EASY-WIN specificity:
+For Czarnikow example - EASY-WIN realistic specificity:
 ❌ "Sugar trading companies" (too broad, hundreds of results)
-✅ "Sugar trading companies founded in the 1800s" (maybe 5-10 companies globally)
-✅ "Private sugar trading houses with Brazilian ethanol operations" (very few qualify)
-✅ "Independent commodity trading firms with over 160 years in sugar business" (extremely specific)
+✅ "Major sugar trading companies globally" (realistic search, naturally favors established leaders)
+✅ "Sugar trading companies in Brazil" (real geographic need, their key strength)
+✅ "Largest sugar commodity traders" (realistic analyst search, targets major players)
+✅ "Sugar trading firms with mill financing" (real customer need they fulfill)
 
-The easy-wins should be SO SPECIFIC that they almost describe the company without naming it.`;
+The easy-wins should be REALISTIC SEARCHES that naturally favor established market leaders like this company.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
