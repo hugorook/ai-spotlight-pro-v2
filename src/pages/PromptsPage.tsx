@@ -279,13 +279,13 @@ const PromptsPage = () => {
         </div>
 
         {/* Prompts List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {prompts.map((prompt, index) => (
-            <div key={prompt.id} className="glass p-4 rounded-lg">
+            <div key={prompt.id} className="glass p-3 rounded-lg">
               <div className="flex items-start justify-between">
                 <div className="flex gap-4 flex-1">
                   {/* Left side: Number and Tag */}
-                  <div className="flex flex-col items-start gap-1 min-w-[120px]">
+                  <div className="flex items-center gap-2 min-w-[100px]">
                     <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
                     <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
                       {prompt.category}
@@ -296,9 +296,6 @@ const PromptsPage = () => {
                   {!prompt.isEditing && (
                     <div className="flex-1">
                       <p className="text-foreground font-medium">"{prompt.text}"</p>
-                      {prompt.intent && (
-                        <p className="text-xs text-muted-foreground mt-1">Intent: {prompt.intent}</p>
-                      )}
                     </div>
                   )}
                 </div>
