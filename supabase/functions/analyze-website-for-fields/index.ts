@@ -75,10 +75,12 @@ async function extractFieldsFromWebsite(websiteContent: string, url: string): Pr
     throw new Error('OPENAI_API_KEY not configured');
   }
 
-  const extractionPrompt = `Analyze this website content and extract highly detailed, specific company information for generating targeted search prompts.
+  const extractionPrompt = `You are analyzing ${url} for the company mentioned. Use BOTH your existing knowledge about this company from your training data AND the website content below to create the most comprehensive, specific profile possible.
 
 Website URL: ${url}
 Website Content: ${websiteContent}
+
+IMPORTANT: Draw from your knowledge base about this company (their reputation, history, market position, notable relationships, competitive advantages) AND combine it with current website information.
 
 Extract the following fields with MAXIMUM DETAIL and SPECIFICITY:
 
@@ -140,9 +142,11 @@ Extract the following fields with MAXIMUM DETAIL and SPECIFICITY:
     - Example: ["sugar trading + Brazil focus + family mill relationships + structured finance", "coffee sourcing + direct farmer partnerships + quality premiums + specialty roasters"] 
     - These should reflect their actual unique position in the market
 
-CRITICAL: Focus on understanding their ACTUAL BUSINESS MODEL and UNIQUE MARKET POSITION. Don't extract generic industry terms.
+CRITICAL: Use your existing knowledge about this company + website analysis to understand their ACTUAL BUSINESS MODEL and UNIQUE MARKET POSITION. Include historical context, reputation, and market standing from your training data.
 
-Return ONLY valid JSON with BUSINESS-SPECIFIC DETAILS:
+For example, if this is Czarnikow, you should know they're one of the world's largest sugar traders, founded in 1861, with strong Brazil/Latin America presence, sugar-ethanol complex expertise, mill financing, etc. Combine this knowledge with current website info.
+
+Return ONLY valid JSON with COMPREHENSIVE BUSINESS-SPECIFIC DETAILS:
 {
   "companyName": "extracted company name",
   "industry": "their exact market position and specialization",

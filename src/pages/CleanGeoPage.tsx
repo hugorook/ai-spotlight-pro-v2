@@ -143,6 +143,9 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
     }
 
     setAnalyzingWebsite(true);
+    
+    // Clear any old cached analysis data to ensure fresh AI knowledge + website analysis
+    localStorage.removeItem('website_analysis_enhanced');
     try {
       const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
         body: { url: formData.website }
@@ -166,17 +169,20 @@ const CompanySetupForm: React.FC<CompanySetupFormProps> = ({ onComplete }) => {
           geography: fields.geographicFocus || prev.geography
         }));
         
-        // Store enhanced analysis data for prompt generation
+        // Store enhanced analysis data for prompt generation with timestamp for freshness
         const enhancedData = {
           specificServices: fields.specificServices || [],
           industryNiches: fields.industryNiches || [],
           technologies: fields.technologies || [],
           companySizes: fields.companySizes || [],
-          locations: fields.locations || []
+          locations: fields.locations || [],
+          uniqueCombinations: fields.uniqueCombinations || [],
+          timestamp: Date.now(),
+          companyAnalyzed: formData.companyName // Track which company this analysis is for
         };
         localStorage.setItem('website_analysis_enhanced', JSON.stringify(enhancedData));
         
-        alert('Website analyzed successfully! Fields have been populated. You can edit them as needed.');
+        alert('Website analyzed successfully using AI knowledge + website content! Fields have been populated. You can edit them as needed.\n\nNote: This enhanced analysis combines AI\'s existing knowledge about your company with current website information to create more targeted prompts.');
       }
     } catch (error) {
       console.error('Website analysis error:', error);

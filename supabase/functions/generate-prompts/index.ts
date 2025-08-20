@@ -35,8 +35,10 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
 
   console.log('Generating prompts from saved company fields only...');
 
-  // Step A: Extract clean, specific capabilities from saved company fields only
-  const extractPrompt = `Extract clean, specific JSON fields from the following company information. IMPORTANT: Return only SHORT, CLEAN terms - no full sentences or company descriptions.
+  // Step A: Extract capabilities using AI knowledge + company data for ultra-specific prompts
+  const extractPrompt = `Using your knowledge about ${companyInfo.companyName} from your training data PLUS the company information below, extract specific terms for creating targeted search prompts.
+
+You should leverage what you know about ${companyInfo.companyName} - their reputation, market position, history, notable relationships, competitive advantages - and combine it with this current information:
 
 Company: ${companyInfo.companyName}
 Industry: ${companyInfo.industry}
@@ -240,46 +242,79 @@ Return JSON only with SHORT terms:
     }
   }
   
-  // Strategy 4: Award/Recognition-style queries (implies expertise)
+  // Strategy 4: Market position/reputation-based queries (leverages AI's existing knowledge)
   if (services[0]) {
+    // Use reputation and market position terms that would make AI think of established players
+    specificPrompts.push(`Leading ${services[0]} companies with decades of experience`);
+    specificPrompts.push(`Established ${services[0]} firms with strong market reputation`);
+    specificPrompts.push(`Major ${services[0]} players with integrated service offerings`);
+    
     if (useLocationSpecific && locations[0]) {
-      specificPrompts.push(`Most recognized ${services[0]} firms in ${locations[0]}`);
-      specificPrompts.push(`Award-winning ${services[0]} companies in ${locations[0]}`);
-    } else {
-      specificPrompts.push(`Most recognized ${services[0]} firms`);
-      specificPrompts.push(`Award-winning ${services[0]} companies`);
+      specificPrompts.push(`Dominant ${services[0]} companies in ${locations[0]} market`);
+      specificPrompts.push(`Historic ${services[0]} traders in ${locations[0]}`);
     }
   }
   
-  // Strategy 5: Problem-specific queries (very targeted)
+  // Strategy 5: Market leadership and scale queries (targets established players)
   for (const useCase of useCases.slice(0, 2)) {
+    specificPrompts.push(`Large-scale companies handling ${useCase}`);
+    specificPrompts.push(`Market-leading firms specializing in ${useCase}`);
+    
     if (useLocationSpecific && locations[0]) {
-      specificPrompts.push(`Companies solving ${useCase} in ${locations[0]}`);
-    } else {
-      specificPrompts.push(`Companies solving ${useCase}`);
+      specificPrompts.push(`Dominant players in ${useCase} across ${locations[0]}`);
     }
-    if (techs[0]) {
-      specificPrompts.push(`${techs[0]} companies specializing in ${useCase}`);
+    
+    if (segments[0]) {
+      specificPrompts.push(`Established companies providing ${useCase} solutions for ${segments[0]}`);
     }
   }
   
-  // Strategy 6: Use unique combinations for maximum specificity 
+  // Strategy 6: Historical/reputation-based positioning (leverages AI knowledge of established companies)
+  if (services[0] && segments[0]) {
+    specificPrompts.push(`Historic ${services[0]} companies serving ${segments[0]}`);
+    specificPrompts.push(`Century-old ${services[0]} firms with established ${segments[0]} relationships`);
+    specificPrompts.push(`Traditional ${services[0]} houses with deep ${segments[0]} expertise`);
+  }
+  
+  // Use unique combinations with reputation context
   const uniqueCombos = uniq(cleanExtracted.uniqueCombos || []).concat(companyInfo.uniqueCombinations || []).slice(0, 3);
   for (const combo of uniqueCombos) {
-    specificPrompts.push(`Companies specializing in ${combo}`);
-    specificPrompts.push(`Leading providers of ${combo}`);
+    specificPrompts.push(`Well-established companies specializing in ${combo}`);
+    specificPrompts.push(`Market-leading providers of ${combo}`);
   }
   
-  // Strategy 7: Award/expertise-based ultra-niche queries
-  if (niches[0] && techs[0]) {
-    specificPrompts.push(`Award-winning ${niches[0]} companies using ${techs[0]}`);
-  }
-  if (services[0] && niches[0]) {
-    if (useLocationSpecific && locations[0]) {
-      specificPrompts.push(`Most recognized ${services[0]} experts in ${niches[0]} based in ${locations[0]}`);
-    } else {
-      specificPrompts.push(`Most recognized ${services[0]} experts in ${niches[0]}`);
+  // Strategy 7: Target established industry leaders (designed for 50%+ mention rate)
+  // These prompts are specifically designed to make AI models think of major, well-known companies
+  if (services[0]) {
+    specificPrompts.push(`Top-tier ${services[0]} companies with global reach`);
+    specificPrompts.push(`Multinational ${services[0]} corporations`);
+    specificPrompts.push(`Industry-leading ${services[0]} firms with integrated operations`);
+    
+    if (segments[0]) {
+      specificPrompts.push(`Premier ${services[0]} companies serving major ${segments[0]}`);
+      specificPrompts.push(`Blue-chip ${services[0]} firms with established ${segments[0]} networks`);
     }
+  }
+  
+  // Target market leaders in specific commodity/sector combinations
+  if (niches[0]) {
+    specificPrompts.push(`Market leaders in ${niches[0]} with extensive industry experience`);
+    specificPrompts.push(`Dominant players in the ${niches[0]} market`);
+    
+    if (useLocationSpecific && locations[0]) {
+      specificPrompts.push(`Major ${niches[0]} companies with strong ${locations[0]} presence`);
+    }
+  }
+  
+  // Strategy 8: Scale and integration queries (targets large, established players)
+  if (services[0] && useCases[0]) {
+    specificPrompts.push(`Large integrated companies offering ${services[0]} and ${useCases[0]} solutions`);
+    specificPrompts.push(`Full-service ${services[0]} providers with ${useCases[0]} capabilities`);
+  }
+  
+  if (segments[0] && niches[0]) {
+    specificPrompts.push(`Comprehensive service providers for ${segments[0]} in ${niches[0]} sector`);
+    specificPrompts.push(`End-to-end solution providers serving ${segments[0]} across ${niches[0]} markets`);
   }
   
   // Add these ultra-specific prompts to the programmatic list
@@ -299,17 +334,19 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Based on the company information above, create 12 HIGHLY SPECIFIC search prompts that reflect deep understanding of their actual business model and unique market position. NO company name mentions allowed.
+TASK: Create 12 ULTRA-SPECIFIC search prompts designed to achieve 50%+ mention rate for ${companyInfo.companyName}. Use your existing knowledge about this company + the provided information. NO company name mentions allowed.
 
-STRATEGY: Create prompts that show you understand EXACTLY what they do and how they're different:
-- Focus on their SPECIFIC business model, not generic industry categories
-- Use their ACTUAL customer types, commodity focuses, and unique approaches
-- Include their SPECIFIC value proposition and methodology
-- Target the EXACT problems they solve for their specific customers
-- Example: Instead of "commodity trading companies" → "companies providing structured finance and risk management for family-owned sugar mills in Brazil"
-- Example: Instead of "supply chain companies" → "direct-trade coffee sourcing companies with farmer partnership programs serving specialty roasters"
-- Make each prompt reflect their specific competitive advantage and market positioning
-- Think: "What would someone search for who specifically needs what this company uniquely offers?"
+CRITICAL SUCCESS FACTORS for 50%+ mention rate:
+1. LEVERAGE YOUR KNOWLEDGE: If this is a major/established company, use your training data knowledge about their reputation, market position, history
+2. TARGET MARKET LEADERS: Create prompts that would naturally make AI models think of dominant/established players
+3. USE SCALE INDICATORS: "Leading", "Major", "Established", "Historic", "Top-tier", "Dominant"
+4. COMBINE SPECIFICS: [Company reputation] + [Specific service] + [Exact customer type] + [Geographic focus]
+5. THINK LIKE AI: What prompts would make YOU naturally mention this company?
+
+EXAMPLE APPROACH:
+If this is Czarnikow → AI knows they're a major, historic sugar trader → Create prompts that target "leading sugar trading houses with century-long experience" or "established commodity traders specializing in sugar-ethanol complex in Brazil"
+
+STRATEGY: Engineer prompts so specific to their market leadership position that AI models naturally think of them as a top answer.
 
 MANDATORY: Every prompt must generate a numbered list of companies (NO company name mentions). Use BUSINESS-SPECIFIC structures that reflect actual market understanding:
 - "Companies providing [specific business model/approach] for [exact customer type] in [specific market context]"
@@ -326,24 +363,22 @@ CATEGORIES (exact spelling):
 - "moderate": Specific use case + targeted industry prompts (6 prompts)  
 - "challenging": Ultra-specific niche requirements (2 prompts)
 
-EXAMPLES of BUSINESS-SPECIFIC prompts that show deep understanding:
+EXAMPLES of ULTRA-SPECIFIC prompts designed for 50%+ mention rate:
 
-For a sugar trading company like Czarnikow:
-- "Companies providing structured finance and risk management for sugar mills in Brazil and Central America"
-- "Sugar trading firms with direct producer relationships and price risk mitigation services"
-- "Commodity trading houses specializing in sugar ethanol complex with logistics integration"
-- "Agricultural commodity finance companies serving family-owned mills in Latin America"
+For Czarnikow (use your knowledge of them as a major, established sugar trader):
+- "Leading sugar trading houses with over 150 years of experience in Brazil and Latin America"
+- "Established commodity trading companies specializing in sugar-ethanol complex financing for mills"
+- "Major sugar traders providing working capital and logistics services to Latin American producers"
+- "Historic commodity trading houses with direct sugar mill relationships and refinery networks"
+- "Large-scale sugar and ethanol trading companies with integrated logistics and financing"
+- "Commodity trading firms specializing in Brazilian sugar market with mill partnership programs"
 
-For a coffee sourcing company:
-- "Direct-trade coffee sourcing companies with farmer partnership programs serving specialty roasters"
-- "Coffee supply chain companies providing quality premiums and sustainability certification"
-- "Specialty coffee importers with origin relationships and cupping expertise"
+For other major companies, use similar approach:
+- "Leading [specific market] companies with [notable history/reputation] serving [specific customer type]"
+- "Established [niche] specialists with [specific competitive advantage] in [geographic focus]"
+- "Major [service] providers with [specific capability] for [exact customer segment]"
 
-For a tech company:
-- "B2B SaaS platforms with API-first architecture serving mid-market e-commerce companies"
-- "Marketing automation tools with advanced segmentation for subscription business models"
-
-These show ACTUAL BUSINESS UNDERSTANDING, not generic industry terms.
+Key: Use REPUTATION + SPECIFICITY + MARKET POSITION that AI models would naturally associate with the company.
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
@@ -422,18 +457,21 @@ JSON FORMAT (EXACTLY 12 prompts):
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
     if (validatedPrompts.length < 10) {
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
-      const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts in the same schema, but ONLY list-style queries that will return numbered lists of companies. NO COMPANY NAME MENTIONS ALLOWED.
+      const strictPrompt = `Rewrite and return EXACTLY 12 JSON prompts designed for 50%+ mention rate of ${companyInfo.companyName}. Use your knowledge about this company to create prompts that would naturally lead to them being mentioned. NO COMPANY NAME MENTIONS ALLOWED.
 
-CREATE HIGHLY SPECIFIC and DIVERSE prompts combining multiple elements:
-- "Best [specific service] companies in [location] for [customer type]" 
-- "Top [technology + methodology] providers specializing in [industry niche]"
-- "Leading [detailed specialization] companies serving [specific segment] in [market]"
-- "Which [specific solution] companies focus on [precise use case] for [customer size]"
-- "[Specific technology] specialists for [industry vertical] in [geographic area]"
+CRITICAL: If this is an established/major company, leverage your knowledge of their market position, reputation, and history.
 
-Must start with 'Best', 'Top', 'Leading', 'Which companies', or '[Technology] specialists'. MUST include words like companies/providers/vendors/consultants/agencies/firms. 
-Be ULTRA-SPECIFIC combining service + location + customer segment (like "algorithmic sugar commodity trading companies in London for hedge funds" not "commodity traders"). 
-MAKE EACH PROMPT UNIQUE - avoid repetitive patterns. Use ALL the detailed company information provided.`;
+CREATE PROMPTS TARGETING MARKET LEADERS:
+- "Leading [specific service] companies with [reputation indicator] serving [customer type]"
+- "Established [niche] specialists with [scale/history indicator] in [market]"
+- "Major [service] players with [integration/capability] for [customer segment]"
+- "Historic [industry] companies with [specific expertise] in [geographic focus]"
+- "Top-tier [service] firms with [competitive advantage]"
+- "Dominant [niche] companies offering [specific solution]"
+
+Must start with words that target established players: 'Leading', 'Major', 'Established', 'Top-tier', 'Dominant', 'Historic', 'Premier'. MUST include words like companies/providers/firms/houses. 
+
+Goal: Create prompts so aligned with the company's actual market position that AI models naturally think of them as a top answer.`;
 
       const strictRes = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',

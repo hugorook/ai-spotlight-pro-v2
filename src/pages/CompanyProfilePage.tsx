@@ -238,6 +238,9 @@ const CompanyProfilePage = () => {
     }
 
     setAnalyzingWebsite(true);
+    
+    // Clear any old cached analysis data to ensure fresh AI knowledge + website analysis
+    localStorage.removeItem('website_analysis_enhanced');
     try {
       const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
         body: { url: formData.website }
@@ -265,19 +268,22 @@ const CompanyProfilePage = () => {
           geography: fields.geographicFocus || prev.geography
         }));
         
-        // Store enhanced analysis data for prompt generation
+        // Store enhanced analysis data for prompt generation with timestamp for freshness
         const enhancedData = {
           specificServices: fields.specificServices || [],
           industryNiches: fields.industryNiches || [],
           technologies: fields.technologies || [],
           companySizes: fields.companySizes || [],
-          locations: fields.locations || []
+          locations: fields.locations || [],
+          uniqueCombinations: fields.uniqueCombinations || [],
+          timestamp: Date.now(),
+          companyAnalyzed: formData.companyName // Track which company this analysis is for
         };
         localStorage.setItem('website_analysis_enhanced', JSON.stringify(enhancedData));
         
         toast({ 
-          title: 'Analysis Complete', 
-          description: 'Website analyzed successfully! Fields have been populated. You can edit them as needed.' 
+          title: 'Enhanced Analysis Complete', 
+          description: 'Website analyzed using AI knowledge + website content! This enhanced analysis combines AI\'s existing knowledge about your company with current website information to create more targeted prompts.' 
         });
       }
     } catch (error) {

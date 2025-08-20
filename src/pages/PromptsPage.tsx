@@ -87,12 +87,23 @@ const PromptsPage = () => {
     try {
       setGenerating(true);
       
-      // Load enhanced analysis data if available, but prioritize current company profile
+      // Load enhanced analysis data if available and recent, but prioritize current company profile
       let enhancedData = {};
       try {
         const stored = localStorage.getItem('website_analysis_enhanced');
         if (stored) {
-          enhancedData = JSON.parse(stored);
+          const parsedData = JSON.parse(stored);
+          // Check if analysis is for current company and is recent (less than 1 hour old)
+          const isRecent = parsedData.timestamp && (Date.now() - parsedData.timestamp < 3600000);
+          const isCurrentCompany = parsedData.companyAnalyzed === companyData.company_name;
+          
+          if (isRecent && isCurrentCompany) {
+            enhancedData = parsedData;
+            console.log('Using fresh enhanced analysis data with AI knowledge integration');
+          } else {
+            console.log('Enhanced analysis data is stale or for different company, will use basic extraction');
+            localStorage.removeItem('website_analysis_enhanced');
+          }
         }
       } catch (e) {
         console.log('No enhanced analysis data available');
@@ -128,7 +139,11 @@ const PromptsPage = () => {
       // Save to localStorage
       localStorage.setItem(`prompts_${companyData.id}`, JSON.stringify(generatedPrompts));
       
-      toast({ title: 'Success', description: `Generated ${generatedPrompts.length} realistic search prompts` });
+      const hasEnhancedData = Object.keys(enhancedData).length > 0;
+      toast({ 
+        title: 'Success', 
+        description: `Generated ${generatedPrompts.length} ${hasEnhancedData ? 'AI-enhanced' : 'standard'} search prompts${hasEnhancedData ? ' using AI knowledge + company analysis' : ''}` 
+      });
     } catch (error) {
       console.error('Error generating prompts:', error);
       toast({ title: 'Error', description: 'Failed to generate prompts', variant: 'destructive' });
