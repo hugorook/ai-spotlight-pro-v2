@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Brain, BarChart3, MessageSquare, User } from 'lucide-react';
+import { Brain, BarChart3, MessageSquare, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   path: string;
@@ -12,6 +13,11 @@ interface NavItem {
 const TopNavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const getUserInitials = (email: string) => {
+    return email.split('@')[0].substring(0, 2).toUpperCase();
+  };
 
   const navItems: NavItem[] = [
     { 
@@ -59,24 +65,37 @@ const TopNavBar = () => {
           </span>
         </div>
 
-        {/* Navigation Items */}
-        <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
+        {/* Navigation Items and Profile */}
+        <div className="flex items-center gap-4">
+          <nav className="flex items-center gap-1">
+            {navItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                  isActive(item.path)
+                    ? "bg-[#E7E2F9] text-foreground"
+                    : "text-foreground hover:text-white hover:bg-[#E7E2F9]"
+                )}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Profile Circle */}
+          {user && (
             <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                isActive(item.path)
-                  ? "bg-[#111E63] text-white"
-                  : "text-foreground hover:text-white hover:bg-[#111E63]"
-              )}
+              onClick={() => navigate('/settings')}
+              className="w-8 h-8 rounded-full bg-[#E7E2F9] hover:bg-[#111E63] text-foreground hover:text-white flex items-center justify-center text-sm font-medium transition-colors"
+              title="Settings"
             >
-              {item.icon}
-              <span>{item.label}</span>
+              {getUserInitials(user.email || 'User')}
             </button>
-          ))}
-        </nav>
+          )}
+        </div>
       </div>
     </div>
   );
