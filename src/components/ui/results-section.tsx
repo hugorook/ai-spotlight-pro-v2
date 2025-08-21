@@ -9,6 +9,28 @@ interface TestResult {
   sentiment: 'positive' | 'neutral' | 'negative';
   context: string;
   response?: string; // Full AI response
+  failureAnalysis?: FailureAnalysis;
+}
+
+interface FailureAnalysis {
+  primaryReason: string;
+  category: 'content' | 'authority' | 'technical' | 'competition';
+  severity: 'critical' | 'moderate' | 'minor';
+  quickFix: string;
+  detailedFix: string;
+  timeToFix: string;
+  difficulty: 'easy' | 'moderate' | 'needs-dev';
+  expectedImpact: string;
+  competitorInsight?: string;
+}
+
+interface TrendingOpportunity {
+  query: string;
+  trendScore: number;
+  timeWindow: string;
+  reasoning: string;
+  suggestedContent: string;
+  difficulty: 'easy' | 'moderate' | 'advanced';
 }
 
 interface ResultsSectionProps {
@@ -24,6 +46,7 @@ interface ResultsSectionProps {
   onPrintReport?: () => void;
   onCopyResults?: () => void;
   websiteAnalysis?: any;
+  trendingOpportunities?: TrendingOpportunity[];
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
@@ -38,7 +61,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onExportCsv,
   onPrintReport,
   onCopyResults,
-  websiteAnalysis
+  websiteAnalysis,
+  trendingOpportunities = []
 }) => {
   const [activeTab, setActiveTab] = useState('results');
   const [showAllResults, setShowAllResults] = useState(false);
@@ -47,7 +71,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending')) {
       setActiveTab(savedTab);
     }
   }, []);
@@ -140,6 +164,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           {[
             { id: 'results', label: 'Results', icon: BarChart3 },
             { id: 'strategy', label: 'Strategy', icon: Lightbulb },
+            { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'website', label: 'Website Analysis', icon: Globe }
           ].map((tab) => (
             <button
@@ -327,6 +352,48 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         <div className="mt-2 whitespace-pre-wrap">{fullResponse}</div>
                       </div>
                     )}
+
+                    {/* Show failure analysis for non-mentioned or low-ranking results */}
+                    {result.failureAnalysis && (
+                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                            result.failureAnalysis.severity === 'critical' ? 'bg-red-500' :
+                            result.failureAnalysis.severity === 'moderate' ? 'bg-yellow-500' :
+                            'bg-blue-500'
+                          }`}></div>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-red-800 mb-2">
+                              Why you didn't rank: {result.failureAnalysis.primaryReason}
+                            </div>
+                            <div className="text-xs text-red-700 space-y-1">
+                              <div><strong>Quick Fix ({result.failureAnalysis.timeToFix}):</strong> {result.failureAnalysis.quickFix}</div>
+                              <div><strong>Expected Impact:</strong> {result.failureAnalysis.expectedImpact}</div>
+                              {result.failureAnalysis.competitorInsight && (
+                                <div><strong>Competitor Insight:</strong> {result.failureAnalysis.competitorInsight}</div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className={`px-2 py-1 rounded-full text-xs ${
+                                result.failureAnalysis.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                                result.failureAnalysis.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {result.failureAnalysis.difficulty}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs ${
+                                result.failureAnalysis.category === 'content' ? 'bg-blue-100 text-blue-700' :
+                                result.failureAnalysis.category === 'authority' ? 'bg-purple-100 text-purple-700' :
+                                result.failureAnalysis.category === 'technical' ? 'bg-orange-100 text-orange-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {result.failureAnalysis.category}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -439,6 +506,68 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'trending' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Trending Opportunities</h3>
+              <div className="text-xs text-muted-foreground">
+                Get ahead of competitors with these emerging trends
+              </div>
+            </div>
+            
+            {trendingOpportunities.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {trendingOpportunities.map((opportunity, index) => (
+                  <div key={index} className="glass p-4 rounded-lg">
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="text-sm font-semibold text-foreground pr-2">
+                        "{opportunity.query}"
+                      </h4>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <TrendingUp className="w-3 h-3 text-green-600" />
+                        <span className="text-xs font-medium text-green-600">
+                          {opportunity.trendScore}%
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 text-xs text-muted-foreground">
+                      <p><strong>Why it's trending:</strong> {opportunity.reasoning}</p>
+                      <p><strong>Action needed:</strong> {opportunity.suggestedContent}</p>
+                      <p><strong>Timeline:</strong> {opportunity.timeWindow}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        opportunity.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                        opportunity.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {opportunity.difficulty}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setContentTopic(opportunity.query);
+                          generateContent(opportunity.suggestedContent);
+                        }}
+                        className="px-3 py-1 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none"
+                      >
+                        Create Content
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="glass p-6 rounded-lg text-center">
+                <TrendingUp className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No trending opportunities found yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Run a health check to discover trending queries in your industry</p>
+              </div>
+            )}
           </div>
         )}
 

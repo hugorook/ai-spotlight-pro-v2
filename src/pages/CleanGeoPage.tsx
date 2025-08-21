@@ -25,6 +25,28 @@ interface TestResult {
   sentiment: 'positive' | 'neutral' | 'negative';
   context: string;
   response?: string; // Full AI response
+  failureAnalysis?: FailureAnalysis;
+}
+
+interface FailureAnalysis {
+  primaryReason: string;
+  category: 'content' | 'authority' | 'technical' | 'competition';
+  severity: 'critical' | 'moderate' | 'minor';
+  quickFix: string;
+  detailedFix: string;
+  timeToFix: string;
+  difficulty: 'easy' | 'moderate' | 'needs-dev';
+  expectedImpact: string;
+  competitorInsight?: string;
+}
+
+interface TrendingOpportunity {
+  query: string;
+  trendScore: number;
+  timeWindow: string;
+  reasoning: string;
+  suggestedContent: string;
+  difficulty: 'easy' | 'moderate' | 'advanced';
 }
 
 interface ContentOpportunity {
@@ -955,6 +977,7 @@ export default function CleanGeoPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [autoStrategies, setAutoStrategies] = useState<any[]>([]);
   const [strategyLoading, setStrategyLoading] = useState(false);
+  const [trendingOpportunities, setTrendingOpportunities] = useState<TrendingOpportunity[]>([]);
   const [strategyError, setStrategyError] = useState<string | null>(null);
   const [showResultsSection, setShowResultsSection] = useState(false);
   const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null);
@@ -1335,6 +1358,28 @@ export default function CleanGeoPage() {
               context: result.context || '',
               response: result.response || ''
             };
+
+            // Add failure analysis for non-mentioned or low-ranking results
+            if (!testResult.mentioned || testResult.position > 5) {
+              try {
+                const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-prompt-failure', {
+                  body: {
+                    prompt: currentPrompt,
+                    companyName: company.company_name,
+                    companyWebsite: company.website_url || '',
+                    mentioned: testResult.mentioned,
+                    position: testResult.position,
+                    aiResponse: testResult.response
+                  }
+                });
+
+                if (!analysisError && analysisData?.analysis) {
+                  testResult.failureAnalysis = analysisData.analysis;
+                }
+              } catch (analysisError) {
+                console.error('Error analyzing prompt failure:', analysisError);
+              }
+            }
             
             results.push(testResult);
             
@@ -1432,6 +1477,9 @@ export default function CleanGeoPage() {
         setShowResultsSection(true);
       }, 1000);
 
+      // Get trending opportunities for this company
+      await getTrendingOpportunities();
+
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
       
@@ -1452,6 +1500,36 @@ export default function CleanGeoPage() {
       setIsRunningHealthCheck(false);
       setCurrentTestPrompt('');
       setTestProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Get trending opportunities for the company
+  const getTrendingOpportunities = async () => {
+    if (!company) return;
+
+    try {
+      console.log('Getting trending opportunities for:', company.company_name);
+      
+      const { data, error } = await supabase.functions.invoke('trending-opportunities', {
+        body: {
+          industry: company.industry,
+          companyName: company.company_name,
+          services: company.key_differentiators?.split(',').map(s => s.trim()) || [],
+          keywords: [company.industry, company.company_name]
+        }
+      });
+
+      if (error) {
+        console.error('Trending opportunities error:', error);
+        return;
+      }
+
+      if (data?.opportunities) {
+        setTrendingOpportunities(data.opportunities);
+        console.log(`Found ${data.opportunities.length} trending opportunities`);
+      }
+    } catch (error) {
+      console.error('Error getting trending opportunities:', error);
     }
   };
 
@@ -1822,6 +1900,7 @@ export default function CleanGeoPage() {
               onPrintReport={() => printReport('geo-report')}
               onCopyResults={copyGeoResultsToClipboard}
               websiteAnalysis={websiteAnalysis}
+              trendingOpportunities={trendingOpportunities}
             />
           </div>
         )}
