@@ -514,10 +514,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {onNewTest && (
               <button
                 onClick={onNewTest}
-                className="w-full flex items-start gap-3 px-4 py-3 rounded-md text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-none"
+                className="w-full flex items-center px-4 py-3 rounded-md text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-none"
               >
-                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                Run Health Check
+                <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-start">
+                  <CheckCircle className="w-4 h-4" />
+                </div>
+                <span className="flex-1 text-left">Run Health Check</span>
               </button>
             )}
             
@@ -532,14 +534,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full flex items-start gap-3 px-4 py-3 rounded-md text-sm font-medium transition-none ${
+                className={`w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-none ${
                   activeTab === tab.id
                     ? 'bg-[#111E63] text-white'
                     : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
                 }`}
               >
-                <tab.icon className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                {tab.label}
+                <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-start">
+                  <tab.icon className="w-4 h-4" />
+                </div>
+                <span className="flex-1 text-left">{tab.label}</span>
               </button>
             ))}
           </div>
