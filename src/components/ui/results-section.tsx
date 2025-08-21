@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -54,6 +54,38 @@ interface CMSDetection {
   instructions: any;
 }
 
+interface AuthorityOpportunity {
+  source: string;
+  type: 'directory' | 'review_platform' | 'industry_publication' | 'podcast' | 'award' | 'certification';
+  description: string;
+  actionRequired: string;
+  estimatedEffort: 'low' | 'medium' | 'high';
+  potentialImpact: 'low' | 'medium' | 'high';
+  url?: string;
+  contactInfo?: string;
+}
+
+interface CompetitorMention {
+  competitor: string;
+  source: string;
+  type: string;
+  reasoning: string;
+  opportunityForYou: string;
+}
+
+interface CompetitiveAuthorityAnalysis {
+  industryAuthorities: string[];
+  keyDirectories: string[];
+  reviewPlatforms: string[];
+  authorityOpportunities: AuthorityOpportunity[];
+  competitorMentions: CompetitorMention[];
+  actionPlan: {
+    immediate: AuthorityOpportunity[];
+    shortTerm: AuthorityOpportunity[];
+    longTerm: AuthorityOpportunity[];
+  };
+}
+
 interface ResultsSectionProps {
   isVisible: boolean;
   results: TestResult[];
@@ -91,11 +123,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [cmsDetection, setCmsDetection] = useState<CMSDetection | null>(null);
   const [smartFixes, setSmartFixes] = useState<{ [key: string]: SmartFix }>({});
   const [generatingFix, setGeneratingFix] = useState<string | null>(null);
+  const [authorityAnalysis, setAuthorityAnalysis] = useState<CompetitiveAuthorityAnalysis | null>(null);
+  const [authorityLoading, setAuthorityLoading] = useState(false);
   
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority')) {
       setActiveTab(savedTab);
     }
   }, []);
@@ -125,6 +159,30 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       }
     } catch (error) {
       console.error('Error detecting CMS:', error);
+    }
+  };
+
+  const loadAuthorityAnalysis = async () => {
+    if (!company || authorityLoading || authorityAnalysis) return;
+    
+    setAuthorityLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-competitive-authority', {
+        body: {
+          companyName: company.company_name,
+          industry: company.industry,
+          keyDifferentiators: company.key_differentiators
+        }
+      });
+
+      if (!error && data?.analysis) {
+        setAuthorityAnalysis(data.analysis);
+        console.log('Authority analysis completed:', data.analysis);
+      }
+    } catch (error) {
+      console.error('Error loading authority analysis:', error);
+    } finally {
+      setAuthorityLoading(false);
     }
   };
 
@@ -194,7 +252,37 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     if (score >= 80) return 'A';
     if (score >= 70) return 'B';
     if (score >= 60) return 'C';
-    return 'D';
+    if (score >= 50) return 'D';
+    return 'F';
+  };
+
+  const getGradeDescription = (grade: string) => {
+    switch (grade) {
+      case 'A+': return 'Excellent AI visibility - you appear consistently';
+      case 'A': return 'Strong AI visibility - appearing in most relevant queries';
+      case 'B': return 'Good AI visibility - room for improvement';
+      case 'C': return 'Moderate AI visibility - several gaps to address';
+      case 'D': return 'Poor AI visibility - significant improvements needed';
+      case 'F': return 'Minimal AI visibility - urgent action required';
+      default: return 'AI visibility assessment';
+    }
+  };
+
+  const getIndustryBenchmark = (industry: string) => {
+    // Industry benchmarks based on typical AI mention rates
+    const benchmarks = {
+      'Technology/Software': 45,
+      'Professional Services': 38,
+      'Marketing/Advertising': 42,
+      'Finance/Banking': 35,
+      'Healthcare': 32,
+      'Manufacturing': 28,
+      'E-commerce/Retail': 40,
+      'Education': 36,
+      'Real Estate': 30,
+      'Other': 35
+    };
+    return benchmarks[industry as keyof typeof benchmarks] || 35;
   };
 
   const generateContent = async (topicOverride?: string) => {
@@ -361,7 +449,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             { id: 'results', label: 'Results', icon: BarChart3 },
             { id: 'strategy', label: 'Strategy', icon: Lightbulb },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
-            { id: 'website', label: 'Website Analysis', icon: Globe }
+            { id: 'website', label: 'Website Analysis', icon: Globe },
+            { id: 'authority', label: 'Authority', icon: Award }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -383,8 +472,82 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       <div className="p-6">
         {activeTab === 'results' && (
           <div>
+            {/* Dashboard Header */}
+            <div className="mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                {/* Main Grade Card */}
+                <div className="md:col-span-2 glass p-6 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-baseline gap-3">
+                        <div className={`text-6xl font-bold ${getHealthScoreColor(mentionRate)}`}>
+                          {getHealthScoreGrade(mentionRate)}
+                        </div>
+                        <div className="text-2xl text-muted-foreground">
+                          {mentionRate}%
+                        </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {getGradeDescription(getHealthScoreGrade(mentionRate))}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-muted-foreground mb-1">Industry Benchmark</div>
+                      <div className="text-lg font-semibold">
+                        {getIndustryBenchmark(company?.industry || 'Other')}%
+                      </div>
+                      <div className={`text-xs ${mentionRate > getIndustryBenchmark(company?.industry || 'Other') ? 'text-green-600' : 'text-red-600'}`}>
+                        {mentionRate > getIndustryBenchmark(company?.industry || 'Other') 
+                          ? `+${mentionRate - getIndustryBenchmark(company?.industry || 'Other')}% above average`
+                          : `${getIndustryBenchmark(company?.industry || 'Other') - mentionRate}% below average`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="glass p-6 rounded-lg">
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs text-muted-foreground">Tests Run</div>
+                      <div className="text-xl font-semibold">{results.length}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Avg Position</div>
+                      <div className="text-xl font-semibold">#{avgPosition || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Top Issues</div>
+                      <div className="text-sm">
+                        {results.filter(r => r.failureAnalysis?.severity === 'critical').length > 0 
+                          ? `${results.filter(r => r.failureAnalysis?.severity === 'critical').length} Critical`
+                          : 'None Critical'
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Wins Summary */}
+              <div className="glass p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-semibold mb-1">Your Top 3 Quick Wins</h4>
+                    <div className="text-xs text-muted-foreground">
+                      Fix these first for maximum impact
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Est. {results.filter(r => r.failureAnalysis?.difficulty === 'easy').length} easy fixes available
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Test Results</h3>
+              <h3 className="text-lg font-semibold">Detailed Results</h3>
               <div className="flex items-center gap-2">
                 {onExportCsv && (
                   <button
@@ -824,6 +987,207 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     Please add a website URL to your company profile to enable website analysis.
                   </p>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'authority' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Authority Intelligence</h3>
+              {!authorityAnalysis && (
+                <button
+                  onClick={loadAuthorityAnalysis}
+                  disabled={authorityLoading || !company}
+                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  {authorityLoading ? 'Analyzing...' : 'Analyze Authority'}
+                </button>
+              )}
+            </div>
+            
+            {authorityAnalysis ? (
+              <div className="space-y-6">
+                {/* Authority Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-8 h-8 text-blue-500" />
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.authorityOpportunities.length}</div>
+                        <div className="text-sm text-muted-foreground">Opportunities</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Award className="w-8 h-8 text-green-500" />
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.actionPlan.immediate.length}</div>
+                        <div className="text-sm text-muted-foreground">Quick Wins</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Target className="w-8 h-8 text-purple-500" />
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.competitorMentions.length}</div>
+                        <div className="text-sm text-muted-foreground">Competitor Insights</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Action Plan */}
+                <div className="glass p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold mb-3 text-foreground">30-Day Action Plan</h4>
+                  <div className="space-y-3">
+                    {authorityAnalysis.actionPlan.immediate.map((opportunity, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-green-800 mb-1">
+                            {opportunity.source}
+                          </div>
+                          <div className="text-xs text-green-700 mb-2">
+                            {opportunity.description}
+                          </div>
+                          <div className="text-xs text-green-600">
+                            <strong>Action:</strong> {opportunity.actionRequired}
+                          </div>
+                          {opportunity.url && (
+                            <a
+                              href={opportunity.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block mt-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90"
+                            >
+                              Visit Source
+                            </a>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            opportunity.estimatedEffort === 'low' ? 'bg-green-100 text-green-700' :
+                            opportunity.estimatedEffort === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {opportunity.estimatedEffort} effort
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            opportunity.potentialImpact === 'high' ? 'bg-purple-100 text-purple-700' :
+                            opportunity.potentialImpact === 'medium' ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {opportunity.potentialImpact} impact
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Industry Authority Sources */}
+                {authorityAnalysis.industryAuthorities.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">Key Industry Authorities</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {authorityAnalysis.industryAuthorities.map((authority, index) => (
+                        <span key={index} className="px-2 py-1 bg-[#111E63] text-white rounded-full text-xs">
+                          {authority}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Competitive Mentions */}
+                {authorityAnalysis.competitorMentions.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-2 text-foreground">How Competitors Get Mentioned</h4>
+                    <div className="space-y-3">
+                      {authorityAnalysis.competitorMentions.map((mention, index) => (
+                        <div key={index} className="p-3 bg-blue-50 rounded-lg">
+                          <div className="text-sm font-medium text-blue-800 mb-1">
+                            {mention.competitor} → {mention.source}
+                          </div>
+                          <div className="text-xs text-blue-700 mb-2">
+                            <strong>Why:</strong> {mention.reasoning}
+                          </div>
+                          <div className="text-xs text-blue-600">
+                            <strong>Your Opportunity:</strong> {mention.opportunityForYou}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* All Authority Opportunities */}
+                <div className="glass p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold mb-2 text-foreground">All Authority Building Opportunities</h4>
+                  <div className="space-y-3">
+                    {authorityAnalysis.authorityOpportunities.map((opportunity, index) => (
+                      <div key={index} className="p-3 border border-gray-200 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-foreground mb-1">
+                              {opportunity.source}
+                            </div>
+                            <div className="text-xs text-muted-foreground mb-2">
+                              {opportunity.description}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <strong>Action:</strong> {opportunity.actionRequired}
+                            </div>
+                            {opportunity.contactInfo && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                <strong>Contact:</strong> {opportunity.contactInfo}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-1 ml-3">
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              opportunity.type === 'directory' ? 'bg-blue-100 text-blue-700' :
+                              opportunity.type === 'review_platform' ? 'bg-green-100 text-green-700' :
+                              opportunity.type === 'industry_publication' ? 'bg-purple-100 text-purple-700' :
+                              opportunity.type === 'podcast' ? 'bg-orange-100 text-orange-700' :
+                              opportunity.type === 'award' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-pink-100 text-pink-700'
+                            }`}>
+                              {opportunity.type.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : authorityLoading ? (
+              <div className="glass p-6 rounded-lg text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">Analyzing competitive authority landscape...</p>
+                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
+              </div>
+            ) : (
+              <div className="glass p-6 rounded-lg text-center">
+                <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-foreground mb-2">Authority Intelligence Analysis</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Discover where your competitors get mentioned and find specific opportunities to build authority in your industry.
+                </p>
+                <button
+                  onClick={loadAuthorityAnalysis}
+                  disabled={!company}
+                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  Start Authority Analysis
+                </button>
               </div>
             )}
           </div>
