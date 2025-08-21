@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -31,6 +31,27 @@ interface TrendingOpportunity {
   reasoning: string;
   suggestedContent: string;
   difficulty: 'easy' | 'moderate' | 'advanced';
+}
+
+interface SmartFix {
+  title: string;
+  description: string;
+  code?: string;
+  content?: string;
+  instructions: {
+    platform: string;
+    steps: string[];
+  };
+  preview: string;
+  timeToImplement: string;
+  difficulty: 'easy' | 'moderate' | 'needs-dev';
+}
+
+interface CMSDetection {
+  cms: string;
+  confidence: number;
+  detectedBy: string[];
+  instructions: any;
 }
 
 interface ResultsSectionProps {
@@ -67,6 +88,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [activeTab, setActiveTab] = useState('results');
   const [showAllResults, setShowAllResults] = useState(false);
   const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
+  const [cmsDetection, setCmsDetection] = useState<CMSDetection | null>(null);
+  const [smartFixes, setSmartFixes] = useState<{ [key: string]: SmartFix }>({});
+  const [generatingFix, setGeneratingFix] = useState<string | null>(null);
   
   // Persist active tab in localStorage
   useEffect(() => {
@@ -82,6 +106,28 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     setExpandedResults(new Set());
   }, [results.length]);
 
+  // Detect CMS when component mounts
+  useEffect(() => {
+    if (company?.website_url && !cmsDetection) {
+      detectWebsiteCMS(company.website_url);
+    }
+  }, [company?.website_url]);
+
+  const detectWebsiteCMS = async (url: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('detect-cms', {
+        body: { url }
+      });
+
+      if (!error && data?.detection) {
+        setCmsDetection(data.detection);
+        console.log('CMS detected:', data.detection.cms);
+      }
+    } catch (error) {
+      console.error('Error detecting CMS:', error);
+    }
+  };
+
   const toggleResultExpansion = (index: number) => {
     const newExpanded = new Set(expandedResults);
     if (newExpanded.has(index)) {
@@ -95,6 +141,37 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     localStorage.setItem('activeResultsTab', tabId);
+  };
+
+  const handleGenerateFix = async (result: TestResult, fixType: 'faq' | 'content' | 'schema' | 'authority') => {
+    if (!result.failureAnalysis || !company) return;
+
+    const fixKey = `${result.prompt}-${fixType}`;
+    setGeneratingFix(fixKey);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-smart-fixes', {
+        body: {
+          failureReason: result.failureAnalysis.primaryReason,
+          prompt: result.prompt,
+          companyName: company.company_name,
+          industry: company.industry,
+          cms: cmsDetection?.cms || 'custom',
+          fixType
+        }
+      });
+
+      if (!error && data?.smartFix) {
+        setSmartFixes(prev => ({
+          ...prev,
+          [fixKey]: data.smartFix
+        }));
+      }
+    } catch (error) {
+      console.error('Error generating smart fix:', error);
+    } finally {
+      setGeneratingFix(null);
+    }
   };
   const [contentTopic, setContentTopic] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
@@ -154,6 +231,125 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     } catch (error) {
       console.error('Copy failed:', error);
     }
+  };
+
+  // FailureAnalysisCard component
+  const FailureAnalysisCard = ({ result, company, onGenerateFix }: { 
+    result: TestResult; 
+    company: any; 
+    onGenerateFix: (fixType: 'faq' | 'content' | 'schema' | 'authority') => void; 
+  }) => {
+    const [showSmartFix, setShowSmartFix] = useState(false);
+    const fixKey = `${result.prompt}-${result.failureAnalysis?.category}`;
+    const smartFix = smartFixes[fixKey];
+    const isGenerating = generatingFix === fixKey;
+
+    return (
+      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+            result.failureAnalysis?.severity === 'critical' ? 'bg-red-500' :
+            result.failureAnalysis?.severity === 'moderate' ? 'bg-yellow-500' :
+            'bg-blue-500'
+          }`}></div>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-red-800 mb-2">
+              Why you didn't rank: {result.failureAnalysis?.primaryReason}
+            </div>
+            <div className="text-xs text-red-700 space-y-1">
+              <div><strong>Quick Fix ({result.failureAnalysis?.timeToFix}):</strong> {result.failureAnalysis?.quickFix}</div>
+              <div><strong>Expected Impact:</strong> {result.failureAnalysis?.expectedImpact}</div>
+              {result.failureAnalysis?.competitorInsight && (
+                <div><strong>Competitor Insight:</strong> {result.failureAnalysis.competitorInsight}</div>
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  result.failureAnalysis?.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                  result.failureAnalysis?.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {result.failureAnalysis?.difficulty}
+                </span>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  result.failureAnalysis?.category === 'content' ? 'bg-blue-100 text-blue-700' :
+                  result.failureAnalysis?.category === 'authority' ? 'bg-purple-100 text-purple-700' :
+                  result.failureAnalysis?.category === 'technical' ? 'bg-orange-100 text-orange-700' :
+                  'bg-gray-100 text-gray-700'
+                }`}>
+                  {result.failureAnalysis?.category}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (!smartFix) {
+                      onGenerateFix(result.failureAnalysis?.category as any);
+                    }
+                    setShowSmartFix(!showSmartFix);
+                  }}
+                  disabled={isGenerating}
+                  className="px-3 py-1 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none flex items-center gap-1"
+                >
+                  <Wrench className="w-3 h-3" />
+                  {isGenerating ? 'Generating...' : smartFix ? 'Show Fix' : 'Get Fix'}
+                </button>
+              </div>
+            </div>
+
+            {/* Smart Fix Display */}
+            {showSmartFix && smartFix && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+                <div className="text-sm font-medium text-green-800 mb-2">{smartFix.title}</div>
+                <div className="text-xs text-green-700 mb-3">{smartFix.description}</div>
+                
+                {smartFix.code && (
+                  <div className="mb-3">
+                    <div className="text-xs font-medium text-green-800 mb-1">Code to Copy:</div>
+                    <div className="bg-gray-800 text-green-400 p-2 rounded text-xs font-mono overflow-x-auto">
+                      {smartFix.code}
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(smartFix.code!)}
+                      className="mt-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy Code
+                    </button>
+                  </div>
+                )}
+
+                {smartFix.content && (
+                  <div className="mb-3">
+                    <div className="text-xs font-medium text-green-800 mb-1">Content to Add:</div>
+                    <div className="bg-white p-2 rounded border text-xs">
+                      {smartFix.content}
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(smartFix.content!)}
+                      className="mt-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy Content
+                    </button>
+                  </div>
+                )}
+
+                <div className="text-xs text-green-700">
+                  <div className="font-medium">Implementation ({smartFix.timeToImplement}):</div>
+                  <ol className="list-decimal list-inside ml-2 space-y-1">
+                    {smartFix.instructions.steps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -355,44 +551,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                     {/* Show failure analysis for non-mentioned or low-ranking results */}
                     {result.failureAnalysis && (
-                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="flex items-start gap-3">
-                          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                            result.failureAnalysis.severity === 'critical' ? 'bg-red-500' :
-                            result.failureAnalysis.severity === 'moderate' ? 'bg-yellow-500' :
-                            'bg-blue-500'
-                          }`}></div>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium text-red-800 mb-2">
-                              Why you didn't rank: {result.failureAnalysis.primaryReason}
-                            </div>
-                            <div className="text-xs text-red-700 space-y-1">
-                              <div><strong>Quick Fix ({result.failureAnalysis.timeToFix}):</strong> {result.failureAnalysis.quickFix}</div>
-                              <div><strong>Expected Impact:</strong> {result.failureAnalysis.expectedImpact}</div>
-                              {result.failureAnalysis.competitorInsight && (
-                                <div><strong>Competitor Insight:</strong> {result.failureAnalysis.competitorInsight}</div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                result.failureAnalysis.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                                result.failureAnalysis.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                              }`}>
-                                {result.failureAnalysis.difficulty}
-                              </span>
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                result.failureAnalysis.category === 'content' ? 'bg-blue-100 text-blue-700' :
-                                result.failureAnalysis.category === 'authority' ? 'bg-purple-100 text-purple-700' :
-                                result.failureAnalysis.category === 'technical' ? 'bg-orange-100 text-orange-700' :
-                                'bg-gray-100 text-gray-700'
-                              }`}>
-                                {result.failureAnalysis.category}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <FailureAnalysisCard 
+                        result={result}
+                        company={company}
+                        onGenerateFix={(fixType) => handleGenerateFix(result, fixType)}
+                      />
                     )}
                   </div>
                 );
