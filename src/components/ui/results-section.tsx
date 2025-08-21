@@ -86,44 +86,6 @@ interface CompetitiveAuthorityAnalysis {
   };
 }
 
-interface ImplementedFix {
-  fixType: 'faq' | 'content' | 'schema' | 'authority';
-  description: string;
-  implementedDate: string;
-  targetPrompts: string[];
-  platform: string;
-}
-
-interface ProgressMetrics {
-  overallImprovement: {
-    mentionRateChange: number;
-    positionImprovement: number;
-    sentimentImprovement: number;
-    trend: 'improving' | 'declining' | 'stable';
-  };
-  specificImprovements: {
-    prompt: string;
-    beforeMentioned: boolean;
-    afterMentioned: boolean;
-    positionChange: number;
-    sentimentChange: string;
-    likelyReason: string;
-  }[];
-  fixAttribution: {
-    fixType: string;
-    description: string;
-    estimatedImpact: 'high' | 'medium' | 'low';
-    promptsImproved: string[];
-    confidence: number;
-  }[];
-  recommendations: {
-    priority: 'high' | 'medium' | 'low';
-    action: string;
-    reasoning: string;
-    expectedTimeframe: string;
-  }[];
-  nextSteps: string[];
-}
 
 interface CompetitorProfile {
   name: string;
@@ -202,37 +164,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [generatingFix, setGeneratingFix] = useState<string | null>(null);
   const [authorityAnalysis, setAuthorityAnalysis] = useState<CompetitiveAuthorityAnalysis | null>(null);
   const [authorityLoading, setAuthorityLoading] = useState(false);
-  const [progressMetrics, setProgressMetrics] = useState<ProgressMetrics | null>(null);
-  const [progressLoading, setProgressLoading] = useState(false);
-  const [previousResults, setPreviousResults] = useState<TestResult[] | null>(null);
   const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
   const [benchmarkLoading, setBenchmarkLoading] = useState(false);
   
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority' || savedTab === 'progress' || savedTab === 'benchmark')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'website' || savedTab === 'benchmark' || savedTab === 'authority' || savedTab === 'trending')) {
       setActiveTab(savedTab);
     }
   }, []);
 
-  // Load previous results for progress comparison
-  useEffect(() => {
-    const savedPreviousResults = localStorage.getItem('previousTestResults');
-    if (savedPreviousResults) {
-      try {
-        setPreviousResults(JSON.parse(savedPreviousResults));
-      } catch (error) {
-        console.error('Error parsing previous results:', error);
-      }
-    }
-
-    // Save current results as previous when new results arrive
-    if (results.length > 0) {
-      const currentResultsKey = `testResults_${company?.company_name || 'unknown'}_${Date.now()}`;
-      localStorage.setItem('previousTestResults', JSON.stringify(results));
-    }
-  }, [results, company?.company_name]);
 
   // Reset show all results when results change
   useEffect(() => {
@@ -246,6 +188,20 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       detectWebsiteCMS(company.website_url);
     }
   }, [company?.website_url]);
+
+  // Auto-load authority analysis when tab becomes active
+  useEffect(() => {
+    if (activeTab === 'authority' && company && !authorityAnalysis && !authorityLoading) {
+      loadAuthorityAnalysis();
+    }
+  }, [activeTab, company, authorityAnalysis, authorityLoading]);
+
+  // Auto-load industry benchmark when tab becomes active
+  useEffect(() => {
+    if (activeTab === 'benchmark' && company && results.length > 0 && !industryBenchmark && !benchmarkLoading) {
+      loadIndustryBenchmark();
+    }
+  }, [activeTab, company, results.length, industryBenchmark, benchmarkLoading]);
 
   const detectWebsiteCMS = async (url: string) => {
     try {
@@ -286,30 +242,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   };
 
-  const loadProgressTracking = async () => {
-    if (!company || progressLoading || !results.length) return;
-    
-    setProgressLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('track-progress', {
-        body: {
-          companyName: company.company_name,
-          currentResults: results,
-          previousResults: previousResults,
-          timeframe: '30 days'
-        }
-      });
-
-      if (!error && data?.progressMetrics) {
-        setProgressMetrics(data.progressMetrics);
-        console.log('Progress tracking completed:', data.progressMetrics);
-      }
-    } catch (error) {
-      console.error('Error loading progress tracking:', error);
-    } finally {
-      setProgressLoading(false);
-    }
-  };
 
   const loadIndustryBenchmark = async () => {
     if (!company || benchmarkLoading || !results.length) return;
@@ -386,9 +318,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       setGeneratingFix(null);
     }
   };
-  const [contentTopic, setContentTopic] = useState('');
-  const [generatedContent, setGeneratedContent] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
   if (!isVisible) return null;
 
   const mentionRate = results.length > 0 ? Math.round((results.filter(r => r.mentioned).length / results.length) * 100) : 0;
@@ -440,33 +369,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     return benchmarks[industry as keyof typeof benchmarks] || 35;
   };
 
-  const generateContent = async (topicOverride?: string) => {
-    const topic = (topicOverride ?? contentTopic).trim();
-    if (!topic || !company) return;
-    setIsGenerating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          companyName: company.company_name,
-          industry: company.industry,
-          targetCustomers: company.target_customers,
-          differentiators: company.key_differentiators,
-          topic,
-        },
-      });
-      if (error) throw error;
-      if (data && (data as any).error) throw new Error((data as any).error);
-      const content = (data as any)?.content ?? '';
-      setGeneratedContent(content);
-    } catch (error) {
-      console.error('Content generation error:', error);
-      // Fallback to mock content if the function fails
-      const content = `# ${topic}\n\nThis is generated content for ${company.company_name} about ${topic}.\n\n## Key Benefits\n- Improved AI visibility\n- Better search rankings\n- Enhanced brand recognition\n\n## Call to Action\nContact ${company.company_name} today to learn more about our ${company.industry} solutions.`;
-      setGeneratedContent(content);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const copyToClipboard = (text: string) => {
     try {
@@ -597,111 +499,37 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   return (
     <div className="w-full animate-fade-in">
-      {/* Tabs */}
-      <div className="mb-6">
-        <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1">
-          {[
-            { id: 'results', label: 'Results', icon: BarChart3 },
-            { id: 'strategy', label: 'Strategy', icon: Lightbulb },
-            { id: 'trending', label: 'Trending', icon: TrendingUp },
-            { id: 'website', label: 'Website Analysis', icon: Globe },
-            { id: 'authority', label: 'Authority', icon: Award },
-            { id: 'progress', label: 'Progress', icon: Clock },
-            { id: 'benchmark', label: 'Benchmark', icon: Activity }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-lg font-medium transition-none ${
-                activeTab === tab.id
-                  ? 'bg-[#111E63] text-white'
-                  : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
+      <div className="flex gap-6">
+        {/* Left Sidebar Tabs */}
+        <div className="w-64 flex-shrink-0">
+          <div className="space-y-2">
+            {[
+              { id: 'results', label: 'Results', icon: BarChart3 },
+              { id: 'website', label: 'Website Analysis', icon: Globe },
+              { id: 'benchmark', label: 'Benchmark', icon: Activity },
+              { id: 'authority', label: 'Authority', icon: Award },
+              { id: 'trending', label: 'Trending', icon: TrendingUp }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-none ${
+                  activeTab === tab.id
+                    ? 'bg-[#111E63] text-white'
+                    : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Tab Content */}
-      <div className="p-6">
+        {/* Tab Content */}
+        <div className="flex-1">
         {activeTab === 'results' && (
           <div>
-            {/* Dashboard Header */}
-            <div className="mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                {/* Main Grade Card */}
-                <div className="md:col-span-2 glass p-6 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-baseline gap-3">
-                        <div className={`text-6xl font-bold ${getHealthScoreColor(mentionRate)}`}>
-                          {getHealthScoreGrade(mentionRate)}
-                        </div>
-                        <div className="text-2xl text-muted-foreground">
-                          {mentionRate}%
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {getGradeDescription(getHealthScoreGrade(mentionRate))}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-muted-foreground mb-1">Industry Benchmark</div>
-                      <div className="text-lg font-semibold">
-                        {getIndustryBenchmark(company?.industry || 'Other')}%
-                      </div>
-                      <div className={`text-xs ${mentionRate > getIndustryBenchmark(company?.industry || 'Other') ? 'text-green-600' : 'text-red-600'}`}>
-                        {mentionRate > getIndustryBenchmark(company?.industry || 'Other') 
-                          ? `+${mentionRate - getIndustryBenchmark(company?.industry || 'Other')}% above average`
-                          : `${getIndustryBenchmark(company?.industry || 'Other') - mentionRate}% below average`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="glass p-6 rounded-lg">
-                  <div className="space-y-3">
-                    <div>
-                      <div className="text-xs text-muted-foreground">Tests Run</div>
-                      <div className="text-xl font-semibold">{results.length}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground">Avg Position</div>
-                      <div className="text-xl font-semibold">#{avgPosition || 'N/A'}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground">Top Issues</div>
-                      <div className="text-sm">
-                        {results.filter(r => r.failureAnalysis?.severity === 'critical').length > 0 
-                          ? `${results.filter(r => r.failureAnalysis?.severity === 'critical').length} Critical`
-                          : 'None Critical'
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Wins Summary */}
-              <div className="glass p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-semibold mb-1">Your Top 3 Quick Wins</h4>
-                    <div className="text-xs text-muted-foreground">
-                      Fix these first for maximum impact
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Est. {results.filter(r => r.failureAnalysis?.difficulty === 'easy').length} easy fixes available
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Detailed Results</h3>
@@ -895,102 +723,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           </div>
         )}
 
-        {activeTab === 'strategy' && (
-          <div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              {/* Strategy Recommendations */}
-              <div className="glass p-4 rounded-lg min-h-[400px] h-fit">
-                <h4 className="text-sm font-semibold mb-2">Strategy Recommendations</h4>
-                {strategyLoading ? (
-                  <div className="text-center py-4">
-                    <div className="animate-pulse text-muted-foreground text-xs">Generating personalized strategies...</div>
-                  </div>
-                ) : strategyError ? (
-                  <div className="text-center py-4">
-                    <div className="text-red-600 text-xs">Error: {strategyError}</div>
-                  </div>
-                ) : strategies.length > 0 ? (
-                  <div className="flex flex-col gap-3 h-full">
-                    {strategies.map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          const title = item.title || String(item);
-                          setContentTopic(title);
-                          generateContent(title);
-                        }}
-                        className="text-left rounded-md border border-input bg-background px-3 py-2 hover:bg-[#111E63] hover:text-white transition-none group"
-                      >
-                        <div className="font-semibold text-sm leading-tight break-words group-hover:text-white">{item.title || String(item)}</div>
-                        {item.reason && (
-                          <div className="text-xs text-muted-foreground mt-1 leading-relaxed break-words group-hover:text-white">{item.reason}</div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-sm text-muted-foreground text-center">No items yet. Run a health check to generate recommendations.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Content Generator */}
-              <div className="glass p-6 rounded-lg">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Generate Content</h3>
-                
-                <div className="mb-5">
-                  <label className="block text-sm font-medium text-foreground mb-1">Content Topic</label>
-                  <input
-                    type="text"
-                    value={contentTopic}
-                    onChange={(e) => setContentTopic(e.target.value)}
-                    placeholder="What should the content be about?"
-                    className="flex h-10 w-full rounded-md border border-transparent bg-white text-black px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm placeholder:text-black/60"
-                  />
-                </div>
-
-                <button
-                  onClick={() => generateContent()}
-                  disabled={!contentTopic.trim() || isGenerating}
-                  className="inline-flex w-full items-center justify-center rounded-md bg-[#111E63] text-white px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#111E63] transition-none mb-6"
-                >
-                  {isGenerating ? 'Generating…' : 'Generate Content'}
-                </button>
-
-                {/* Generated Content - moved inside the same box */}
-                <div className="border-t border-white/20 pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-base font-semibold text-foreground">Generated Content</h4>
-                    {generatedContent && (
-                      <button
-                        onClick={() => copyToClipboard(generatedContent)}
-                        className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#111E63] text-white px-3 py-1.5 text-xs font-medium hover:bg-[#111E63] transition-none"
-                      >
-                        Copy
-                      </button>
-                    )}
-                  </div>
-
-                  {generatedContent ? (
-                    <textarea
-                      value={generatedContent}
-                      onChange={(e) => setGeneratedContent(e.target.value)}
-                      className="w-full min-h-[300px] rounded-md border border-transparent bg-white text-black p-4 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    />
-                  ) : (
-                    <div className="min-h-[300px] flex items-center justify-center text-muted-foreground text-center">
-                      <div>
-                        <p>Generated content will appear here</p>
-                        <p className="text-sm">Enter a topic and click generate to start</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {activeTab === 'trending' && (
           <div>
@@ -1031,15 +763,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       }`}>
                         {opportunity.difficulty}
                       </span>
-                      <button
-                        onClick={() => {
-                          setContentTopic(opportunity.query);
-                          generateContent(opportunity.suggestedContent);
-                        }}
-                        className="px-3 py-1 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none"
-                      >
-                        Create Content
-                      </button>
+                      <span className="px-3 py-1 text-xs bg-[#111E63] text-white rounded">
+                        {opportunity.difficulty} to implement
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -1151,17 +877,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'authority' && (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h3 className="text-lg font-semibold">Authority Intelligence</h3>
-              {!authorityAnalysis && (
-                <button
-                  onClick={loadAuthorityAnalysis}
-                  disabled={authorityLoading || !company}
-                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  {authorityLoading ? 'Analyzing...' : 'Analyze Authority'}
-                </button>
-              )}
             </div>
             
             {authorityAnalysis ? (
@@ -1350,256 +1067,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           </div>
         )}
 
-        {activeTab === 'progress' && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Progress Tracking</h3>
-              {!progressMetrics && (
-                <button
-                  onClick={loadProgressTracking}
-                  disabled={progressLoading || !company || results.length === 0}
-                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  {progressLoading ? 'Analyzing...' : 'Track Progress'}
-                </button>
-              )}
-            </div>
-            
-            {progressMetrics ? (
-              <div className="space-y-6">
-                {/* Overall Progress Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                        progressMetrics.overallImprovement.mentionRateChange > 0 ? 'bg-green-100' :
-                        progressMetrics.overallImprovement.mentionRateChange < 0 ? 'bg-red-100' : 'bg-gray-100'
-                      }`}>
-                        {progressMetrics.overallImprovement.mentionRateChange > 0 ? (
-                          <ArrowUp className="w-4 h-4 text-green-600" />
-                        ) : progressMetrics.overallImprovement.mentionRateChange < 0 ? (
-                          <ArrowDown className="w-4 h-4 text-red-600" />
-                        ) : (
-                          <MinusIcon className="w-4 h-4 text-gray-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">
-                          {progressMetrics.overallImprovement.mentionRateChange > 0 ? '+' : ''}
-                          {progressMetrics.overallImprovement.mentionRateChange.toFixed(1)}%
-                        </div>
-                        <div className="text-sm text-muted-foreground">Mention Rate Change</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                        progressMetrics.overallImprovement.positionImprovement > 0 ? 'bg-green-100' :
-                        progressMetrics.overallImprovement.positionImprovement < 0 ? 'bg-red-100' : 'bg-gray-100'
-                      }`}>
-                        {progressMetrics.overallImprovement.positionImprovement > 0 ? (
-                          <ArrowUp className="w-4 h-4 text-green-600" />
-                        ) : progressMetrics.overallImprovement.positionImprovement < 0 ? (
-                          <ArrowDown className="w-4 h-4 text-red-600" />
-                        ) : (
-                          <MinusIcon className="w-4 h-4 text-gray-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">
-                          {progressMetrics.overallImprovement.positionImprovement > 0 ? '+' : ''}
-                          {progressMetrics.overallImprovement.positionImprovement.toFixed(1)}
-                        </div>
-                        <div className="text-sm text-muted-foreground">Position Change</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                        progressMetrics.overallImprovement.trend === 'improving' ? 'bg-green-100' :
-                        progressMetrics.overallImprovement.trend === 'declining' ? 'bg-red-100' : 'bg-gray-100'
-                      }`}>
-                        {progressMetrics.overallImprovement.trend === 'improving' ? (
-                          <TrendingUp className="w-4 h-4 text-green-600" />
-                        ) : progressMetrics.overallImprovement.trend === 'declining' ? (
-                          <ArrowDown className="w-4 h-4 text-red-600" />
-                        ) : (
-                          <MinusIcon className="w-4 h-4 text-gray-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-foreground capitalize">
-                          {progressMetrics.overallImprovement.trend}
-                        </div>
-                        <div className="text-sm text-muted-foreground">Overall Trend</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Specific Improvements */}
-                {progressMetrics.specificImprovements.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Specific Improvements</h4>
-                    <div className="space-y-3">
-                      {progressMetrics.specificImprovements.map((improvement, index) => (
-                        <div key={index} className="p-3 bg-green-50 rounded-lg">
-                          <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-green-800 mb-1">
-                                "{improvement.prompt.length > 80 ? improvement.prompt.substring(0, 80) + '...' : improvement.prompt}"
-                              </div>
-                              <div className="text-xs text-green-700 space-y-1">
-                                <div>
-                                  <strong>Status:</strong> {improvement.beforeMentioned ? 'Mentioned' : 'Not mentioned'} → {improvement.afterMentioned ? 'Mentioned' : 'Not mentioned'}
-                                  {improvement.positionChange !== 0 && ` (Position change: ${improvement.positionChange > 0 ? '+' : ''}${improvement.positionChange})`}
-                                </div>
-                                {improvement.sentimentChange !== 'no change' && (
-                                  <div><strong>Sentiment:</strong> {improvement.sentimentChange}</div>
-                                )}
-                                <div><strong>Likely reason:</strong> {improvement.likelyReason}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Fix Attribution */}
-                {progressMetrics.fixAttribution.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Fix Attribution Analysis</h4>
-                    <div className="space-y-3">
-                      {progressMetrics.fixAttribution.map((fix, index) => (
-                        <div key={index} className="p-3 bg-blue-50 rounded-lg">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-blue-800 mb-1">
-                                {fix.fixType}: {fix.description}
-                              </div>
-                              <div className="text-xs text-blue-700 mb-2">
-                                <strong>Prompts improved:</strong> {fix.promptsImproved.join(', ')}
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                  fix.estimatedImpact === 'high' ? 'bg-green-100 text-green-700' :
-                                  fix.estimatedImpact === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                  'bg-gray-100 text-gray-700'
-                                }`}>
-                                  {fix.estimatedImpact} impact
-                                </span>
-                                <span className="text-xs text-blue-600">
-                                  {fix.confidence}% confidence
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Recommendations */}
-                {progressMetrics.recommendations.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Strategic Recommendations</h4>
-                    <div className="space-y-3">
-                      {progressMetrics.recommendations.map((rec, index) => (
-                        <div key={index} className="p-3 border border-gray-200 rounded-lg">
-                          <div className="flex items-start gap-3">
-                            <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${
-                              rec.priority === 'high' ? 'bg-red-100 text-red-700' :
-                              rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-green-100 text-green-700'
-                            }`}>
-                              {rec.priority} priority
-                            </span>
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-foreground mb-1">
-                                {rec.action}
-                              </div>
-                              <div className="text-xs text-muted-foreground mb-1">
-                                <strong>Reasoning:</strong> {rec.reasoning}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                <strong>Expected timeframe:</strong> {rec.expectedTimeframe}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Next Steps */}
-                {progressMetrics.nextSteps.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Next Steps</h4>
-                    <ul className="space-y-2">
-                      {progressMetrics.nextSteps.map((step, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
-                          <span className="w-6 h-6 bg-[#111E63] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-                            {index + 1}
-                          </span>
-                          {step}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ) : progressLoading ? (
-              <div className="glass p-6 rounded-lg text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-sm text-muted-foreground">Analyzing progress and attributing improvements...</p>
-                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
-              </div>
-            ) : (
-              <div className="glass p-6 rounded-lg text-center">
-                <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-foreground mb-2">Progress Tracking & Attribution</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Track your improvements over time and see which fixes are making the biggest impact on your AI visibility.
-                </p>
-                {!previousResults ? (
-                  <div className="text-xs text-muted-foreground mb-4">
-                    Run multiple health checks over time to track your progress and improvement attribution.
-                  </div>
-                ) : null}
-                <button
-                  onClick={loadProgressTracking}
-                  disabled={!company || results.length === 0}
-                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  {results.length === 0 ? 'Run Health Check First' : 'Analyze Progress'}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
 
         {activeTab === 'benchmark' && (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h3 className="text-lg font-semibold">Industry Benchmark</h3>
-              {!industryBenchmark && (
-                <button
-                  onClick={loadIndustryBenchmark}
-                  disabled={benchmarkLoading || !company || results.length === 0}
-                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  {benchmarkLoading ? 'Analyzing...' : 'Load Benchmark'}
-                </button>
-              )}
             </div>
             
             {industryBenchmark ? (
@@ -1833,6 +1305,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
