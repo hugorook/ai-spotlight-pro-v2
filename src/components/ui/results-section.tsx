@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users, Clock, ArrowUp, ArrowDown, Minus as MinusIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -86,6 +86,45 @@ interface CompetitiveAuthorityAnalysis {
   };
 }
 
+interface ImplementedFix {
+  fixType: 'faq' | 'content' | 'schema' | 'authority';
+  description: string;
+  implementedDate: string;
+  targetPrompts: string[];
+  platform: string;
+}
+
+interface ProgressMetrics {
+  overallImprovement: {
+    mentionRateChange: number;
+    positionImprovement: number;
+    sentimentImprovement: number;
+    trend: 'improving' | 'declining' | 'stable';
+  };
+  specificImprovements: {
+    prompt: string;
+    beforeMentioned: boolean;
+    afterMentioned: boolean;
+    positionChange: number;
+    sentimentChange: string;
+    likelyReason: string;
+  }[];
+  fixAttribution: {
+    fixType: string;
+    description: string;
+    estimatedImpact: 'high' | 'medium' | 'low';
+    promptsImproved: string[];
+    confidence: number;
+  }[];
+  recommendations: {
+    priority: 'high' | 'medium' | 'low';
+    action: string;
+    reasoning: string;
+    expectedTimeframe: string;
+  }[];
+  nextSteps: string[];
+}
+
 interface ResultsSectionProps {
   isVisible: boolean;
   results: TestResult[];
@@ -125,14 +164,35 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [generatingFix, setGeneratingFix] = useState<string | null>(null);
   const [authorityAnalysis, setAuthorityAnalysis] = useState<CompetitiveAuthorityAnalysis | null>(null);
   const [authorityLoading, setAuthorityLoading] = useState(false);
+  const [progressMetrics, setProgressMetrics] = useState<ProgressMetrics | null>(null);
+  const [progressLoading, setProgressLoading] = useState(false);
+  const [previousResults, setPreviousResults] = useState<TestResult[] | null>(null);
   
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority' || savedTab === 'progress')) {
       setActiveTab(savedTab);
     }
   }, []);
+
+  // Load previous results for progress comparison
+  useEffect(() => {
+    const savedPreviousResults = localStorage.getItem('previousTestResults');
+    if (savedPreviousResults) {
+      try {
+        setPreviousResults(JSON.parse(savedPreviousResults));
+      } catch (error) {
+        console.error('Error parsing previous results:', error);
+      }
+    }
+
+    // Save current results as previous when new results arrive
+    if (results.length > 0) {
+      const currentResultsKey = `testResults_${company?.company_name || 'unknown'}_${Date.now()}`;
+      localStorage.setItem('previousTestResults', JSON.stringify(results));
+    }
+  }, [results, company?.company_name]);
 
   // Reset show all results when results change
   useEffect(() => {
@@ -183,6 +243,31 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       console.error('Error loading authority analysis:', error);
     } finally {
       setAuthorityLoading(false);
+    }
+  };
+
+  const loadProgressTracking = async () => {
+    if (!company || progressLoading || !results.length) return;
+    
+    setProgressLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('track-progress', {
+        body: {
+          companyName: company.company_name,
+          currentResults: results,
+          previousResults: previousResults,
+          timeframe: '30 days'
+        }
+      });
+
+      if (!error && data?.progressMetrics) {
+        setProgressMetrics(data.progressMetrics);
+        console.log('Progress tracking completed:', data.progressMetrics);
+      }
+    } catch (error) {
+      console.error('Error loading progress tracking:', error);
+    } finally {
+      setProgressLoading(false);
     }
   };
 
@@ -450,7 +535,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             { id: 'strategy', label: 'Strategy', icon: Lightbulb },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'website', label: 'Website Analysis', icon: Globe },
-            { id: 'authority', label: 'Authority', icon: Award }
+            { id: 'authority', label: 'Authority', icon: Award },
+            { id: 'progress', label: 'Progress', icon: Clock }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1187,6 +1273,243 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
                 >
                   Start Authority Analysis
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'progress' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Progress Tracking</h3>
+              {!progressMetrics && (
+                <button
+                  onClick={loadProgressTracking}
+                  disabled={progressLoading || !company || results.length === 0}
+                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  {progressLoading ? 'Analyzing...' : 'Track Progress'}
+                </button>
+              )}
+            </div>
+            
+            {progressMetrics ? (
+              <div className="space-y-6">
+                {/* Overall Progress Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                        progressMetrics.overallImprovement.mentionRateChange > 0 ? 'bg-green-100' :
+                        progressMetrics.overallImprovement.mentionRateChange < 0 ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        {progressMetrics.overallImprovement.mentionRateChange > 0 ? (
+                          <ArrowUp className="w-4 h-4 text-green-600" />
+                        ) : progressMetrics.overallImprovement.mentionRateChange < 0 ? (
+                          <ArrowDown className="w-4 h-4 text-red-600" />
+                        ) : (
+                          <MinusIcon className="w-4 h-4 text-gray-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">
+                          {progressMetrics.overallImprovement.mentionRateChange > 0 ? '+' : ''}
+                          {progressMetrics.overallImprovement.mentionRateChange.toFixed(1)}%
+                        </div>
+                        <div className="text-sm text-muted-foreground">Mention Rate Change</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                        progressMetrics.overallImprovement.positionImprovement > 0 ? 'bg-green-100' :
+                        progressMetrics.overallImprovement.positionImprovement < 0 ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        {progressMetrics.overallImprovement.positionImprovement > 0 ? (
+                          <ArrowUp className="w-4 h-4 text-green-600" />
+                        ) : progressMetrics.overallImprovement.positionImprovement < 0 ? (
+                          <ArrowDown className="w-4 h-4 text-red-600" />
+                        ) : (
+                          <MinusIcon className="w-4 h-4 text-gray-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">
+                          {progressMetrics.overallImprovement.positionImprovement > 0 ? '+' : ''}
+                          {progressMetrics.overallImprovement.positionImprovement.toFixed(1)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Position Change</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                        progressMetrics.overallImprovement.trend === 'improving' ? 'bg-green-100' :
+                        progressMetrics.overallImprovement.trend === 'declining' ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        {progressMetrics.overallImprovement.trend === 'improving' ? (
+                          <TrendingUp className="w-4 h-4 text-green-600" />
+                        ) : progressMetrics.overallImprovement.trend === 'declining' ? (
+                          <ArrowDown className="w-4 h-4 text-red-600" />
+                        ) : (
+                          <MinusIcon className="w-4 h-4 text-gray-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-foreground capitalize">
+                          {progressMetrics.overallImprovement.trend}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Overall Trend</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Specific Improvements */}
+                {progressMetrics.specificImprovements.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Specific Improvements</h4>
+                    <div className="space-y-3">
+                      {progressMetrics.specificImprovements.map((improvement, index) => (
+                        <div key={index} className="p-3 bg-green-50 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-green-800 mb-1">
+                                "{improvement.prompt.length > 80 ? improvement.prompt.substring(0, 80) + '...' : improvement.prompt}"
+                              </div>
+                              <div className="text-xs text-green-700 space-y-1">
+                                <div>
+                                  <strong>Status:</strong> {improvement.beforeMentioned ? 'Mentioned' : 'Not mentioned'} → {improvement.afterMentioned ? 'Mentioned' : 'Not mentioned'}
+                                  {improvement.positionChange !== 0 && ` (Position change: ${improvement.positionChange > 0 ? '+' : ''}${improvement.positionChange})`}
+                                </div>
+                                {improvement.sentimentChange !== 'no change' && (
+                                  <div><strong>Sentiment:</strong> {improvement.sentimentChange}</div>
+                                )}
+                                <div><strong>Likely reason:</strong> {improvement.likelyReason}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fix Attribution */}
+                {progressMetrics.fixAttribution.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Fix Attribution Analysis</h4>
+                    <div className="space-y-3">
+                      {progressMetrics.fixAttribution.map((fix, index) => (
+                        <div key={index} className="p-3 bg-blue-50 rounded-lg">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-blue-800 mb-1">
+                                {fix.fixType}: {fix.description}
+                              </div>
+                              <div className="text-xs text-blue-700 mb-2">
+                                <strong>Prompts improved:</strong> {fix.promptsImproved.join(', ')}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  fix.estimatedImpact === 'high' ? 'bg-green-100 text-green-700' :
+                                  fix.estimatedImpact === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {fix.estimatedImpact} impact
+                                </span>
+                                <span className="text-xs text-blue-600">
+                                  {fix.confidence}% confidence
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {progressMetrics.recommendations.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Strategic Recommendations</h4>
+                    <div className="space-y-3">
+                      {progressMetrics.recommendations.map((rec, index) => (
+                        <div key={index} className="p-3 border border-gray-200 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${
+                              rec.priority === 'high' ? 'bg-red-100 text-red-700' :
+                              rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {rec.priority} priority
+                            </span>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-foreground mb-1">
+                                {rec.action}
+                              </div>
+                              <div className="text-xs text-muted-foreground mb-1">
+                                <strong>Reasoning:</strong> {rec.reasoning}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                <strong>Expected timeframe:</strong> {rec.expectedTimeframe}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Steps */}
+                {progressMetrics.nextSteps.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Next Steps</h4>
+                    <ul className="space-y-2">
+                      {progressMetrics.nextSteps.map((step, index) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-6 h-6 bg-[#111E63] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          {step}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : progressLoading ? (
+              <div className="glass p-6 rounded-lg text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">Analyzing progress and attributing improvements...</p>
+                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
+              </div>
+            ) : (
+              <div className="glass p-6 rounded-lg text-center">
+                <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-foreground mb-2">Progress Tracking & Attribution</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Track your improvements over time and see which fixes are making the biggest impact on your AI visibility.
+                </p>
+                {!previousResults ? (
+                  <div className="text-xs text-muted-foreground mb-4">
+                    Run multiple health checks over time to track your progress and improvement attribution.
+                  </div>
+                ) : null}
+                <button
+                  onClick={loadProgressTracking}
+                  disabled={!company || results.length === 0}
+                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  {results.length === 0 ? 'Run Health Check First' : 'Analyze Progress'}
                 </button>
               </div>
             )}
