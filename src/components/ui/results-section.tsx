@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users, Clock, ArrowUp, ArrowDown, Minus as MinusIcon } from 'lucide-react';
+import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users, Clock, ArrowUp, ArrowDown, Minus as MinusIcon, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TestResult {
@@ -125,6 +125,44 @@ interface ProgressMetrics {
   nextSteps: string[];
 }
 
+interface CompetitorProfile {
+  name: string;
+  estimatedMentionRate: number;
+  avgPosition: number;
+  strengths: string[];
+  weaknesses: string[];
+  keyDifferentiators: string[];
+}
+
+interface IndustryBenchmark {
+  industry: string;
+  averageMentionRate: number;
+  topPercentileMentionRate: number;
+  medianPosition: number;
+  commonStrengths: string[];
+  commonWeaknesses: string[];
+  industrySpecificOpportunities: string[];
+  competitiveLandscape: {
+    leaders: CompetitorProfile[];
+    emerging: CompetitorProfile[];
+    challenges: string[];
+  };
+  performanceAnalysis: {
+    relativePosition: 'leader' | 'above average' | 'average' | 'below average' | 'needs improvement';
+    percentileRank: number;
+    gapToLeaders: number;
+    gapToAverage: number;
+    improvementPotential: number;
+  };
+  actionableInsights: {
+    priority: 'high' | 'medium' | 'low';
+    insight: string;
+    rationale: string;
+    expectedImpact: string;
+  }[];
+  benchmarkingRecommendations: string[];
+}
+
 interface ResultsSectionProps {
   isVisible: boolean;
   results: TestResult[];
@@ -167,11 +205,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [progressMetrics, setProgressMetrics] = useState<ProgressMetrics | null>(null);
   const [progressLoading, setProgressLoading] = useState(false);
   const [previousResults, setPreviousResults] = useState<TestResult[] | null>(null);
+  const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
+  const [benchmarkLoading, setBenchmarkLoading] = useState(false);
   
   // Persist active tab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority' || savedTab === 'progress')) {
+    if (savedTab && (savedTab === 'results' || savedTab === 'strategy' || savedTab === 'website' || savedTab === 'trending' || savedTab === 'authority' || savedTab === 'progress' || savedTab === 'benchmark')) {
       setActiveTab(savedTab);
     }
   }, []);
@@ -268,6 +308,36 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       console.error('Error loading progress tracking:', error);
     } finally {
       setProgressLoading(false);
+    }
+  };
+
+  const loadIndustryBenchmark = async () => {
+    if (!company || benchmarkLoading || !results.length) return;
+    
+    setBenchmarkLoading(true);
+    try {
+      const mentionRate = results.length > 0 ? Math.round((results.filter(r => r.mentioned).length / results.length) * 100) : 0;
+      const avgPosition = results.filter(r => r.mentioned).length > 0 
+        ? Math.round(results.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / results.filter(r => r.mentioned).length)
+        : 0;
+
+      const { data, error } = await supabase.functions.invoke('industry-benchmarking', {
+        body: {
+          industry: company.industry,
+          companyName: company.company_name,
+          currentMentionRate: mentionRate,
+          currentAvgPosition: avgPosition
+        }
+      });
+
+      if (!error && data?.benchmark) {
+        setIndustryBenchmark(data.benchmark);
+        console.log('Industry benchmarking completed:', data.benchmark);
+      }
+    } catch (error) {
+      console.error('Error loading industry benchmark:', error);
+    } finally {
+      setBenchmarkLoading(false);
     }
   };
 
@@ -536,7 +606,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'website', label: 'Website Analysis', icon: Globe },
             { id: 'authority', label: 'Authority', icon: Award },
-            { id: 'progress', label: 'Progress', icon: Clock }
+            { id: 'progress', label: 'Progress', icon: Clock },
+            { id: 'benchmark', label: 'Benchmark', icon: Activity }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1510,6 +1581,253 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
                 >
                   {results.length === 0 ? 'Run Health Check First' : 'Analyze Progress'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'benchmark' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Industry Benchmark</h3>
+              {!industryBenchmark && (
+                <button
+                  onClick={loadIndustryBenchmark}
+                  disabled={benchmarkLoading || !company || results.length === 0}
+                  className="px-3 py-1.5 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  {benchmarkLoading ? 'Analyzing...' : 'Load Benchmark'}
+                </button>
+              )}
+            </div>
+            
+            {industryBenchmark ? (
+              <div className="space-y-6">
+                {/* Performance Analysis Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                        industryBenchmark.performanceAnalysis.relativePosition === 'leader' ? 'bg-green-100' :
+                        industryBenchmark.performanceAnalysis.relativePosition === 'above average' ? 'bg-blue-100' :
+                        industryBenchmark.performanceAnalysis.relativePosition === 'average' ? 'bg-yellow-100' :
+                        'bg-red-100'
+                      }`}>
+                        <Activity className={`w-4 h-4 ${
+                          industryBenchmark.performanceAnalysis.relativePosition === 'leader' ? 'text-green-600' :
+                          industryBenchmark.performanceAnalysis.relativePosition === 'above average' ? 'text-blue-600' :
+                          industryBenchmark.performanceAnalysis.relativePosition === 'average' ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`} />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-foreground capitalize">
+                          {industryBenchmark.performanceAnalysis.relativePosition.replace(' ', '-')}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Relative Position</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Target className="w-8 h-8 text-purple-500" />
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">
+                          {industryBenchmark.performanceAnalysis.percentileRank}th
+                        </div>
+                        <div className="text-sm text-muted-foreground">Percentile Rank</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <TrendingUp className="w-8 h-8 text-green-500" />
+                      <div>
+                        <div className="text-2xl font-bold text-foreground">
+                          +{industryBenchmark.performanceAnalysis.improvementPotential}%
+                        </div>
+                        <div className="text-sm text-muted-foreground">Improvement Potential</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Industry Comparison */}
+                <div className="glass p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Performance Comparison</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-muted-foreground">Industry Average</div>
+                      <div className="text-lg font-semibold">{industryBenchmark.averageMentionRate}%</div>
+                      <div className="text-xs text-muted-foreground">mention rate</div>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <div className="text-xs text-muted-foreground">Top Performers (90th percentile)</div>
+                      <div className="text-lg font-semibold">{industryBenchmark.topPercentileMentionRate}%</div>
+                      <div className="text-xs text-muted-foreground">mention rate</div>
+                    </div>
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <div className="text-xs text-muted-foreground">Median Position</div>
+                      <div className="text-lg font-semibold">#{industryBenchmark.medianPosition}</div>
+                      <div className="text-xs text-muted-foreground">when mentioned</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gap Analysis */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Performance Gaps</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-2 bg-red-50 rounded">
+                        <span className="text-sm text-red-800">Gap to Leaders</span>
+                        <span className="text-sm font-semibold text-red-600">-{industryBenchmark.performanceAnalysis.gapToLeaders}%</span>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-yellow-50 rounded">
+                        <span className="text-sm text-yellow-800">Gap to Average</span>
+                        <span className="text-sm font-semibold text-yellow-600">
+                          {industryBenchmark.performanceAnalysis.gapToAverage > 0 ? '+' : ''}{industryBenchmark.performanceAnalysis.gapToAverage}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Challenges</h4>
+                    <ul className="space-y-2">
+                      {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {challenge}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Competitive Landscape */}
+                {(industryBenchmark.competitiveLandscape.leaders.length > 0 || industryBenchmark.competitiveLandscape.emerging.length > 0) && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Competitive Landscape</h4>
+                    
+                    {industryBenchmark.competitiveLandscape.leaders.length > 0 && (
+                      <div className="mb-4">
+                        <div className="text-xs font-medium text-muted-foreground mb-2">Industry Leaders</div>
+                        <div className="space-y-2">
+                          {industryBenchmark.competitiveLandscape.leaders.map((leader, index) => (
+                            <div key={index} className="p-3 bg-green-50 rounded-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm font-medium text-green-800">{leader.name}</div>
+                                <div className="text-xs text-green-600">
+                                  {leader.estimatedMentionRate}% • #{leader.avgPosition} avg
+                                </div>
+                              </div>
+                              <div className="text-xs text-green-700 space-y-1">
+                                <div><strong>Strengths:</strong> {leader.strengths.join(', ')}</div>
+                                <div><strong>Key differentiators:</strong> {leader.keyDifferentiators.join(', ')}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {industryBenchmark.competitiveLandscape.emerging.length > 0 && (
+                      <div>
+                        <div className="text-xs font-medium text-muted-foreground mb-2">Emerging Competitors</div>
+                        <div className="space-y-2">
+                          {industryBenchmark.competitiveLandscape.emerging.map((competitor, index) => (
+                            <div key={index} className="p-3 bg-blue-50 rounded-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm font-medium text-blue-800">{competitor.name}</div>
+                                <div className="text-xs text-blue-600">
+                                  {competitor.estimatedMentionRate}% • #{competitor.avgPosition} avg
+                                </div>
+                              </div>
+                              <div className="text-xs text-blue-700 space-y-1">
+                                <div><strong>Strengths:</strong> {competitor.strengths.join(', ')}</div>
+                                <div><strong>Key differentiators:</strong> {competitor.keyDifferentiators.join(', ')}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Actionable Insights */}
+                {industryBenchmark.actionableInsights.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Strategic Insights</h4>
+                    <div className="space-y-3">
+                      {industryBenchmark.actionableInsights.map((insight, index) => (
+                        <div key={index} className="p-3 border border-gray-200 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${
+                              insight.priority === 'high' ? 'bg-red-100 text-red-700' :
+                              insight.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {insight.priority} priority
+                            </span>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-foreground mb-1">
+                                {insight.insight}
+                              </div>
+                              <div className="text-xs text-muted-foreground mb-1">
+                                <strong>Why it matters:</strong> {insight.rationale}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                <strong>Expected impact:</strong> {insight.expectedImpact}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Benchmarking Recommendations */}
+                {industryBenchmark.benchmarkingRecommendations.length > 0 && (
+                  <div className="glass p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold mb-3 text-foreground">Next Steps</h4>
+                    <ul className="space-y-2">
+                      {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                          <span className="w-6 h-6 bg-[#111E63] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          {rec}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : benchmarkLoading ? (
+              <div className="glass p-6 rounded-lg text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">Analyzing industry benchmarks and competitive landscape...</p>
+                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
+              </div>
+            ) : (
+              <div className="glass p-6 rounded-lg text-center">
+                <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-foreground mb-2">Industry Benchmarking Analysis</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Compare your AI visibility performance against industry leaders and identify strategic opportunities to outperform competitors.
+                </p>
+                <button
+                  onClick={loadIndustryBenchmark}
+                  disabled={!company || results.length === 0}
+                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                >
+                  {results.length === 0 ? 'Run Health Check First' : 'Analyze Benchmarks'}
                 </button>
               </div>
             )}
