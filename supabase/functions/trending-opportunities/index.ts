@@ -3,6 +3,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const SERP_API_KEY = Deno.env.get('SERP_API_KEY');
 
 interface TrendingRequest {
   industry: string;
@@ -20,51 +21,130 @@ interface TrendingOpportunity {
   difficulty: 'easy' | 'moderate' | 'advanced';
 }
 
+// Get real Google Trends data using SERP API
+async function getGoogleTrendsData(keywords: string[]): Promise<any> {
+  if (!SERP_API_KEY) {
+    console.warn('SERP_API_KEY not set, skipping trends data');
+    return null;
+  }
+
+  try {
+    // Get trending data for the industry keywords (limit to 3 keywords to avoid long URLs)
+    const searchKeywords = keywords.slice(0, 3).join(',');
+    const trendsUrl = `https://serpapi.com/search.json?engine=google_trends&q=${encodeURIComponent(searchKeywords)}&data_type=TIMESERIES&hl=en&geo=US&api_key=${SERP_API_KEY}`;
+    
+    console.log('Fetching Google Trends for:', searchKeywords);
+    const response = await fetch(trendsUrl);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`SERP API error: ${response.status} - ${errorText}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    console.log('Google Trends data received');
+    return data;
+  } catch (error) {
+    console.error('Error fetching Google Trends data:', error);
+    return null;
+  }
+}
+
+// Get related queries that are trending up
+async function getRelatedQueries(keyword: string): Promise<any> {
+  if (!SERP_API_KEY) {
+    return null;
+  }
+
+  try {
+    const relatedUrl = `https://serpapi.com/search.json?engine=google_trends&q=${encodeURIComponent(keyword)}&data_type=RELATED_QUERIES&hl=en&geo=US&api_key=${SERP_API_KEY}`;
+    
+    console.log('Fetching related queries for:', keyword);
+    const response = await fetch(relatedUrl);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`SERP API related queries error: ${response.status} - ${errorText}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    console.log('Related queries data received');
+    return data;
+  } catch (error) {
+    console.error('Error fetching related queries:', error);
+    return null;
+  }
+}
+
 async function getTrendingOpportunities(request: TrendingRequest): Promise<TrendingOpportunity[]> {
   if (!OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not configured');
   }
 
-  const trendingPrompt = `You are a trend analyst specializing in AI search and content opportunities. Analyze trending topics and emerging queries for this company:
+  // Prepare keywords for Google Trends analysis
+  const industryKeywords = [
+    request.industry,
+    ...request.services.slice(0, 2), // Limit to avoid long URLs
+    ...(request.keywords || []).slice(0, 2)
+  ].filter(k => k && k.length > 2); // Filter out empty/short keywords
+
+  console.log('Analyzing trends for keywords:', industryKeywords);
+
+  // Get real Google Trends data
+  const trendsData = await getGoogleTrendsData(industryKeywords);
+  const relatedQueries = await getRelatedQueries(request.industry);
+
+  // Prepare trending context for AI analysis
+  let trendsContext = '';
+  if (trendsData) {
+    trendsContext += `\nREAL GOOGLE TRENDS DATA:\n${JSON.stringify(trendsData, null, 2)}`;
+  }
+  if (relatedQueries) {
+    trendsContext += `\nRELATED TRENDING QUERIES:\n${JSON.stringify(relatedQueries, null, 2)}`;
+  }
+
+  const trendingPrompt = `You are a trend analyst specializing in AI search and content opportunities. Analyze REAL Google Trends data and emerging queries for this company:
 
 Company: ${request.companyName}
 Industry: ${request.industry}
 Services: ${JSON.stringify(request.services)}
 Current Keywords: ${JSON.stringify(request.keywords)}
 
-TASK: Identify 3-4 trending opportunities where this company should create content NOW to get ahead of competitors. Focus on:
+${trendsContext}
 
-1. Emerging search patterns in their industry
-2. New questions people are asking AI assistants about their services
-3. Seasonal/timely opportunities in the next 2-8 weeks
-4. Adjacent markets they could easily expand into
+TASK: Based on the REAL Google Trends data above, identify 3-4 trending opportunities where this company should create content NOW to get ahead of competitors.
 
-For each opportunity, consider:
-- What specific queries are trending up
-- Why this trend is happening (news, seasonal, technological shifts)
-- What content would help them rank for these queries
-- How quickly they need to act
+IMPORTANT: Use the actual trending data provided. Look for:
+1. Keywords with rising search volume (breakout trends, rising percentages)
+2. Related queries that are gaining momentum in the "rising" section
+3. Seasonal patterns showing upward trends
+4. Adjacent terms that are connecting to their industry
 
-EXAMPLES of good trending opportunities:
-- "AI-powered supply chain optimization" (if it's growing due to efficiency focus)
-- "Sustainable packaging solutions" (if ESG requirements are increasing)
-- "Remote work productivity tools" (if new regulations are coming)
+For each opportunity, analyze:
+- What specific queries show rising search volume in the data
+- Why this trend is happening (based on the trend trajectory)
+- What content would help them rank for these trending queries
+- Timeline based on trend velocity
+
+${trendsData || relatedQueries ? 'Focus on the actual trend data provided above. Extract rising queries from the "rising" sections.' : 'Note: No trends data available (likely due to SERP API key not configured). Provide general industry insights based on current market conditions and seasonal trends.'}
 
 Return JSON with exactly this structure:
 {
   "opportunities": [
     {
-      "query": "specific search query trending up",
+      "query": "specific trending query from the data or realistic industry trend",
       "trendScore": 85,
-      "timeWindow": "Next 3-4 weeks for early mover advantage", 
-      "reasoning": "Why this is trending (news, seasonal, tech shifts)",
+      "timeWindow": "Next 3-4 weeks based on trend velocity", 
+      "reasoning": "${trendsData ? 'Based on Google Trends data showing rising interest' : 'Based on industry analysis and seasonal patterns'}",
       "suggestedContent": "Specific content piece to create (FAQ, blog post, case study)",
       "difficulty": "easy"
     }
   ]
 }
 
-Focus on realistic, actionable opportunities where they can create content quickly and rank before competitors notice the trend.`;
+Focus on realistic, actionable opportunities that this company can quickly act on.`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -77,7 +157,7 @@ Focus on realistic, actionable opportunities where they can create content quick
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert trend analyst who identifies emerging content opportunities before competitors. Focus on realistic, actionable trends with specific timelines.'
+          content: 'You are an expert trend analyst who identifies emerging content opportunities using real Google Trends data. Focus on realistic, actionable trends with specific timelines. When trends data is available, extract actual rising queries.'
         },
         { role: 'user', content: trendingPrompt },
       ],
@@ -128,7 +208,8 @@ serve(async (req: Request) => {
     const body = await req.json();
     console.log('trending-opportunities request:', { 
       industry: body.industry,
-      companyName: body.companyName 
+      companyName: body.companyName,
+      hasSerp: !!SERP_API_KEY
     });
     
     if (!body.industry || !body.companyName) {
@@ -138,7 +219,10 @@ serve(async (req: Request) => {
     const opportunities = await getTrendingOpportunities(body);
     
     console.log('trending-opportunities completed successfully');
-    return new Response(JSON.stringify({ opportunities }), { 
+    return new Response(JSON.stringify({ 
+      opportunities,
+      note: !SERP_API_KEY ? 'SERP API key not configured - using general industry insights' : 'Using real Google Trends data'
+    }), { 
       headers: { 'Content-Type': 'application/json', ...corsHeaders } 
     });
     
