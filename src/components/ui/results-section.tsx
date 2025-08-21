@@ -189,19 +189,26 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   }, [company?.website_url]);
 
-  // Auto-load authority analysis when tab becomes active
+  // Auto-load all analyses when results change (new health check)
   useEffect(() => {
-    if (activeTab === 'authority' && company && !authorityAnalysis && !authorityLoading) {
-      loadAuthorityAnalysis();
+    if (results.length > 0 && company) {
+      // Load authority analysis if not already loaded or if results changed
+      if (!authorityAnalysis && !authorityLoading) {
+        loadAuthorityAnalysis();
+      }
+      
+      // Load industry benchmark if not already loaded or if results changed
+      if (!industryBenchmark && !benchmarkLoading) {
+        loadIndustryBenchmark();
+      }
     }
-  }, [activeTab, company, authorityAnalysis, authorityLoading]);
+  }, [results.length, company]);
 
-  // Auto-load industry benchmark when tab becomes active
+  // Reset analyses when results change (new test run)
   useEffect(() => {
-    if (activeTab === 'benchmark' && company && results.length > 0 && !industryBenchmark && !benchmarkLoading) {
-      loadIndustryBenchmark();
-    }
-  }, [activeTab, company, results.length, industryBenchmark, benchmarkLoading]);
+    setAuthorityAnalysis(null);
+    setIndustryBenchmark(null);
+  }, [results]);
 
   const detectWebsiteCMS = async (url: string) => {
     try {
