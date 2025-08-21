@@ -507,9 +507,21 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   return (
     <div className="w-full animate-fade-in">
       <div className="flex gap-6">
-        {/* Left Sidebar Tabs */}
+        {/* Left Sidebar */}
         <div className="w-64 flex-shrink-0">
           <div className="space-y-2">
+            {/* Health Check Button */}
+            {onNewTest && (
+              <button
+                onClick={onNewTest}
+                className="w-full flex items-start gap-3 px-4 py-3 rounded-md text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-none"
+              >
+                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                Run Health Check
+              </button>
+            )}
+            
+            {/* Navigation Tabs */}
             {[
               { id: 'results', label: 'Results', icon: BarChart3 },
               { id: 'website', label: 'Website Analysis', icon: Globe },
@@ -520,13 +532,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-none ${
+                className={`w-full flex items-start gap-3 px-4 py-3 rounded-md text-sm font-medium transition-none ${
                   activeTab === tab.id
                     ? 'bg-[#111E63] text-white'
                     : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 {tab.label}
               </button>
             ))}
@@ -571,70 +583,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               </div>
             </div>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="glass p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-2xl font-bold text-foreground mb-1">{mentionRate}%</div>
-                    <div className="text-sm text-muted-foreground">Mention Rate</div>
-                  </div>
-                  <div className="w-16 h-16 relative">
-                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
-                      <defs>
-                        <linearGradient id="mentionRateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#111E63" />
-                          <stop offset="100%" stopColor="#111E63" />
-                        </linearGradient>
-                      </defs>
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        stroke="rgba(17, 30, 99, 0.2)"
-                        strokeWidth="8"
-                        fill="none"
-                      />
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        stroke="url(#mentionRateGradient)"
-                        strokeWidth="8"
-                        fill="none"
-                        strokeDasharray={`${(mentionRate / 100) * 251.2} 251.2`}
-                        className="transition-all duration-1000 ease-out"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-foreground">
-                        {mentionRate}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass p-4 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-8 h-8 text-green-500" />
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">#{avgPosition || 'N/A'}</div>
-                    <div className="text-sm text-muted-foreground">Avg Position</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass p-4 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="w-8 h-8 text-purple-500" />
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{results.length}</div>
-                    <div className="text-sm text-muted-foreground">Tests Run</div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Detailed Results */}
             <div className="space-y-3">
