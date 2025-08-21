@@ -1,6 +1,7 @@
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import AppHeader from "@/components/AppHeader";
-import Sidebar from "@/components/layout/Sidebar";
+import TopNavBar from "@/components/layout/TopNavBar";
+import HealthCheckSidebar from "@/components/layout/HealthCheckSidebar";
 import { useLocation, Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -15,9 +16,24 @@ type AppShellProps = PropsWithChildren<{
   title?: string;
   subtitle?: string;
   right?: ReactNode;
+  showHealthCheckSidebar?: boolean;
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
+  onRunHealthCheck?: () => void;
+  isRunning?: boolean;
 }>;
 
-export default function AppShell({ title, subtitle, right, children }: AppShellProps) {
+export default function AppShell({ 
+  title, 
+  subtitle, 
+  right, 
+  children, 
+  showHealthCheckSidebar = false,
+  activeTab = 'results',
+  onTabChange,
+  onRunHealthCheck,
+  isRunning = false
+}: AppShellProps) {
   const location = useLocation();
   const segments = useMemo(() => {
     const parts = location.pathname.split("/").filter(Boolean);
@@ -32,13 +48,21 @@ export default function AppShell({ title, subtitle, right, children }: AppShellP
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Left Sidebar */}
-      <Sidebar />
+      {/* Top Navigation Bar */}
+      <TopNavBar />
+      
+      {/* Health Check Sidebar (only on health check page) */}
+      {showHealthCheckSidebar && onTabChange && onRunHealthCheck && (
+        <HealthCheckSidebar 
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          onRunHealthCheck={onRunHealthCheck}
+          isRunning={isRunning}
+        />
+      )}
       
       {/* Main Content Area */}
-      <div className="ml-16 flex flex-col">
-        <AppHeader />
-        
+      <div className={`flex flex-col pt-16 ${showHealthCheckSidebar ? 'ml-64' : ''}`}>
         <div className="flex-1 p-6">
           {children}
         </div>

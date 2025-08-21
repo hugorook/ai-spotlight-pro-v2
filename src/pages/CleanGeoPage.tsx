@@ -974,6 +974,7 @@ export default function CleanGeoPage() {
   const [lastResults, setLastResults] = useState<TestResult[]>([]);
   const [jokeIndex, setJokeIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('health');
+  const [healthCheckTab, setHealthCheckTab] = useState('results');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [autoStrategies, setAutoStrategies] = useState<any[]>([]);
   const [strategyLoading, setStrategyLoading] = useState(false);
@@ -1792,49 +1793,57 @@ export default function CleanGeoPage() {
   }
 
   return (
-    <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models" right={(
-      <div className="flex items-center gap-2 border border-border rounded-full px-4 py-2">
-        <span>📈</span>
-        <span className="text-foreground">Health Score: {healthScore}/100</span>
-        <HelpTooltip content="Your health score shows the percentage of AI prompts where your company gets mentioned. Higher scores mean better AI visibility." />
-      </div>
-    )}>
+    <AppShell 
+      title="AI Health Check" 
+      subtitle="Test how visible your company is to AI models" 
+      showHealthCheckSidebar={true}
+      activeTab={healthCheckTab}
+      onTabChange={setHealthCheckTab}
+      onRunHealthCheck={runHealthCheck}
+      isRunning={isRunningHealthCheck}
+      right={(
+        <div className="flex items-center gap-2 border border-border rounded-full px-4 py-2">
+          <span>📈</span>
+          <span className="text-foreground">Health Score: {healthScore}/100</span>
+          <HelpTooltip content="Your health score shows the percentage of AI prompts where your company gets mentioned. Higher scores mean better AI visibility." />
+        </div>
+      )}
+    >
+      {/* Morse animation below buttons - separate section so it doesn't stretch boxes */}
+      {(isRunningHealthCheck || isTestingCustom) && (
+        <div className="mb-8 flex justify-center">
+          <MorseLoader
+            isActive={isRunningHealthCheck || isTestingCustom}
+            progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
+          />
+        </div>
+      )}
 
-
-        {/* Morse animation below buttons - separate section so it doesn't stretch boxes */}
-        {(isRunningHealthCheck || isTestingCustom) && (
-          <div className="mb-8 flex justify-center">
-            <MorseLoader
-              isActive={isRunningHealthCheck || isTestingCustom}
-              progress={testProgress.total > 0 ? (testProgress.current / testProgress.total) * 100 : 0}
-            />
-          </div>
-        )}
-
-
-        {/* New Animated Results Section */}
-        {showResultsSection && lastResults.length > 0 && (
-          <div className="mt-8">
-            <ResultsSection
-              isVisible={showResultsSection}
-              results={lastResults}
-              healthScore={healthScore}
-              onNewTest={() => {
-                setShowResultsSection(false);
-                runHealthCheck();
-              }}
-              strategies={autoStrategies}
-              strategyLoading={strategyLoading}
-              strategyError={strategyError}
-              company={company}
-              onExportCsv={() => downloadCsv('geo-health-check.csv', lastResults as any)}
-              onPrintReport={() => printReport('geo-report')}
-              onCopyResults={copyGeoResultsToClipboard}
-              websiteAnalysis={websiteAnalysis}
-              trendingOpportunities={trendingOpportunities}
-            />
-          </div>
-        )}
+      {/* New Animated Results Section */}
+      {showResultsSection && lastResults.length > 0 && (
+        <div className="mt-8">
+          <ResultsSection
+            isVisible={showResultsSection}
+            results={lastResults}
+            healthScore={healthScore}
+            onNewTest={() => {
+              setShowResultsSection(false);
+              runHealthCheck();
+            }}
+            strategies={autoStrategies}
+            strategyLoading={strategyLoading}
+            strategyError={strategyError}
+            company={company}
+            onExportCsv={() => downloadCsv('geo-health-check.csv', lastResults as any)}
+            onPrintReport={() => printReport('geo-report')}
+            onCopyResults={copyGeoResultsToClipboard}
+            websiteAnalysis={websiteAnalysis}
+            trendingOpportunities={trendingOpportunities}
+            activeTab={healthCheckTab}
+            onTabChange={setHealthCheckTab}
+          />
+        </div>
+      )}
 
 
         {/* Content Strategy section removed */}

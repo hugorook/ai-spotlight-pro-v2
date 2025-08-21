@@ -139,6 +139,8 @@ interface ResultsSectionProps {
   onCopyResults?: () => void;
   websiteAnalysis?: any;
   trendingOpportunities?: TrendingOpportunity[];
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
@@ -154,9 +156,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onPrintReport,
   onCopyResults,
   websiteAnalysis,
-  trendingOpportunities = []
+  trendingOpportunities = [],
+  activeTab: externalActiveTab,
+  onTabChange: externalOnTabChange
 }) => {
-  const [activeTab, setActiveTab] = useState('results');
+  const [internalActiveTab, setInternalActiveTab] = useState('results');
+  
+  // Use external activeTab if provided, otherwise use internal
+  const activeTab = externalActiveTab || internalActiveTab;
+  const setActiveTab = externalOnTabChange || setInternalActiveTab;
   const [showAllResults, setShowAllResults] = useState(false);
   const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
   const [cmsDetection, setCmsDetection] = useState<CMSDetection | null>(null);
@@ -167,13 +175,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
   const [benchmarkLoading, setBenchmarkLoading] = useState(false);
   
-  // Persist active tab in localStorage
+  // Persist active tab in localStorage (only when using internal state)
   useEffect(() => {
-    const savedTab = localStorage.getItem('activeResultsTab');
-    if (savedTab && (savedTab === 'results' || savedTab === 'website' || savedTab === 'benchmark' || savedTab === 'authority' || savedTab === 'trending')) {
-      setActiveTab(savedTab);
+    if (!externalActiveTab) {
+      const savedTab = localStorage.getItem('activeResultsTab');
+      if (savedTab && (savedTab === 'results' || savedTab === 'website' || savedTab === 'benchmark' || savedTab === 'authority' || savedTab === 'trending')) {
+        setInternalActiveTab(savedTab);
+      }
     }
-  }, []);
+  }, [externalActiveTab]);
 
 
   // Reset show all results when results change
@@ -292,7 +302,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    localStorage.setItem('activeResultsTab', tabId);
+    if (!externalOnTabChange) {
+      localStorage.setItem('activeResultsTab', tabId);
+    }
   };
 
   const handleGenerateFix = async (result: TestResult, fixType: 'faq' | 'content' | 'schema' | 'authority') => {
@@ -506,51 +518,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   return (
     <div className="w-full animate-fade-in">
-      <div className="flex gap-6">
-        {/* Left Sidebar */}
-        <div className="w-64 flex-shrink-0">
-          <div className="space-y-2">
-            {/* Health Check Button */}
-            {onNewTest && (
-              <button
-                onClick={onNewTest}
-                className="w-full flex items-center px-4 py-3 rounded-md text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-none"
-              >
-                <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-start">
-                  <CheckCircle className="w-4 h-4" />
-                </div>
-                <span className="flex-1 text-left">Run Health Check</span>
-              </button>
-            )}
-            
-            {/* Navigation Tabs */}
-            {[
-              { id: 'results', label: 'Results', icon: BarChart3 },
-              { id: 'website', label: 'Website Analysis', icon: Globe },
-              { id: 'benchmark', label: 'Benchmark', icon: Activity },
-              { id: 'authority', label: 'Authority', icon: Award },
-              { id: 'trending', label: 'Trending', icon: TrendingUp }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-none ${
-                  activeTab === tab.id
-                    ? 'bg-[#111E63] text-white'
-                    : 'bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white'
-                }`}
-              >
-                <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-start">
-                  <tab.icon className="w-4 h-4" />
-                </div>
-                <span className="flex-1 text-left">{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="flex-1">
+      {/* Tab Content */}
+      <div className="w-full">
         {activeTab === 'results' && (
           <div>
 
@@ -1264,7 +1233,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             )}
           </div>
         )}
-        </div>
       </div>
     </div>
   );
