@@ -469,6 +469,7 @@
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    color: #000000 !important;
   }
   
   .sidebar-button:hover, [role="tab"]:hover, .nav-button:hover {
@@ -476,6 +477,16 @@
     color: white !important;
     border: none !important;
     box-shadow: none !important;
+  }
+  
+  /* Navigation and sidebar text should be black */
+  .nav-text, .sidebar-text, .tab-text {
+    color: #000000 !important;
+  }
+  
+  /* Icons in navigation and sidebar should be black */
+  .nav-icon, .sidebar-icon {
+    color: #000000 !important;
   }
   
   /* Run Health Check button always has border */

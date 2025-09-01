@@ -74,13 +74,13 @@ const TopNavBar = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "nav-button flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                  "nav-button nav-text flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
                   isActive(item.path)
                     ? "bg-[#E7F0F6] text-foreground"
                     : "text-foreground hover:text-white hover:bg-[#5F209B]"
                 )}
               >
-                {item.icon}
+                <span className="nav-icon">{item.icon}</span>
                 <span>{item.label}</span>
               </button>
             ))}

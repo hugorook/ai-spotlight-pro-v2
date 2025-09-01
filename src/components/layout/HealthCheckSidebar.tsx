@@ -37,7 +37,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
               : "health-check-button text-foreground hover:bg-[#5F209B] hover:text-white"
           )}
         >
-          <Play className="w-4 h-4" />
+          <Play className="sidebar-icon w-4 h-4" />
           {isRunning ? 'Running...' : 'Run Health Check'}
         </button>
 
@@ -49,14 +49,14 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
-                  "w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors",
+                  "sidebar-button sidebar-text w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors",
                   activeTab === tab.id 
                     ? 'bg-[#E7F0F6] text-foreground' 
                     : 'sidebar-button text-foreground hover:bg-[#5F209B] hover:text-white'
                 )}
               >
                 <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
-                  <tab.icon className="w-4 h-4" />
+                  <tab.icon className="sidebar-icon w-4 h-4" />
                 </div>
                 <span className="flex-1 text-left">{tab.label}</span>
               </button>

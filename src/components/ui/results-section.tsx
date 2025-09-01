@@ -714,14 +714,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'website' && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Website Analysis</h3>
+            <h3 className="page-title text-lg font-semibold mb-4">Website Analysis</h3>
             
             {websiteAnalysis ? (
               <div className="space-y-6">
                 {/* Content Summary */}
                 <div className="glass p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-2 text-foreground">Content Summary</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <h4 className="page-title text-sm font-semibold mb-2">Content Summary</h4>
+                  <p className="body-copy text-sm leading-relaxed">
                     {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
                   </p>
                 </div>
@@ -729,7 +729,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Key Topics */}
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
                   <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">Key Topics</h4>
+                    <h4 className="page-title text-sm font-semibold mb-2">Key Topics</h4>
                     <div className="flex flex-wrap gap-2">
                       {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
                         <span key={index} className="px-2 py-1 bg-[#111E63] text-white rounded-full text-xs">
@@ -743,10 +743,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* AI Optimization Opportunities */}
                 {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
                   <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">AI Optimization Opportunities</h4>
+                    <h4 className="page-title text-sm font-semibold mb-2">AI Optimization Opportunities</h4>
                     <ul className="space-y-2">
                       {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                        <li key={index} className="body-copy text-sm flex items-start">
                           <span className="w-2 h-2 bg-[#111E63] rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {opportunity}
                         </li>
@@ -758,10 +758,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Content Gaps */}
                 {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
                   <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">Content Gaps</h4>
+                    <h4 className="page-title text-sm font-semibold mb-2">Content Gaps</h4>
                     <ul className="space-y-2">
                       {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                        <li key={index} className="body-copy text-sm flex items-start">
                           <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {gap}
                         </li>
@@ -773,10 +773,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Recommendations */}
                 {websiteAnalysis.analysis?.recommendations?.length > 0 && (
                   <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">Recommendations</h4>
+                    <h4 className="page-title text-sm font-semibold mb-2">Recommendations</h4>
                     <ul className="space-y-2">
                       {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                        <li key={index} className="body-copy text-sm flex items-start">
                           <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {rec}
                         </li>
@@ -793,12 +793,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-foreground mb-2">No Website Analysis Available</h4>
-                <p className="text-sm text-muted-foreground mb-4">
+                <h4 className="page-title text-lg font-medium mb-2">No Website Analysis Available</h4>
+                <p className="body-copy text-sm mb-4">
                   Website analysis will be performed when you run a health check with a company website URL configured.
                 </p>
                 {!company?.website_url && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="body-copy text-xs">
                     Please add a website URL to your company profile to enable website analysis.
                   </p>
                 )}
@@ -1103,7 +1103,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Challenges</h4>
                     <ul className="space-y-2">
                       {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                        <li key={index} className="body-copy text-sm flex items-start">
                           <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {challenge}
                         </li>
@@ -1202,7 +1202,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <h4 className="text-sm font-semibold mb-3 text-foreground">Next Steps</h4>
                     <ul className="space-y-2">
                       {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start">
+                        <li key={index} className="body-copy text-sm flex items-start">
                           <span className="w-6 h-6 bg-[#111E63] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
                             {index + 1}
                           </span>
