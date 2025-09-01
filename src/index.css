@@ -543,15 +543,28 @@
   .modal-content {
     max-width: 2xl !important; /* Smaller than max-w-4xl */
     max-height: 80vh !important; /* Smaller than 90vh */
+    margin-left: 16rem !important; /* Don't cover sidebar (w-64 = 16rem) */
   }
   
   .modal-text {
-    font-size: 0.875rem !important; /* text-sm */
-    line-height: 1.25rem !important;
+    font-size: 0.75rem !important; /* text-xs - smaller */
+    line-height: 1rem !important;
+    font-family: var(--font-sans), sans-serif !important; /* Force Inter */
+    color: #000000 !important; /* Force black */
   }
   
   .modal-title-text {
     font-size: 1rem !important; /* text-base instead of text-lg */
+  }
+  
+  /* Force all modal body copy to use Inter and black */
+  .modal-content .body-copy,
+  .modal-content p,
+  .modal-content div:not(.modal-title) {
+    font-family: var(--font-sans), sans-serif !important;
+    color: #000000 !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
   }
   
   /* Sidebar flush to top nav */

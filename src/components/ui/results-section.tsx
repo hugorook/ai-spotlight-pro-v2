@@ -701,32 +701,41 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
 
         {activeTab === 'website' && (
-          <div className="flex gap-6">
-            <div className="w-48 flex-shrink-0 flex items-start justify-center">
-              <h3 className="page-title text-3xl font-bold">Website Analysis</h3>
-            </div>
-            <div className="flex-1">
+          <div>
+            <h3 className="page-title text-lg font-semibold mb-6">Website Analysis</h3>
             
             {websiteAnalysis ? (
               <div className="space-y-6">
                 {/* Content Summary */}
-                <div className="glass p-4 rounded-lg">
-                  <h4 className="page-title text-sm font-semibold mb-2">Content Summary</h4>
-                  <p className="body-copy text-sm leading-relaxed">
-                    {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
-                  </p>
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 flex items-start justify-center">
+                    <h4 className="page-title text-2xl font-bold">Content Summary</h4>
+                  </div>
+                  <div className="flex-1">
+                    <div className="glass p-4 rounded-lg">
+                      <p className="body-copy text-sm leading-relaxed">
+                        {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Key Topics */}
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="page-title text-sm font-semibold mb-2">Key Topics</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
-                          {topic}
-                        </span>
-                      ))}
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 flex items-start justify-center">
+                      <h4 className="page-title text-2xl font-bold">Key Topics</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex flex-wrap gap-2">
+                          {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
+                            <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -795,16 +804,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 )}
               </div>
             )}
-            </div>
           </div>
         )}
 
         {activeTab === 'authority' && (
-          <div className="flex gap-6">
-            <div className="w-48 flex-shrink-0 flex items-start justify-center">
-              <h3 className="page-title text-3xl font-bold">Authority</h3>
-            </div>
-            <div className="flex-1">
+          <div>
+            <h3 className="page-title text-lg font-semibold mb-6">Authority</h3>
             
             {authorityAnalysis ? (
               <div className="space-y-6">
@@ -982,16 +987,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </p>
               </div>
             )}
-            </div>
           </div>
         )}
 
         {activeTab === 'benchmark' && (
-          <div className="flex gap-6">
-            <div className="w-48 flex-shrink-0 flex items-start justify-center">
-              <h3 className="page-title text-3xl font-bold">Benchmark</h3>
-            </div>
-            <div className="flex-1">
+          <div>
+            <h3 className="page-title text-lg font-semibold mb-6">Benchmark</h3>
             
             {industryBenchmark ? (
               <div className="space-y-6">
@@ -1215,7 +1216,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </p>
               </div>
             )}
-            </div>
           </div>
         )}
       </div>
