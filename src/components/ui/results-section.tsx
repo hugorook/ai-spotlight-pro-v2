@@ -1031,207 +1031,230 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {industryBenchmark ? (
               <div className="space-y-6">
                 {/* Performance Analysis Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                        industryBenchmark.performanceAnalysis.relativePosition === 'leader' ? 'bg-green-100' :
-                        industryBenchmark.performanceAnalysis.relativePosition === 'above average' ? 'bg-blue-100' :
-                        industryBenchmark.performanceAnalysis.relativePosition === 'average' ? 'bg-yellow-100' :
-                        'bg-red-100'
-                      }`}>
-                        <Activity className={`w-4 h-4 ${
-                          industryBenchmark.performanceAnalysis.relativePosition === 'leader' ? 'text-green-600' :
-                          industryBenchmark.performanceAnalysis.relativePosition === 'above average' ? 'text-blue-600' :
-                          industryBenchmark.performanceAnalysis.relativePosition === 'average' ? 'text-yellow-600' :
-                          'text-red-600'
-                        }`} />
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-foreground capitalize">
-                          {industryBenchmark.performanceAnalysis.relativePosition.replace(' ', '-')}
-                        </div>
-                        <div className="text-sm text-muted-foreground">Relative Position</div>
-                      </div>
-                    </div>
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">Performance Analysis Overview</h4>
                   </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Target className="w-8 h-8 text-purple-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">
-                          {industryBenchmark.performanceAnalysis.percentileRank}th
+                  <div className="flex-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white">
+                            <Activity className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-foreground capitalize">
+                              {industryBenchmark.performanceAnalysis.relativePosition.replace(' ', '-')}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Relative Position</div>
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">Percentile Rank</div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <TrendingUp className="w-8 h-8 text-green-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">
-                          +{industryBenchmark.performanceAnalysis.improvementPotential}%
+                      
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Target className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <div className="text-2xl font-bold text-foreground">
+                              {industryBenchmark.performanceAnalysis.percentileRank}th
+                            </div>
+                            <div className="text-sm text-muted-foreground">Percentile Rank</div>
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">Improvement Potential</div>
+                      </div>
+                      
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <TrendingUp className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <div className="text-2xl font-bold text-foreground">
+                              +{industryBenchmark.performanceAnalysis.improvementPotential}%
+                            </div>
+                            <div className="text-sm text-muted-foreground">Improvement Potential</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Industry Comparison */}
-                <div className="glass p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Performance Comparison</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-muted-foreground">Industry Average</div>
-                      <div className="text-lg font-semibold">{industryBenchmark.averageMentionRate}%</div>
-                      <div className="text-xs text-muted-foreground">mention rate</div>
-                    </div>
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <div className="text-xs text-muted-foreground">Top Performers (90th percentile)</div>
-                      <div className="text-lg font-semibold">{industryBenchmark.topPercentileMentionRate}%</div>
-                      <div className="text-xs text-muted-foreground">mention rate</div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-xs text-muted-foreground">Median Position</div>
-                      <div className="text-lg font-semibold">#{industryBenchmark.medianPosition}</div>
-                      <div className="text-xs text-muted-foreground">when mentioned</div>
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">Industry Comparison</h4>
+                  </div>
+                  <div className="flex-1">
+                    <div className="glass p-4 rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-3 glass rounded-lg">
+                          <div className="text-xs text-muted-foreground">Industry Average</div>
+                          <div className="text-lg font-semibold">{industryBenchmark.averageMentionRate}%</div>
+                          <div className="text-xs text-muted-foreground">mention rate</div>
+                        </div>
+                        <div className="p-3 glass rounded-lg">
+                          <div className="text-xs text-muted-foreground">Top Performers (90th percentile)</div>
+                          <div className="text-lg font-semibold">{industryBenchmark.topPercentileMentionRate}%</div>
+                          <div className="text-xs text-muted-foreground">mention rate</div>
+                        </div>
+                        <div className="p-3 glass rounded-lg">
+                          <div className="text-xs text-muted-foreground">Median Position</div>
+                          <div className="text-lg font-semibold">#{industryBenchmark.medianPosition}</div>
+                          <div className="text-xs text-muted-foreground">when mentioned</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Gap Analysis */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Performance Gaps</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-2 bg-red-50 rounded">
-                        <span className="text-sm text-red-800">Gap to Leaders</span>
-                        <span className="text-sm font-semibold text-red-600">-{industryBenchmark.performanceAnalysis.gapToLeaders}%</span>
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">Gap Analysis</h4>
+                  </div>
+                  <div className="flex-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="glass p-4 rounded-lg">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Performance Gaps</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-2 glass rounded">
+                            <span className="text-sm text-muted-foreground">Gap to Leaders</span>
+                            <span className="text-sm font-semibold text-foreground">-{industryBenchmark.performanceAnalysis.gapToLeaders}%</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 glass rounded">
+                            <span className="text-sm text-muted-foreground">Gap to Average</span>
+                            <span className="text-sm font-semibold text-foreground">
+                              {industryBenchmark.performanceAnalysis.gapToAverage > 0 ? '+' : ''}{industryBenchmark.performanceAnalysis.gapToAverage}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between p-2 bg-yellow-50 rounded">
-                        <span className="text-sm text-yellow-800">Gap to Average</span>
-                        <span className="text-sm font-semibold text-yellow-600">
-                          {industryBenchmark.performanceAnalysis.gapToAverage > 0 ? '+' : ''}{industryBenchmark.performanceAnalysis.gapToAverage}%
-                        </span>
+
+                      <div className="glass p-4 rounded-lg">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Challenges</h4>
+                        <ul className="space-y-2">
+                          {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
+                            <li key={index} className="body-copy text-sm flex items-start">
+                              <span className="w-2 h-2 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              {challenge}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Challenges</h4>
-                    <ul className="space-y-2">
-                      {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
-                        <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {challenge}
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
 
-                {/* Competitive Landscape */}
+                {/* Industry Leaders */}
                 {(industryBenchmark.competitiveLandscape.leaders.length > 0 || industryBenchmark.competitiveLandscape.emerging.length > 0) && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Competitive Landscape</h4>
-                    
-                    {industryBenchmark.competitiveLandscape.leaders.length > 0 && (
-                      <div className="mb-4">
-                        <div className="text-xs font-medium text-muted-foreground mb-2">Industry Leaders</div>
-                        <div className="space-y-2">
-                          {industryBenchmark.competitiveLandscape.leaders.map((leader, index) => (
-                            <div key={index} className="p-3 bg-green-50 rounded-lg">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="text-sm font-medium text-green-800">{leader.name}</div>
-                                <div className="text-xs text-green-600">
-                                  {leader.estimatedMentionRate}% • #{leader.avgPosition} avg
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Industry Leaders</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        {industryBenchmark.competitiveLandscape.leaders.length > 0 && (
+                          <div className="mb-4">
+                            <div className="text-xs font-medium text-muted-foreground mb-2">Industry Leaders</div>
+                            <div className="space-y-2">
+                              {industryBenchmark.competitiveLandscape.leaders.map((leader, index) => (
+                                <div key={index} className="p-3 glass rounded-lg">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="text-sm font-medium text-foreground">{leader.name}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {leader.estimatedMentionRate}% • #{leader.avgPosition} avg
+                                    </div>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground space-y-1">
+                                    <div><strong>Strengths:</strong> {leader.strengths.join(', ')}</div>
+                                    <div><strong>Key differentiators:</strong> {leader.keyDifferentiators.join(', ')}</div>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="text-xs text-green-700 space-y-1">
-                                <div><strong>Strengths:</strong> {leader.strengths.join(', ')}</div>
-                                <div><strong>Key differentiators:</strong> {leader.keyDifferentiators.join(', ')}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {industryBenchmark.competitiveLandscape.emerging.length > 0 && (
-                      <div>
-                        <div className="text-xs font-medium text-muted-foreground mb-2">Emerging Competitors</div>
-                        <div className="space-y-2">
-                          {industryBenchmark.competitiveLandscape.emerging.map((competitor, index) => (
-                            <div key={index} className="p-3 bg-blue-50 rounded-lg">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="text-sm font-medium text-blue-800">{competitor.name}</div>
-                                <div className="text-xs text-blue-600">
-                                  {competitor.estimatedMentionRate}% • #{competitor.avgPosition} avg
-                                </div>
-                              </div>
-                              <div className="text-xs text-blue-700 space-y-1">
-                                <div><strong>Strengths:</strong> {competitor.strengths.join(', ')}</div>
-                                <div><strong>Key differentiators:</strong> {competitor.keyDifferentiators.join(', ')}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Actionable Insights */}
-                {industryBenchmark.actionableInsights.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Strategic Insights</h4>
-                    <div className="space-y-3">
-                      {industryBenchmark.actionableInsights.map((insight, index) => (
-                        <div key={index} className="p-3 border border-gray-200 rounded-lg">
-                          <div className="flex items-start gap-3">
-                            <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${
-                              insight.priority === 'high' ? 'bg-red-100 text-red-700' :
-                              insight.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-green-100 text-green-700'
-                            }`}>
-                              {insight.priority} priority
-                            </span>
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-foreground mb-1">
-                                {insight.insight}
-                              </div>
-                              <div className="text-xs text-muted-foreground mb-1">
-                                <strong>Why it matters:</strong> {insight.rationale}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                <strong>Expected impact:</strong> {insight.expectedImpact}
-                              </div>
+                              ))}
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        )}
+
+                        {industryBenchmark.competitiveLandscape.emerging.length > 0 && (
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground mb-2">Emerging Competitors</div>
+                            <div className="space-y-2">
+                              {industryBenchmark.competitiveLandscape.emerging.map((competitor, index) => (
+                                <div key={index} className="p-3 glass rounded-lg">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="text-sm font-medium text-foreground">{competitor.name}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {competitor.estimatedMentionRate}% • #{competitor.avgPosition} avg
+                                    </div>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground space-y-1">
+                                    <div><strong>Strengths:</strong> {competitor.strengths.join(', ')}</div>
+                                    <div><strong>Key differentiators:</strong> {competitor.keyDifferentiators.join(', ')}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Benchmarking Recommendations */}
+                {/* Strategic Insights */}
+                {industryBenchmark.actionableInsights.length > 0 && (
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Strategic Insights</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="space-y-3">
+                          {industryBenchmark.actionableInsights.map((insight, index) => (
+                            <div key={index} className="p-3 glass rounded-lg">
+                              <div className="flex items-start gap-3">
+                                <span className="px-2 py-1 rounded-full text-xs flex-shrink-0 bg-[#5F209B] text-white">
+                                  {insight.priority} priority
+                                </span>
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium text-foreground mb-1">
+                                    {insight.insight}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mb-1">
+                                    <strong>Why it matters:</strong> {insight.rationale}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    <strong>Expected impact:</strong> {insight.expectedImpact}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Steps */}
                 {industryBenchmark.benchmarkingRecommendations.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-3 text-foreground">Next Steps</h4>
-                    <ul className="space-y-2">
-                      {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
-                        <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-6 h-6 bg-[#5F209B] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-                            {index + 1}
-                          </span>
-                          {rec}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Next Steps</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <ul className="space-y-2">
+                          {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
+                            <li key={index} className="body-copy text-sm flex items-start">
+                              <span className="w-6 h-6 bg-[#5F209B] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                                {index + 1}
+                              </span>
+                              {rec}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
