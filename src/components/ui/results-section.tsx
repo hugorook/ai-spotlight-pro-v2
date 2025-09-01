@@ -872,128 +872,137 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
 
                 {/* Quick Action Plan */}
-                <div className="glass p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-3 text-foreground">30-Day Action Plan</h4>
-                  <div className="space-y-3">
-                    {authorityAnalysis.actionPlan.immediate.map((opportunity, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-green-800 mb-1">
-                            {opportunity.source}
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">30-Day Action Plan</h4>
+                  </div>
+                  <div className="flex-1">
+                    <div className="glass p-4 rounded-lg">
+                      <div className="space-y-3">
+                        {authorityAnalysis.actionPlan.immediate.map((opportunity, index) => (
+                          <div key={index} className="authority-card flex items-start gap-3 p-3 rounded-lg">
+                            <div className="status-dot w-2 h-2 rounded-full mt-2 flex-shrink-0"></div>
+                            <div className="flex-1">
+                              <div className="page-title text-sm font-medium mb-1">
+                                {opportunity.source}
+                              </div>
+                              <div className="body-copy text-xs mb-2">
+                                {opportunity.description}
+                              </div>
+                              <div className="body-copy text-xs">
+                                <strong>Action:</strong> {opportunity.actionRequired}
+                              </div>
+                              {opportunity.url && (
+                                <a
+                                  href={opportunity.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-block mt-2 px-2 py-1 text-xs button-text bg-[#5F209B] text-white rounded hover:opacity-90"
+                                >
+                                  Visit Source
+                                </a>
+                              )}
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="info-badge px-2 py-1 rounded-full text-xs">
+                                {opportunity.estimatedEffort} effort
+                              </span>
+                              <span className="info-badge px-2 py-1 rounded-full text-xs">
+                                {opportunity.potentialImpact} impact
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-xs text-green-700 mb-2">
-                            {opportunity.description}
-                          </div>
-                          <div className="text-xs text-green-600">
-                            <strong>Action:</strong> {opportunity.actionRequired}
-                          </div>
-                          {opportunity.url && (
-                            <a
-                              href={opportunity.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-block mt-2 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90"
-                            >
-                              Visit Source
-                            </a>
-                          )}
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            opportunity.estimatedEffort === 'low' ? 'bg-green-100 text-green-700' :
-                            opportunity.estimatedEffort === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
-                          }`}>
-                            {opportunity.estimatedEffort} effort
-                          </span>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            opportunity.potentialImpact === 'high' ? 'bg-purple-100 text-purple-700' :
-                            opportunity.potentialImpact === 'medium' ? 'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
-                            {opportunity.potentialImpact} impact
-                          </span>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
 
                 {/* Industry Authority Sources */}
                 {authorityAnalysis.industryAuthorities.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">Key Industry Authorities</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {authorityAnalysis.industryAuthorities.map((authority, index) => (
-                        <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
-                          {authority}
-                        </span>
-                      ))}
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Key Industry Authorities</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex flex-wrap gap-2">
+                          {authorityAnalysis.industryAuthorities.map((authority, index) => (
+                            <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
+                              {authority}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Competitive Mentions */}
                 {authorityAnalysis.competitorMentions.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 text-foreground">How Competitors Get Mentioned</h4>
-                    <div className="space-y-3">
-                      {authorityAnalysis.competitorMentions.map((mention, index) => (
-                        <div key={index} className="p-3 bg-blue-50 rounded-lg">
-                          <div className="text-sm font-medium text-blue-800 mb-1">
-                            {mention.competitor} → {mention.source}
-                          </div>
-                          <div className="text-xs text-blue-700 mb-2">
-                            <strong>Why:</strong> {mention.reasoning}
-                          </div>
-                          <div className="text-xs text-blue-600">
-                            <strong>Your Opportunity:</strong> {mention.opportunityForYou}
-                          </div>
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">How Competitors Get Mentioned</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="space-y-3">
+                          {authorityAnalysis.competitorMentions.map((mention, index) => (
+                            <div key={index} className="authority-card p-3 rounded-lg">
+                              <div className="page-title text-sm font-medium mb-1">
+                                {mention.competitor} → {mention.source}
+                              </div>
+                              <div className="body-copy text-xs mb-2">
+                                <strong>Why:</strong> {mention.reasoning}
+                              </div>
+                              <div className="body-copy text-xs">
+                                <strong>Your Opportunity:</strong> {mention.opportunityForYou}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* All Authority Opportunities */}
-                <div className="glass p-4 rounded-lg">
-                  <h4 className="text-sm font-semibold mb-2 text-foreground">All Authority Building Opportunities</h4>
-                  <div className="space-y-3">
-                    {authorityAnalysis.authorityOpportunities.map((opportunity, index) => (
-                      <div key={index} className="p-3 border border-gray-200 rounded-lg">
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">All Authority Building Opportunities</h4>
+                  </div>
+                  <div className="flex-1">
+                    <div className="glass p-4 rounded-lg">
+                      <div className="space-y-3">
+                        {authorityAnalysis.authorityOpportunities.map((opportunity, index) => (
+                          <div key={index} className="authority-card p-3 rounded-lg">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-foreground mb-1">
+                            <div className="page-title text-sm font-medium mb-1">
                               {opportunity.source}
                             </div>
-                            <div className="text-xs text-muted-foreground mb-2">
+                            <div className="body-copy text-xs mb-2">
                               {opportunity.description}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="body-copy text-xs">
                               <strong>Action:</strong> {opportunity.actionRequired}
                             </div>
                             {opportunity.contactInfo && (
-                              <div className="text-xs text-muted-foreground mt-1">
+                              <div className="body-copy text-xs mt-1">
                                 <strong>Contact:</strong> {opportunity.contactInfo}
                               </div>
                             )}
                           </div>
                           <div className="flex flex-col gap-1 ml-3">
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              opportunity.type === 'directory' ? 'bg-blue-100 text-blue-700' :
-                              opportunity.type === 'review_platform' ? 'bg-green-100 text-green-700' :
-                              opportunity.type === 'industry_publication' ? 'bg-purple-100 text-purple-700' :
-                              opportunity.type === 'podcast' ? 'bg-orange-100 text-orange-700' :
-                              opportunity.type === 'award' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-pink-100 text-pink-700'
-                            }`}>
+                            <span className="info-badge px-2 py-1 rounded-full text-xs">
                               {opportunity.type.replace('_', ' ')}
                             </span>
                           </div>
                         </div>
                       </div>
-                    ))}
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
