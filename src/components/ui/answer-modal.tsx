@@ -47,13 +47,13 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
       
       {/* Modal */}
       <div className="fixed inset-0 modal-container flex items-center justify-center p-6">
-        <div className="bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden">
+        <div className="modal-content bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full rounded-xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-black/10">
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="modal-title text-xl font-semibold tracking-tight">
+                <h2 className="modal-title modal-title-text font-semibold tracking-tight">
                   Full AI Response
                 </h2>
                 <div className="flex items-center gap-2 body-copy text-sm">
@@ -74,10 +74,10 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
           </div>
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
             {/* Prompt */}
             <div className="mb-6">
-              <h3 className="modal-title text-lg font-medium mb-3 tracking-tight">
+              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
                 Test Prompt
               </h3>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
@@ -87,12 +87,12 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
 
             {/* Full Response */}
             <div>
-              <h3 className="modal-title text-lg font-medium mb-3 tracking-tight">
+              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
                 AI Response
               </h3>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 {result.response ? (
-                  <div className="body-copy leading-relaxed">
+                  <div className="body-copy modal-text leading-relaxed">
                     {result.response.split('\n').map((paragraph, index) => (
                       <p key={index} className="mb-3 last:mb-0">
                         {paragraph}
@@ -100,7 +100,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
                     ))}
                   </div>
                 ) : result.context ? (
-                  <div className="body-copy leading-relaxed">
+                  <div className="body-copy modal-text leading-relaxed">
                     <p className="mb-3"><strong>Context where mentioned:</strong></p>
                     <p>{result.context}</p>
                   </div>

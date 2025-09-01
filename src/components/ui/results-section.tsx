@@ -701,8 +701,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
 
         {activeTab === 'website' && (
-          <div>
-            <h3 className="page-title text-lg font-semibold mb-4">Website Analysis</h3>
+          <div className="flex gap-6">
+            <div className="w-48 flex-shrink-0 flex items-start justify-center">
+              <h3 className="page-title text-3xl font-bold">Website Analysis</h3>
+            </div>
+            <div className="flex-1">
             
             {websiteAnalysis ? (
               <div className="space-y-6">
@@ -792,14 +795,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 )}
               </div>
             )}
+            </div>
           </div>
         )}
 
         {activeTab === 'authority' && (
-          <div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold">Authority Intelligence</h3>
+          <div className="flex gap-6">
+            <div className="w-48 flex-shrink-0 flex items-start justify-center">
+              <h3 className="page-title text-3xl font-bold">Authority</h3>
             </div>
+            <div className="flex-1">
             
             {authorityAnalysis ? (
               <div className="space-y-6">
@@ -807,7 +812,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="glass p-4 rounded-lg">
                     <div className="flex items-center gap-3">
-                      <Users className="w-8 h-8 text-blue-500" />
+                      <Users className="w-8 h-8 text-muted-foreground" />
                       <div>
                         <div className="text-2xl font-bold text-foreground">{authorityAnalysis.authorityOpportunities.length}</div>
                         <div className="text-sm text-muted-foreground">Opportunities</div>
@@ -977,15 +982,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </p>
               </div>
             )}
+            </div>
           </div>
         )}
 
-
         {activeTab === 'benchmark' && (
-          <div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold">Industry Benchmark</h3>
+          <div className="flex gap-6">
+            <div className="w-48 flex-shrink-0 flex items-start justify-center">
+              <h3 className="page-title text-3xl font-bold">Benchmark</h3>
             </div>
+            <div className="flex-1">
             
             {industryBenchmark ? (
               <div className="space-y-6">
@@ -1209,6 +1215,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </p>
               </div>
             )}
+            </div>
           </div>
         )}
       </div>

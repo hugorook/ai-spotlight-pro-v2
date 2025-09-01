@@ -60,13 +60,13 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
       
       {/* Modal */}
       <div className="fixed inset-0 modal-container flex items-center justify-center p-6">
-        <div className="bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden">
+        <div className="modal-content bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-2xl rounded-xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-black/10">
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="modal-title text-xl font-semibold tracking-tight">
+                <h2 className="modal-title modal-title-text font-semibold tracking-tight">
                   Recommendations
                 </h2>
                 <div className="flex items-center gap-2 body-copy text-sm">
@@ -87,10 +87,10 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
           </div>
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
             {/* Prompt Context */}
             <div className="mb-6">
-              <h3 className="modal-title text-lg font-medium mb-3 tracking-tight">
+              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
                 Query Context
               </h3>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
@@ -106,7 +106,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Why you didn't rank:
                   </h4>
-                  <p className="body-copy leading-relaxed">
+                  <p className="body-copy modal-text leading-relaxed">
                     {result.failureAnalysis.primaryReason}
                   </p>
                 </div>
@@ -116,7 +116,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Quick Fix ({result.failureAnalysis.timeToFix}):
                   </h4>
-                  <p className="body-copy leading-relaxed">
+                  <p className="body-copy modal-text leading-relaxed">
                     {result.failureAnalysis.quickFix}
                   </p>
                 </div>
@@ -126,7 +126,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Expected Impact:
                   </h4>
-                  <p className="body-copy leading-relaxed">
+                  <p className="body-copy modal-text leading-relaxed">
                     {result.failureAnalysis.expectedImpact}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                     <h4 className="modal-title font-medium mb-2">
                       Competitor Insight:
                     </h4>
-                    <p className="body-copy leading-relaxed">
+                    <p className="body-copy modal-text leading-relaxed">
                       {result.failureAnalysis.competitorInsight}
                     </p>
                   </div>

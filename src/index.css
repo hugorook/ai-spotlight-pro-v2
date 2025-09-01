@@ -539,6 +539,21 @@
     height: 40px;
   }
   
+  /* Modal sizing and typography */
+  .modal-content {
+    max-width: 2xl !important; /* Smaller than max-w-4xl */
+    max-height: 80vh !important; /* Smaller than 90vh */
+  }
+  
+  .modal-text {
+    font-size: 0.875rem !important; /* text-sm */
+    line-height: 1.25rem !important;
+  }
+  
+  .modal-title-text {
+    font-size: 1rem !important; /* text-base instead of text-lg */
+  }
+  
   /* Sidebar flush to top nav */
   .sidebar-flush {
     top: 0 !important;
