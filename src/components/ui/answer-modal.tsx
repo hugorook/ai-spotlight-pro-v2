@@ -1,0 +1,121 @@
+import React from 'react';
+import { X, AlertCircle, CheckCircle, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface TestResult {
+  prompt: string;
+  mentioned: boolean;
+  position: number;
+  sentiment: 'positive' | 'neutral' | 'negative';
+  context: string;
+  response?: string;
+}
+
+interface AnswerModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  result: TestResult | null;
+}
+
+const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) => {
+  if (!isOpen || !result) return null;
+
+  const getSentimentIcon = (sentiment: string) => {
+    switch (sentiment) {
+      case 'positive':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'negative':
+        return <AlertCircle className="w-4 h-4 text-red-600" />;
+      default:
+        return <Minus className="w-4 h-4 text-yellow-600" />;
+    }
+  };
+
+  const getStatusIcon = (mentioned: boolean) => {
+    return mentioned ? 
+      <div className="w-3 h-3 bg-green-500 rounded-full"></div> : 
+      <div className="w-3 h-3 bg-red-500 rounded-full"></div>;
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+        <div className="bg-gray-100/90 backdrop-blur-xl border border-gray-200/50 w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+            <div className="flex items-center gap-4">
+              {getStatusIcon(result.mentioned)}
+              <div>
+                <h2 className="text-xl font-serif font-semibold text-gray-800 tracking-tight">
+                  Full AI Response
+                </h2>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  {getSentimentIcon(result.sentiment)}
+                  <span className="capitalize">{result.sentiment}</span>
+                  {result.mentioned && result.position && (
+                    <span>• Position #{result.position}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            {/* Prompt */}
+            <div className="mb-6">
+              <h3 className="text-lg font-serif font-medium text-gray-800 mb-3 tracking-tight">
+                Test Prompt
+              </h3>
+              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
+                <p className="font-serif text-gray-800">{result.prompt}</p>
+              </div>
+            </div>
+
+            {/* Full Response */}
+            <div>
+              <h3 className="text-lg font-serif font-medium text-gray-800 mb-3 tracking-tight">
+                AI Response
+              </h3>
+              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
+                {result.response ? (
+                  <div className="body-copy text-sm leading-relaxed text-gray-700">
+                    {result.response.split('\n').map((paragraph, index) => (
+                      <p key={index} className="mb-3 last:mb-0">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                ) : result.context ? (
+                  <div className="body-copy text-sm leading-relaxed text-gray-700">
+                    <p className="mb-3"><strong>Context where mentioned:</strong></p>
+                    <p>{result.context}</p>
+                  </div>
+                ) : (
+                  <p className="body-copy text-sm text-gray-500">
+                    No detailed response available
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default AnswerModal;

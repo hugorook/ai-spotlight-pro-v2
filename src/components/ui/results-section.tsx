@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users, Clock, ArrowUp, ArrowDown, Minus as MinusIcon, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import ResultDetailsModal from './result-details-modal';
+import AnswerModal from './answer-modal';
+import RecommendationsModal from './recommendations-modal';
 
 interface TestResult {
   prompt: string;
@@ -176,7 +177,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
   const [benchmarkLoading, setBenchmarkLoading] = useState(false);
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
+  const [isRecommendationsModalOpen, setIsRecommendationsModalOpen] = useState(false);
   
   // Persist active tab in localStorage (only when using internal state)
   useEffect(() => {
@@ -310,13 +312,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   };
 
-  const handleOpenModal = (result: TestResult) => {
+  const handleOpenAnswerModal = (result: TestResult) => {
     setSelectedResult(result);
-    setIsModalOpen(true);
+    setIsAnswerModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleOpenRecommendationsModal = (result: TestResult) => {
+    setSelectedResult(result);
+    setIsRecommendationsModalOpen(true);
+  };
+
+  const handleCloseAnswerModal = () => {
+    setIsAnswerModalOpen(false);
+    setSelectedResult(null);
+  };
+
+  const handleCloseRecommendationsModal = () => {
+    setIsRecommendationsModalOpen(false);
     setSelectedResult(null);
   };
 
@@ -589,26 +601,26 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 };
 
                 return (
-                  <div key={index} className="p-4 glass rounded-lg hover:bg-white/10 transition-colors">
+                  <div key={index} className="p-3 glass rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 mr-4">
-                        <div className="font-serif font-medium text-foreground mb-1">
+                        <div className="font-serif font-medium text-foreground mb-1 text-sm">
                           {result.prompt}
                         </div>
-                        <div className="body-copy text-sm text-muted-foreground leading-relaxed">
+                        <div className="body-copy text-xs text-muted-foreground leading-tight">
                           {displaySummary}
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {/* Status Dot */}
-                        <div className={`w-3 h-3 rounded-full ${
+                        <div className={`w-2.5 h-2.5 rounded-full ${
                           result.mentioned ? 'bg-green-500' : 'bg-red-500'
                         }`}></div>
                         
                         {/* Position */}
                         {result.mentioned && result.position && (
-                          <span className="font-serif text-sm font-medium text-foreground">
+                          <span className="font-serif text-xs font-medium text-foreground">
                             #{result.position}
                           </span>
                         )}
@@ -618,13 +630,21 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           {getSentimentIcon()}
                         </div>
                         
-                        {/* Plus Button */}
+                        {/* Two Action Buttons */}
                         <button
-                          onClick={() => handleOpenModal(result)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors"
-                          title="View details"
+                          onClick={() => handleOpenAnswerModal(result)}
+                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors rounded border border-gray-300"
+                          title="See full answer"
                         >
-                          <Plus className="w-4 h-4" />
+                          See full answer
+                        </button>
+                        
+                        <button
+                          onClick={() => handleOpenRecommendationsModal(result)}
+                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors rounded border border-gray-300"
+                          title="View recommendations"
+                        >
+                          Recommendations
                         </button>
                       </div>
                     </div>
@@ -1219,10 +1239,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
       </div>
 
-      {/* Result Details Modal */}
-      <ResultDetailsModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+      {/* Answer Modal */}
+      <AnswerModal
+        isOpen={isAnswerModalOpen}
+        onClose={handleCloseAnswerModal}
+        result={selectedResult}
+      />
+
+      {/* Recommendations Modal */}
+      <RecommendationsModal
+        isOpen={isRecommendationsModalOpen}
+        onClose={handleCloseRecommendationsModal}
         result={selectedResult}
       />
     </div>

@@ -47,26 +47,27 @@ const TopNavBar = () => {
   return (
     <div className="fixed top-0 left-0 right-0 z-[110] glass-strong backdrop-blur-xl border-b border-white/20">
       <div className="flex items-center justify-between px-6 py-3">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-            <svg 
-              className="w-6 h-6 text-[#111E63]" 
-              viewBox="0 0 24 24" 
-              fill="currentColor"
-            >
-              <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-              <circle fill="white" cx="9" cy="9.5" r="0.5"/>
-              <circle fill="white" cx="15" cy="9.5" r="0.5"/>
-            </svg>
+        {/* Left Side: Logo and Navigation */}
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <svg 
+                className="w-6 h-6 text-[#111E63]" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+              >
+                <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                <circle fill="white" cx="9" cy="9.5" r="0.5"/>
+                <circle fill="white" cx="15" cy="9.5" r="0.5"/>
+              </svg>
+            </div>
+            <span className="text-lg font-serif font-semibold text-foreground tracking-tight">
+              Ghost AI
+            </span>
           </div>
-          <span className="text-lg font-serif font-semibold text-foreground tracking-tight">
-            Ghost AI
-          </span>
-        </div>
 
-        {/* Navigation Items and Profile */}
-        <div className="flex items-center gap-4">
+          {/* Navigation Items */}
           <nav className="flex items-center gap-1">
             {navItems.map((item) => (
               <button
@@ -84,8 +85,10 @@ const TopNavBar = () => {
               </button>
             ))}
           </nav>
+        </div>
 
-          {/* Profile Circle */}
+        {/* Right Side: Profile Circle */}
+        <div className="flex items-center">
           {user && (
             <button
               onClick={() => navigate('/settings')}
