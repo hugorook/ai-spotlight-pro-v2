@@ -19,8 +19,13 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ["var(--font-sans)", "Inter", "ui-sans-serif", "system-ui"],
-				mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace"],
+				sans: ["Inter", "ui-sans-serif", "system-ui"],
+				serif: ["Playfair Display", "Georgia", "serif"],
+				mono: ["JetBrains Mono", "ui-monospace"],
+			},
+			letterSpacing: {
+				tighter: '-0.02em',
+				tight: '-0.01em',
 			},
 			colors: {
 				border: 'hsl(var(--border))',

@@ -55,8 +55,9 @@
     --ring: 218 61 39;
 
     --radius: 0.75rem;
-    /* Global fonts: Syne */
-    --font-sans: "Syne", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Global fonts: Inter for body, Playfair Display for titles */
+    --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: "Playfair Display", Georgia, serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Design tokens updated for navy theme */
@@ -97,18 +98,18 @@
     min-height: 100vh;
   }
 
-  /* Use Syne everywhere */
+  /* Use Inter for body text */
   * { font-family: var(--font-sans), sans-serif; }
   
-  /* Headers are Syne Bold and uppercase */
+  /* Headers use Playfair Display with tighter kerning */
   h1, h2, h3, h4, h5, h6, .heading {
-    font-family: var(--font-sans), sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-family: var(--font-serif), serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     color: #111E63;
   }
   
-  /* Body text is Syne Regular */
+  /* Body text uses Inter */
   p, span, div, a, li, button {
     font-family: var(--font-sans), sans-serif;
     font-weight: 400;
@@ -424,5 +425,38 @@
     fill: none !important;
     stroke: currentColor !important;
     stroke-width: 1.5 !important;
+  }
+
+  /* Font utility classes */
+  .font-serif {
+    font-family: var(--font-serif), serif !important;
+    letter-spacing: -0.02em;
+  }
+  
+  .font-sans {
+    font-family: var(--font-sans), sans-serif !important;
+  }
+  
+  .font-mono {
+    font-family: var(--font-mono), monospace !important;
+  }
+
+  /* Title-specific classes with tighter kerning */
+  .title, .title-large, .title-small {
+    font-family: var(--font-serif), serif !important;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .title-large {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  .title-small {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: -0.01em;
   }
 }
