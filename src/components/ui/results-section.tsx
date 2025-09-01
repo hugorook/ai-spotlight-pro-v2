@@ -479,7 +479,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     setShowSmartFix(!showSmartFix);
                   }}
                   disabled={isGenerating}
-                  className="px-3 py-1 text-xs bg-[#111E63] text-white rounded hover:opacity-90 transition-none flex items-center gap-1"
+                  className="px-3 py-1 text-xs button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none flex items-center gap-1"
                 >
                   <Wrench className="w-3 h-3" />
                   {isGenerating ? 'Generating...' : smartFix ? 'Show Fix' : 'Get Fix'}
@@ -501,7 +501,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                     <button
                       onClick={() => copyToClipboard(smartFix.code!)}
-                      className="mt-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
+                      className="mt-1 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
                     >
                       <Copy className="w-3 h-3" />
                       Copy Code
@@ -517,7 +517,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                     <button
                       onClick={() => copyToClipboard(smartFix.content!)}
-                      className="mt-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
+                      className="mt-1 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
                     >
                       <Copy className="w-3 h-3" />
                       Copy Content
@@ -549,12 +549,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           <div>
 
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-serif font-semibold tracking-tight">Results</h3>
+              <h3 className="page-title text-lg font-semibold tracking-tight">Results</h3>
               <div className="flex items-center gap-2">
                 {onExportCsv && (
                   <button
                     onClick={onExportCsv}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
+                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
                   >
                     <Download className="w-3 h-3" />
                     Export CSV
@@ -563,7 +563,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {onPrintReport && (
                   <button
                     onClick={onPrintReport}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
+                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
                   >
                     <Printer className="w-3 h-3" />
                     Print PDF
@@ -572,7 +572,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {onCopyResults && (
                   <button
                     onClick={onCopyResults}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs glass rounded-md hover:bg-[#111E63] hover:text-white transition-none"
+                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
                   >
                     <Copy className="w-3 h-3" />
                     Copy
@@ -620,7 +620,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         
                         {/* Position */}
                         {result.mentioned && result.position && (
-                          <span className="font-serif text-xs font-medium text-foreground">
+                          <span className="page-title text-xs font-medium">
                             #{result.position}
                           </span>
                         )}
@@ -633,7 +633,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         {/* Two Action Buttons */}
                         <button
                           onClick={() => handleOpenAnswerModal(result)}
-                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#9233EB] hover:text-white transition-colors rounded border border-gray-300"
+                          className="px-2 py-1 text-xs button-text bg-transparent hover:bg-[#5F209B] hover:text-white transition-colors rounded border border-gray-300"
                           title="See full answer"
                         >
                           See full answer
@@ -641,7 +641,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         
                         <button
                           onClick={() => handleOpenRecommendationsModal(result)}
-                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#9233EB] hover:text-white transition-colors rounded border border-gray-300"
+                          className="px-2 py-1 text-xs button-text bg-transparent hover:bg-[#5F209B] hover:text-white transition-colors rounded border border-gray-300"
                           title="View recommendations"
                         >
                           Recommendations
@@ -695,7 +695,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       }`}>
                         {opportunity.difficulty}
                       </span>
-                      <span className="px-3 py-1 text-xs bg-[#111E63] text-white rounded">
+                      <span className="px-3 py-1 text-xs bg-[#5F209B] text-white rounded">
                         {opportunity.difficulty} to implement
                       </span>
                     </div>
@@ -732,7 +732,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <h4 className="page-title text-sm font-semibold mb-2">Key Topics</h4>
                     <div className="flex flex-wrap gap-2">
                       {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-[#111E63] text-white rounded-full text-xs">
+                        <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
                           {topic}
                         </span>
                       ))}
@@ -747,7 +747,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <ul className="space-y-2">
                       {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
                         <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-2 h-2 bg-[#111E63] rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          <span className="w-2 h-2 bg-[#5F209B] rounded-full mt-2 mr-2 flex-shrink-0"></span>
                           {opportunity}
                         </li>
                       ))}
@@ -870,7 +870,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                               href={opportunity.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-block mt-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:opacity-90"
+                              className="inline-block mt-2 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90"
                             >
                               Visit Source
                             </a>
@@ -903,7 +903,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <h4 className="text-sm font-semibold mb-2 text-foreground">Key Industry Authorities</h4>
                     <div className="flex flex-wrap gap-2">
                       {authorityAnalysis.industryAuthorities.map((authority, index) => (
-                        <span key={index} className="px-2 py-1 bg-[#111E63] text-white rounded-full text-xs">
+                        <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
                           {authority}
                         </span>
                       ))}
@@ -976,7 +976,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               </div>
             ) : authorityLoading ? (
               <div className="glass p-6 rounded-lg text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <div className="animate-spin w-8 h-8 border-2 border-[#5F209B] border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-sm text-muted-foreground">Analyzing competitive authority landscape...</p>
                 <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
               </div>
@@ -990,7 +990,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <button
                   onClick={loadAuthorityAnalysis}
                   disabled={!company}
-                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                  className="px-4 py-2 button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
                 >
                   Start Authority Analysis
                 </button>
@@ -1203,7 +1203,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <ul className="space-y-2">
                       {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
                         <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-6 h-6 bg-[#111E63] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                          <span className="w-6 h-6 bg-[#5F209B] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
                             {index + 1}
                           </span>
                           {rec}
@@ -1215,7 +1215,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               </div>
             ) : benchmarkLoading ? (
               <div className="glass p-6 rounded-lg text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-[#111E63] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <div className="animate-spin w-8 h-8 border-2 border-[#5F209B] border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-sm text-muted-foreground">Analyzing industry benchmarks and competitive landscape...</p>
                 <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
               </div>
@@ -1229,7 +1229,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <button
                   onClick={loadIndustryBenchmark}
                   disabled={!company || results.length === 0}
-                  className="px-4 py-2 bg-[#111E63] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
+                  className="px-4 py-2 button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
                 >
                   {results.length === 0 ? 'Run Health Check First' : 'Analyze Benchmarks'}
                 </button>

@@ -62,7 +62,7 @@ const TopNavBar = () => {
                 <circle fill="white" cx="15" cy="9.5" r="0.5"/>
               </svg>
             </div>
-            <span className="text-lg font-serif font-semibold text-foreground tracking-tight">
+            <span className="page-title text-lg font-semibold tracking-tight">
               Ghost AI
             </span>
           </div>
@@ -81,7 +81,7 @@ const TopNavBar = () => {
                 )}
               >
                 <span className="nav-icon">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="nav-text">{item.label}</span>
               </button>
             ))}
           </nav>

@@ -59,7 +59,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
       />
       
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+      <div className="fixed inset-0 modal-container flex items-center justify-center p-6">
         <div className="bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-black/10">
@@ -69,7 +69,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                 <h2 className="modal-title text-xl font-semibold tracking-tight">
                   Recommendations
                 </h2>
-                <div className="flex items-center gap-2 text-sm text-black">
+                <div className="flex items-center gap-2 body-copy text-sm">
                   {getSentimentIcon(result.sentiment)}
                   <span className="capitalize">{result.sentiment}</span>
                   {result.mentioned && result.position && (
@@ -80,7 +80,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[#5F209B] hover:text-white transition-colors"
+              className="modal-close-button rounded-lg hover:bg-[#5F209B] hover:text-white transition-colors"
             >
               <X className="w-5 h-5 text-black" />
             </button>
@@ -106,7 +106,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Why you didn't rank:
                   </h4>
-                  <p className="body-copy text-sm leading-relaxed">
+                  <p className="body-copy leading-relaxed">
                     {result.failureAnalysis.primaryReason}
                   </p>
                 </div>
@@ -116,7 +116,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Quick Fix ({result.failureAnalysis.timeToFix}):
                   </h4>
-                  <p className="body-copy text-sm leading-relaxed">
+                  <p className="body-copy leading-relaxed">
                     {result.failureAnalysis.quickFix}
                   </p>
                 </div>
@@ -126,7 +126,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                   <h4 className="modal-title font-medium mb-2">
                     Expected Impact:
                   </h4>
-                  <p className="body-copy text-sm leading-relaxed">
+                  <p className="body-copy leading-relaxed">
                     {result.failureAnalysis.expectedImpact}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                     <h4 className="modal-title font-medium mb-2">
                       Competitor Insight:
                     </h4>
-                    <p className="body-copy text-sm leading-relaxed">
+                    <p className="body-copy leading-relaxed">
                       {result.failureAnalysis.competitorInsight}
                     </p>
                   </div>
@@ -165,7 +165,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                 <h4 className="modal-title font-medium mb-2">
                   Great Success!
                 </h4>
-                <p className="body-copy text-sm">
+                <p className="body-copy">
                   Your company was mentioned at position #{result.position} with {result.sentiment} sentiment.
                 </p>
               </div>
@@ -175,7 +175,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                 <h4 className="modal-title font-medium mb-2">
                   Not Mentioned
                 </h4>
-                <p className="body-copy text-sm">
+                <p className="body-copy">
                   Your company was not mentioned in the AI response. Consider optimizing your content for this query.
                 </p>
               </div>

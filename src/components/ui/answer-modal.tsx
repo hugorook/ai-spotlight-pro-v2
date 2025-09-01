@@ -46,7 +46,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
       />
       
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+      <div className="fixed inset-0 modal-container flex items-center justify-center p-6">
         <div className="bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-black/10">
@@ -56,7 +56,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
                 <h2 className="modal-title text-xl font-semibold tracking-tight">
                   Full AI Response
                 </h2>
-                <div className="flex items-center gap-2 text-sm text-black">
+                <div className="flex items-center gap-2 body-copy text-sm">
                   {getSentimentIcon(result.sentiment)}
                   <span className="capitalize">{result.sentiment}</span>
                   {result.mentioned && result.position && (
@@ -67,7 +67,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[#5F209B] hover:text-white transition-colors"
+              className="modal-close-button rounded-lg hover:bg-[#5F209B] hover:text-white transition-colors"
             >
               <X className="w-5 h-5 text-black" />
             </button>
@@ -92,7 +92,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
               </h3>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 {result.response ? (
-                  <div className="body-copy text-sm leading-relaxed">
+                  <div className="body-copy leading-relaxed">
                     {result.response.split('\n').map((paragraph, index) => (
                       <p key={index} className="mb-3 last:mb-0">
                         {paragraph}
@@ -100,12 +100,12 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
                     ))}
                   </div>
                 ) : result.context ? (
-                  <div className="body-copy text-sm leading-relaxed">
+                  <div className="body-copy leading-relaxed">
                     <p className="mb-3"><strong>Context where mentioned:</strong></p>
                     <p>{result.context}</p>
                   </div>
                 ) : (
-                  <p className="body-copy text-sm">
+                  <p className="body-copy">
                     No detailed response available
                   </p>
                 )}

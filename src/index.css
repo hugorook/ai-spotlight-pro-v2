@@ -133,6 +133,25 @@
     color: #000000;
   }
   
+  /* Consistent off-grey styling for all cards and elements */
+  .authority-card, .benchmark-card, .analysis-card, .info-card {
+    background: var(--gradient-subtle-grey) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #000000 !important;
+  }
+  
+  /* All status dots and indicators use subtle grey */
+  .status-dot, .indicator-dot {
+    background: rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* All badges use consistent off-grey styling */
+  .info-badge, .status-badge, .priority-badge {
+    background: var(--gradient-subtle-grey) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
   button:hover, button:focus, button:active {
     color: white !important;
   }
@@ -504,6 +523,20 @@
   /* Top nav bar border separator */
   .top-nav-border {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Modal positioning above nav bar */
+  .modal-container {
+    z-index: 9999 !important;
+  }
+  
+  /* Modal close button styling */
+  .modal-close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
   }
   
   /* Sidebar flush to top nav */

@@ -38,7 +38,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
           )}
         >
           <Play className="sidebar-icon w-4 h-4" />
-          {isRunning ? 'Running...' : 'Run Health Check'}
+          <span className="sidebar-text">{isRunning ? 'Running...' : 'Run Health Check'}</span>
         </button>
 
         {/* Health Check Tabs */}
@@ -58,7 +58,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
                 <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
                   <tab.icon className="sidebar-icon w-4 h-4" />
                 </div>
-                <span className="flex-1 text-left">{tab.label}</span>
+                <span className="sidebar-text flex-1 text-left">{tab.label}</span>
               </button>
             ))}
           </div>
