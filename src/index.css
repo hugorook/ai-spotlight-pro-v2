@@ -550,9 +550,28 @@
   .section-title {
     text-align: right;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-end;
-    padding-top: 1rem; /* Align with content box padding */
+    height: 100%; /* Take full height to center with content */
+  }
+  
+  /* Two-column layout container for perfect alignment */
+  .section-container {
+    display: grid;
+    grid-template-columns: 12rem 1fr; /* 192px (w-48) + remaining space */
+    gap: 1.5rem; /* 24px (gap-6) */
+    align-items: center; /* Vertically center both columns */
+  }
+  
+  /* Content box wrapper for consistent structure */
+  .content-box {
+    width: 100%;
+  }
+  
+  /* Ensure content boxes have consistent structure for alignment */
+  .content-box-wrapper {
+    display: flex;
+    flex-direction: column;
   }
   
   .modal-text {

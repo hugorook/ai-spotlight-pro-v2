@@ -650,11 +650,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {websiteAnalysis ? (
               <div className="space-y-6">
                 {/* Content Summary */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">Content Summary</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <p className="body-copy text-sm leading-relaxed">
                         {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
@@ -665,11 +665,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Key Topics */}
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Key Topics</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="flex flex-wrap gap-2">
                           {websiteAnalysis.analysis.keyTopics.map((topic: string, index: number) => (
@@ -685,11 +685,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* AI Optimization Opportunities */}
                 {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">AI Optimization Opportunities</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
@@ -706,11 +706,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Content Gaps */}
                 {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Content Gaps</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
@@ -727,11 +727,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Recommendations */}
                 {websiteAnalysis.analysis?.recommendations?.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Recommendations</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
@@ -775,11 +775,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {authorityAnalysis ? (
               <div className="space-y-6">
                 {/* Authority Overview */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">Authority Overview</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="glass p-4 rounded-lg">
                         <div className="flex items-center gap-3">
@@ -815,11 +815,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
 
                 {/* Quick Action Plan */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">30-Day Action Plan</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <div className="space-y-3">
                         {authorityAnalysis.actionPlan.immediate.map((opportunity, index) => (
@@ -863,11 +863,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Industry Authority Sources */}
                 {authorityAnalysis.industryAuthorities.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Key Industry Authorities</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="flex flex-wrap gap-2">
                           {authorityAnalysis.industryAuthorities.map((authority, index) => (
@@ -883,11 +883,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Competitive Mentions */}
                 {authorityAnalysis.competitorMentions.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">How Competitors Get Mentioned</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="space-y-3">
                           {authorityAnalysis.competitorMentions.map((mention, index) => (
@@ -910,11 +910,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 )}
 
                 {/* All Authority Opportunities */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">All Authority Building Opportunities</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <div className="space-y-3">
                         {authorityAnalysis.authorityOpportunities.map((opportunity, index) => (
@@ -968,11 +968,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {industryBenchmark ? (
               <div className="space-y-6">
                 {/* Performance Analysis Overview */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">Performance Analysis Overview</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="glass p-4 rounded-lg">
                         <div className="flex items-center gap-3">
@@ -1016,11 +1016,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
 
                 {/* Industry Comparison */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">Industry Comparison</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="p-3 glass rounded-lg">
@@ -1044,11 +1044,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 </div>
 
                 {/* Gap Analysis */}
-                <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 section-title">
+                <div className="section-container">
+                  <div className="section-title">
                     <h4 className="page-title text-2xl font-bold">Gap Analysis</h4>
                   </div>
-                  <div className="flex-1">
+                  <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="glass p-4 rounded-lg">
                         <h4 className="text-sm font-semibold mb-3 text-foreground">Performance Gaps</h4>
@@ -1083,11 +1083,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Industry Leaders */}
                 {(industryBenchmark.competitiveLandscape.leaders.length > 0 || industryBenchmark.competitiveLandscape.emerging.length > 0) && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Industry Leaders</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         {industryBenchmark.competitiveLandscape.leaders.length > 0 && (
                           <div className="mb-4">
@@ -1139,11 +1139,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Strategic Insights */}
                 {industryBenchmark.actionableInsights.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
+                  <div className="section-container">
+                    <div className="section-title">
                       <h4 className="page-title text-2xl font-bold">Strategic Insights</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="space-y-3">
                           {industryBenchmark.actionableInsights.map((insight, index) => (
