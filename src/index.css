@@ -550,9 +550,9 @@
   .section-title {
     text-align: right;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-end;
-    min-height: 100px; /* Ensure consistent height for alignment */
+    padding-top: 1rem; /* Align with content box padding */
   }
   
   .modal-text {

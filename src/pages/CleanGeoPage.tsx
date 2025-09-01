@@ -982,6 +982,10 @@ export default function CleanGeoPage() {
   const [strategyError, setStrategyError] = useState<string | null>(null);
   const [showResultsSection, setShowResultsSection] = useState(false);
   const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null);
+  
+  // Authority and benchmark analysis data state
+  const [authorityAnalysis, setAuthorityAnalysis] = useState<any>(null);
+  const [industryBenchmark, setIndustryBenchmark] = useState<any>(null);
 
   // On mount, load any persisted last run
   useEffect(() => {
@@ -1646,8 +1650,8 @@ export default function CleanGeoPage() {
       });
 
       if (!error && data?.analysis) {
-        // Authority analysis will be handled by ResultsSection component
-        console.log('Authority analysis completed');
+        setAuthorityAnalysis(data.analysis);
+        console.log('Authority analysis completed:', data.analysis);
       }
     } catch (error) {
       console.error('Error loading authority analysis:', error);
@@ -1675,8 +1679,8 @@ export default function CleanGeoPage() {
       });
 
       if (!error && data?.benchmark) {
-        // Industry benchmark will be handled by ResultsSection component
-        console.log('Industry benchmarking completed');
+        setIndustryBenchmark(data.benchmark);
+        console.log('Industry benchmarking completed:', data.benchmark);
       }
     } catch (error) {
       console.error('Error loading industry benchmark:', error);
@@ -1895,6 +1899,8 @@ export default function CleanGeoPage() {
             onCopyResults={copyGeoResultsToClipboard}
             websiteAnalysis={websiteAnalysis}
             trendingOpportunities={trendingOpportunities}
+            authorityAnalysis={authorityAnalysis}
+            industryBenchmark={industryBenchmark}
             activeTab={healthCheckTab}
             onTabChange={setHealthCheckTab}
           />

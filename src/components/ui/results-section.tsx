@@ -141,6 +141,8 @@ interface ResultsSectionProps {
   onCopyResults?: () => void;
   websiteAnalysis?: any;
   trendingOpportunities?: TrendingOpportunity[];
+  authorityAnalysis?: any;
+  industryBenchmark?: any;
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
 }
@@ -159,6 +161,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onCopyResults,
   websiteAnalysis,
   trendingOpportunities = [],
+  authorityAnalysis: externalAuthorityAnalysis,
+  industryBenchmark: externalIndustryBenchmark,
   activeTab: externalActiveTab,
   onTabChange: externalOnTabChange
 }) => {
@@ -172,10 +176,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [cmsDetection, setCmsDetection] = useState<CMSDetection | null>(null);
   const [smartFixes, setSmartFixes] = useState<{ [key: string]: SmartFix }>({});
   const [generatingFix, setGeneratingFix] = useState<string | null>(null);
-  const [authorityAnalysis, setAuthorityAnalysis] = useState<CompetitiveAuthorityAnalysis | null>(null);
-  const [authorityLoading, setAuthorityLoading] = useState(false);
-  const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
-  const [benchmarkLoading, setBenchmarkLoading] = useState(false);
+  // Use external authority and benchmark data from props
+  const authorityAnalysis = externalAuthorityAnalysis;
+  const industryBenchmark = externalIndustryBenchmark;
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
   const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
   const [isRecommendationsModalOpen, setIsRecommendationsModalOpen] = useState(false);
@@ -204,14 +207,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   }, [company?.website_url]);
 
-  // Note: Authority and benchmark analyses are now only loaded when 
-  // the health check button is clicked, not automatically when results change
-
-  // Reset analyses when results change (new test run)
-  useEffect(() => {
-    setAuthorityAnalysis(null);
-    setIndustryBenchmark(null);
-  }, [results]);
+  // Note: Authority and benchmark analyses are now loaded during health check
+  // and passed as props from CleanGeoPage
 
   const detectWebsiteCMS = async (url: string) => {
     try {
@@ -228,60 +225,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   };
 
-  const loadAuthorityAnalysis = async () => {
-    if (!company || authorityLoading || authorityAnalysis) return;
-    
-    setAuthorityLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('analyze-competitive-authority', {
-        body: {
-          companyName: company.company_name,
-          industry: company.industry,
-          keyDifferentiators: company.key_differentiators
-        }
-      });
-
-      if (!error && data?.analysis) {
-        setAuthorityAnalysis(data.analysis);
-        console.log('Authority analysis completed:', data.analysis);
-      }
-    } catch (error) {
-      console.error('Error loading authority analysis:', error);
-    } finally {
-      setAuthorityLoading(false);
-    }
-  };
-
-
-  const loadIndustryBenchmark = async () => {
-    if (!company || benchmarkLoading || !results.length) return;
-    
-    setBenchmarkLoading(true);
-    try {
-      const mentionRate = results.length > 0 ? Math.round((results.filter(r => r.mentioned).length / results.length) * 100) : 0;
-      const avgPosition = results.filter(r => r.mentioned).length > 0 
-        ? Math.round(results.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / results.filter(r => r.mentioned).length)
-        : 0;
-
-      const { data, error } = await supabase.functions.invoke('industry-benchmarking', {
-        body: {
-          industry: company.industry,
-          companyName: company.company_name,
-          currentMentionRate: mentionRate,
-          currentAvgPosition: avgPosition
-        }
-      });
-
-      if (!error && data?.benchmark) {
-        setIndustryBenchmark(data.benchmark);
-        console.log('Industry benchmarking completed:', data.benchmark);
-      }
-    } catch (error) {
-      console.error('Error loading industry benchmark:', error);
-    } finally {
-      setBenchmarkLoading(false);
-    }
-  };
 
   const toggleResultExpansion = (index: number) => {
     const newExpanded = new Set(expandedResults);
@@ -1006,12 +949,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   </div>
                 </div>
               </div>
-            ) : authorityLoading ? (
-              <div className="glass p-6 rounded-lg text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-[#5F209B] border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-sm text-muted-foreground">Analyzing competitive authority landscape...</p>
-                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
-              </div>
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -1257,12 +1194,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                   </div>
                 )}
-              </div>
-            ) : benchmarkLoading ? (
-              <div className="glass p-6 rounded-lg text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-[#5F209B] border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-sm text-muted-foreground">Analyzing industry benchmarks and competitive landscape...</p>
-                <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
               </div>
             ) : (
               <div className="glass p-6 rounded-lg text-center">
