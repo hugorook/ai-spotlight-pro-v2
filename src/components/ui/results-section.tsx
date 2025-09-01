@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Download, Printer, Copy, Plus, Minus, Globe, Code, Eye, Wrench, Award, Users, Clock, ArrowUp, ArrowDown, Minus as MinusIcon, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import ResultDetailsModal from './result-details-modal';
 
 interface TestResult {
   prompt: string;
@@ -174,6 +175,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const [authorityLoading, setAuthorityLoading] = useState(false);
   const [industryBenchmark, setIndustryBenchmark] = useState<IndustryBenchmark | null>(null);
   const [benchmarkLoading, setBenchmarkLoading] = useState(false);
+  const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Persist active tab in localStorage (only when using internal state)
   useEffect(() => {
@@ -305,6 +308,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     if (!externalOnTabChange) {
       localStorage.setItem('activeResultsTab', tabId);
     }
+  };
+
+  const handleOpenModal = (result: TestResult) => {
+    setSelectedResult(result);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedResult(null);
   };
 
   const handleGenerateFix = async (result: TestResult, fixType: 'faq' | 'content' | 'schema' | 'authority') => {
@@ -524,7 +537,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           <div>
 
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Detailed Results</h3>
+              <h3 className="text-lg font-serif font-semibold tracking-tight">Results</h3>
               <div className="flex items-center gap-2">
                 {onExportCsv && (
                   <button
@@ -557,97 +570,68 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             </div>
 
 
-            {/* Detailed Results */}
-            <div className="space-y-3">
-              {results.slice(0, showAllResults ? results.length : 5).map((result, index) => {
-                const isExpanded = expandedResults.has(index);
+            {/* Simplified Results List */}
+            <div className="space-y-2">
+              {results.map((result, index) => {
+                const displaySummary = result.context || 
+                  (result.response && result.response.length > 100 ? result.response.slice(0, 100) + '...' : result.response) ||
+                  'No summary available';
                 
-                // Determine what content we have available
-                const fullResponse = result.response || result.context || '';
-                const contextSummary = result.context || '';
-                
-                // If we have a full response but no separate context, create a summary
-                const displayContext = contextSummary || 
-                  (fullResponse.length > 150 ? fullResponse.slice(0, 150) + '...' : fullResponse) ||
-                  'No context available';
-                
-                // Show plus button if we have any content at all (for testing purposes)
-                const hasExpandableContent = fullResponse.length > 0;
-                
+                const getSentimentIcon = () => {
+                  switch (result.sentiment) {
+                    case 'positive':
+                      return <CheckCircle className="w-4 h-4 text-green-600" />;
+                    case 'negative':
+                      return <MinusIcon className="w-4 h-4 text-red-600" />;
+                    default:
+                      return <Minus className="w-4 h-4 text-yellow-600" />;
+                  }
+                };
+
                 return (
-                  <div key={index} className="p-3 glass rounded-lg">
-                    <div className="flex items-start justify-between">
+                  <div key={index} className="p-4 glass rounded-lg hover:bg-white/10 transition-colors">
+                    <div className="flex items-center justify-between">
                       <div className="flex-1 mr-4">
-                        <div className="font-bold text-foreground">
+                        <div className="font-serif font-medium text-foreground mb-1">
                           {result.prompt}
-                          <div className="text-sm text-muted-foreground break-words font-normal leading-tight">
-                            <strong>Summary:</strong> {displayContext}
-                          </div>
+                        </div>
+                        <div className="body-copy text-sm text-muted-foreground leading-relaxed">
+                          {displaySummary}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 flex-shrink-0">
+                      
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        {/* Status Dot */}
                         <div className={`w-3 h-3 rounded-full ${
                           result.mentioned ? 'bg-green-500' : 'bg-red-500'
                         }`}></div>
-                        {result.mentioned && (
-                          <span className="text-sm font-medium text-foreground">
+                        
+                        {/* Position */}
+                        {result.mentioned && result.position && (
+                          <span className="font-serif text-sm font-medium text-foreground">
                             #{result.position}
                           </span>
                         )}
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          result.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
-                          result.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {result.sentiment}
-                        </span>
-                        {hasExpandableContent && (
-                          <button
-                            onClick={() => toggleResultExpansion(index)}
-                            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#111E63] hover:text-white transition-none"
-                            title={isExpanded ? 'Hide full AI response' : 'View full AI response'}
-                          >
-                            {isExpanded ? (
-                              <Minus className="w-4 h-4 text-muted-foreground" />
-                            ) : (
-                              <Plus className="w-4 h-4 text-muted-foreground" />
-                            )}
-                          </button>
-                        )}
+                        
+                        {/* Sentiment Icon */}
+                        <div className="flex items-center">
+                          {getSentimentIcon()}
+                        </div>
+                        
+                        {/* Plus Button */}
+                        <button
+                          onClick={() => handleOpenModal(result)}
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors"
+                          title="View details"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    
-                    {/* Show full AI response when expanded */}
-                    {isExpanded && hasExpandableContent && (
-                      <div className="text-sm text-foreground break-words bg-white/10 p-3 rounded border-l-4 border-[#111E63]">
-                        <strong className="text-[#111E63]">Full AI Response:</strong>
-                        <div className="mt-2 whitespace-pre-wrap">{fullResponse}</div>
-                      </div>
-                    )}
-
-                    {/* Show failure analysis for non-mentioned or low-ranking results */}
-                    {result.failureAnalysis && (
-                      <FailureAnalysisCard 
-                        result={result}
-                        company={company}
-                        onGenerateFix={(fixType) => handleGenerateFix(result, fixType)}
-                      />
-                    )}
                   </div>
                 );
               })}
             </div>
-            
-            {results.length > 5 && (
-              <div className="mt-4 text-center">
-                <button 
-                  onClick={() => setShowAllResults(!showAllResults)}
-                  className="text-sm text-muted-foreground hover:bg-[#111E63] hover:text-white px-2 py-1 rounded transition-none"
-                >
-                  {showAllResults ? 'Show less ↑' : `View all ${results.length} results →`}
-                </button>
-              </div>
-            )}
           </div>
         )}
 
@@ -1234,6 +1218,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           </div>
         )}
       </div>
+
+      {/* Result Details Modal */}
+      <ResultDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        result={selectedResult}
+      />
     </div>
   );
 };

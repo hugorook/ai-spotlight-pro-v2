@@ -98,8 +98,8 @@
     min-height: 100vh;
   }
 
-  /* Use Inter for body text */
-  * { font-family: var(--font-sans), sans-serif; }
+  /* Use Playfair Display for most text */
+  * { font-family: var(--font-serif), serif; }
   
   /* Headers use Playfair Display with tighter kerning */
   h1, h2, h3, h4, h5, h6, .heading {
@@ -109,9 +109,16 @@
     color: #111E63;
   }
   
-  /* Body text uses Inter */
-  p, span, div, a, li, button {
+  /* Only body copy uses Inter - paragraphs and long content */
+  .body-copy, .prose p, .content p {
     font-family: var(--font-sans), sans-serif;
+    font-weight: 400;
+    color: #111E63;
+  }
+  
+  /* Most UI elements use Playfair Display */
+  p, span, div, a, li, button, label {
+    font-family: var(--font-serif), serif;
     font-weight: 400;
     color: #111E63;
   }

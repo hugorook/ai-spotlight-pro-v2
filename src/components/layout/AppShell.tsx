@@ -35,7 +35,6 @@ export default function AppShell({
   isRunning = false
 }: AppShellProps) {
   const location = useLocation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const segments = useMemo(() => {
     const parts = location.pathname.split("/").filter(Boolean);
@@ -60,19 +59,11 @@ export default function AppShell({
           onTabChange={onTabChange}
           onRunHealthCheck={onRunHealthCheck}
           isRunning={isRunning}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={setSidebarCollapsed}
         />
       )}
       
       {/* Main Content Area */}
-      <div className={`flex flex-col pt-20 transition-all duration-300 ${
-        showHealthCheckSidebar 
-          ? sidebarCollapsed 
-            ? 'ml-16' 
-            : 'ml-64' 
-          : ''
-      }`}>
+      <div className={`flex flex-col pt-20 ${showHealthCheckSidebar ? 'ml-64' : ''}`}>
         <div className="flex-1 px-6 py-4">
           {children}
         </div>
