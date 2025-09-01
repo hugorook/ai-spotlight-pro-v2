@@ -604,7 +604,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   <div key={index} className="p-3 glass rounded-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 mr-4">
-                        <div className="font-serif font-medium text-foreground mb-1 text-sm">
+                        <div className="prompt-text mb-1 text-sm">
                           {result.prompt}
                         </div>
                         <div className="body-copy text-xs text-muted-foreground leading-tight">
