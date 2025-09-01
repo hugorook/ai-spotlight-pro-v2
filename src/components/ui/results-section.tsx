@@ -479,8 +479,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         {activeTab === 'results' && (
           <div>
 
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="page-title text-lg font-semibold tracking-tight">Results</h3>
+            <div className="flex items-center justify-end mb-4">
               <div className="flex items-center gap-2">
                 {onExportCsv && (
                   <button
@@ -589,12 +588,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'trending' && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Trending Opportunities</h3>
-              <div className="text-xs text-muted-foreground">
-                Get ahead of competitors with these emerging trends
-              </div>
-            </div>
             
             {trendingOpportunities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -645,7 +638,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'website' && (
           <div>
-            <h3 className="page-title text-lg font-semibold mb-6">Website Analysis</h3>
             
             {websiteAnalysis ? (
               <div className="space-y-6">
@@ -770,7 +762,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'authority' && (
           <div>
-            <h3 className="page-title text-lg font-semibold mb-6">Authority</h3>
             
             {authorityAnalysis ? (
               <div className="space-y-6">
@@ -963,7 +954,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'benchmark' && (
           <div>
-            <h3 className="page-title text-lg font-semibold mb-6">Benchmark</h3>
             
             {industryBenchmark ? (
               <div className="space-y-6">
