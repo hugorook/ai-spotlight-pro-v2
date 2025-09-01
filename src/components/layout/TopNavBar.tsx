@@ -53,7 +53,7 @@ const TopNavBar = () => {
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
               <svg 
-                className="w-6 h-6 text-[#9233EB]" 
+                className="w-6 h-6 text-[#5F209B]" 
                 viewBox="0 0 24 24" 
                 fill="currentColor"
               >
@@ -74,10 +74,10 @@ const TopNavBar = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                  "nav-button flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
                   isActive(item.path)
-                    ? "bg-[#F9FBFD] text-foreground"
-                    : "text-foreground hover:text-white hover:bg-[#9233EB]"
+                    ? "bg-[#E7F0F6] text-foreground"
+                    : "text-foreground hover:text-white hover:bg-[#5F209B]"
                 )}
               >
                 {item.icon}
@@ -92,7 +92,7 @@ const TopNavBar = () => {
           {user && (
             <button
               onClick={() => navigate('/settings')}
-              className="w-8 h-8 rounded-full bg-[#F9FBFD] hover:bg-[#9233EB] text-foreground hover:text-white flex items-center justify-center text-sm font-medium transition-colors"
+              className="w-8 h-8 rounded-full bg-[#E7F0F6] hover:bg-[#5F209B] text-foreground hover:text-white flex items-center justify-center text-sm font-medium transition-colors"
               title="Settings"
             >
               {getUserInitials(user.email || 'User')}

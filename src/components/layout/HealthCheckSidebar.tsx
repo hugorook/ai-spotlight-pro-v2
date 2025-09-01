@@ -24,7 +24,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
   ];
 
   return (
-    <div className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 z-[100] glass-strong backdrop-blur-xl border-r border-white/20">
+    <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl sidebar-flush">
       <div className="h-full flex flex-col p-4">
         {/* Run Health Check Button */}
         <button
@@ -34,7 +34,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
             "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-colors mb-6",
             isRunning 
               ? "bg-gray-400 text-white cursor-not-allowed"
-              : "bg-transparent text-foreground hover:bg-[#9233EB] hover:text-white border border-gray-300"
+              : "sidebar-button text-foreground hover:bg-[#5F209B] hover:text-white"
           )}
         >
           <Play className="w-4 h-4" />
@@ -51,8 +51,8 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
                 className={cn(
                   "w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors",
                   activeTab === tab.id 
-                    ? 'bg-[#F9FBFD] text-foreground' 
-                    : 'bg-transparent text-foreground hover:bg-[#9233EB] hover:text-white'
+                    ? 'bg-[#E7F0F6] text-foreground' 
+                    : 'sidebar-button text-foreground hover:bg-[#5F209B] hover:text-white'
                 )}
               >
                 <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">

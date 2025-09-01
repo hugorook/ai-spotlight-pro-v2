@@ -60,13 +60,13 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-        <div className="bg-gray-100/90 backdrop-blur-xl border border-black/20 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
+        <div className="bg-[#E7F0F6]/90 backdrop-blur-xl border border-black/20 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-black/10">
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="text-xl font-serif font-semibold text-black tracking-tight">
+                <h2 className="modal-title text-xl font-semibold tracking-tight">
                   Recommendations
                 </h2>
                 <div className="flex items-center gap-2 text-sm text-black">
@@ -80,7 +80,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#5F209B] hover:text-white transition-colors"
             >
               <X className="w-5 h-5 text-black" />
             </button>
@@ -90,11 +90,11 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
             {/* Prompt Context */}
             <div className="mb-6">
-              <h3 className="text-lg font-serif font-medium text-black mb-3 tracking-tight">
+              <h3 className="modal-title text-lg font-medium mb-3 tracking-tight">
                 Query Context
               </h3>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                <p className="font-serif text-black text-sm">{result.prompt}</p>
+                <p className="prompt-text text-sm">{result.prompt}</p>
               </div>
             </div>
 

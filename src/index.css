@@ -26,24 +26,24 @@
     --background: 255 255 255; /* #FFFFFF */
     --foreground: 0 0 0; /* #000000 */
 
-    --card: 249 251 253; /* #F9FBFD - Off grey boxes */
+    --card: 231 240 246; /* #E7F0F6 - Slightly greyer boxes */
     --card-foreground: 0 0 0;
 
-    --popover: 249 251 253;
+    --popover: 231 240 246;
     --popover-foreground: 0 0 0;
 
-    /* Primary color for buttons - purple */
-    --primary: 146 51 235; /* #9233EB */
+    /* Primary color for buttons - darker purple */
+    --primary: 95 32 155; /* #5F209B */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 146 51 235;
+    --primary-glow: 95 32 155;
 
-    --secondary: 249 251 253;
+    --secondary: 231 240 246;
     --secondary-foreground: 0 0 0;
 
     --muted: 240 5% 84%;
     --muted-foreground: 0 0 0;
 
-    --accent: 249 251 253;
+    --accent: 231 240 246;
     --accent-foreground: 0 0 0;
 
     --destructive: 0 84% 60%;
@@ -61,10 +61,10 @@
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Design tokens updated for purple theme */
-    --gradient-ai: #9233EB; /* Purple instead of navy */
-    --gradient-subtle-grey: #F9FBFD;
+    --gradient-ai: #5F209B; /* Darker purple instead of navy */
+    --gradient-subtle-grey: #E7F0F6;
     --shadow-glass: none;
-    --shadow-glass-hover: 0 4px 20px rgba(31, 38, 135, 0.15);
+    --shadow-glass-hover: none;
     --blur-glass: blur(8px);
     
     /* Performance indicators */
@@ -98,29 +98,39 @@
     min-height: 100vh;
   }
 
-  /* Use Playfair Display for most text */
-  * { font-family: var(--font-serif), serif; }
+  /* Use Inter for most text (body) */
+  * { font-family: var(--font-sans), sans-serif; }
   
-  /* Headers use Playfair Display with tighter kerning */
+  /* Headers use Inter by default (will be overridden for specific elements) */
   h1, h2, h3, h4, h5, h6, .heading {
-    font-family: var(--font-serif), serif;
+    font-family: var(--font-sans), sans-serif;
     font-weight: 600;
-    letter-spacing: -0.02em;
     color: #000000;
   }
   
-  /* Only body copy uses Inter - paragraphs and long content */
-  .body-copy, .prose p, .content p {
+  /* Body copy uses Inter */
+  .body-copy, .prose p, .content p, p, span, div, a, li, label {
     font-family: var(--font-sans), sans-serif;
     font-weight: 400;
     color: #000000;
   }
   
-  /* Most UI elements use Playfair Display */
-  p, span, div, a, li, button, label {
+  /* Playfair Display for specific elements - purple color */
+  .playfair-title, .page-title, .prompt-text, .modal-title, .button-text {
     font-family: var(--font-serif), serif;
-    font-weight: 400;
-    color: #000000;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #5F209B;
+  }
+  
+  /* Buttons use Playfair Display and purple */
+  button {
+    font-family: var(--font-serif), serif;
+    color: #5F209B;
+  }
+  
+  button:hover, button:focus, button:active {
+    color: white !important;
   }
 
   /* Card styling with off-grey background and black border */
@@ -129,14 +139,14 @@
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
   }
 
   /* No hover effects on card containers */
   .bg-card:hover, .bg-popover:hover, .card:hover, .panel:hover, .box:hover {
     background: var(--gradient-subtle-grey) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
   }
 
   /* Special glassmorphism utility classes */
@@ -145,14 +155,14 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
 
   /* No hover effects on glass containers */
   .glass:hover {
     background: var(--gradient-subtle-grey);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
 
   .glass-strong {
@@ -160,13 +170,13 @@
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(0, 0, 0, 0.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
   }
 
   .glass-strong:hover {
     background: var(--gradient-subtle-grey);
     border: 1px solid rgba(0, 0, 0, 0.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
   }
 
   /* Remove hover effects from glass-strong containers */
@@ -178,7 +188,7 @@
 
   /* Purple background utilities */
   .bg-gradient-ai {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
   }
 
@@ -194,18 +204,18 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
 
   .glass-card:hover {
     background: var(--gradient-subtle-grey);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
 
   /* Purple accent classes */
   .gradient-accent {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
   }
 
@@ -222,9 +232,9 @@
   button:hover,
   button:focus,
   button:active {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
-    border-color: #9233EB !important;
+    border-color: #5F209B !important;
     box-shadow: none !important;
     transform: none !important;
     transition: none !important;
@@ -247,7 +257,7 @@
   }
 
   [role="tab"]:hover, .toggle:hover, .tab:hover {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
     box-shadow: none !important;
     transform: none !important;
@@ -266,7 +276,7 @@
   .hover\:bg-\[\#9233EB\]:focus,
   button[class*="hover:bg-[#9233EB]"]:hover,
   button[class*="hover:bg-[#9233EB]"]:focus {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
     transition: none !important;
   }
@@ -301,17 +311,17 @@
 
   input:focus, select:focus, textarea:focus {
     background: rgba(255, 255, 255, 0.3);
-    border-color: #9233EB;
-    box-shadow: 0 0 0 3px rgba(146, 51, 235, 0.1);
+    border-color: #5F209B;
+    box-shadow: 0 0 0 3px rgba(95, 32, 155, 0.1);
     transition: none !important;
   }
 
   /* Replace any leftover gradient utilities with purple */
-  .bg-\[\#BF5700\] { background: #9233EB !important; color: white !important; }
+  .bg-\[\#BF5700\] { background: #5F209B !important; color: white !important; }
   
   /* Ensure all gradient classes use purple */
   .bg-gradient-to-r, .bg-gradient-to-l, .bg-gradient-to-t, .bg-gradient-to-b {
-    background: #9233EB !important;
+    background: #5F209B !important;
     color: white !important;
   }
 
@@ -448,6 +458,27 @@
     fill: none !important;
     stroke: currentColor !important;
     stroke-width: 1.5 !important;
+  }
+
+  /* Sidebar and navigation buttons - no borders */
+  .sidebar-button, [role="tab"], .nav-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .sidebar-button:hover, [role="tab"]:hover, .nav-button:hover {
+    background: #5F209B !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Sidebar flush to top nav */
+  .sidebar-flush {
+    top: 0 !important;
+    height: 100vh !important;
+    padding-top: 5rem !important;
   }
 
   /* Font utility classes */
