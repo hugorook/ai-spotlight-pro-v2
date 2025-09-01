@@ -204,20 +204,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
   }, [company?.website_url]);
 
-  // Auto-load all analyses when results change (new health check)
-  useEffect(() => {
-    if (results.length > 0 && company) {
-      // Load authority analysis if not already loaded or if results changed
-      if (!authorityAnalysis && !authorityLoading) {
-        loadAuthorityAnalysis();
-      }
-      
-      // Load industry benchmark if not already loaded or if results changed
-      if (!industryBenchmark && !benchmarkLoading) {
-        loadIndustryBenchmark();
-      }
-    }
-  }, [results.length, company]);
+  // Note: Authority and benchmark analyses are now only loaded when 
+  // the health check button is clicked, not automatically when results change
 
   // Reset analyses when results change (new test run)
   useEffect(() => {
@@ -983,17 +971,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-foreground mb-2">Authority Intelligence Analysis</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Discover where your competitors get mentioned and find specific opportunities to build authority in your industry.
+                <h4 className="page-title text-lg font-medium mb-2">Authority Intelligence Analysis</h4>
+                <p className="body-copy text-sm mb-4">
+                  Authority analysis will be performed automatically when you run a health check.
                 </p>
-                <button
-                  onClick={loadAuthorityAnalysis}
-                  disabled={!company}
-                  className="px-4 py-2 button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  Start Authority Analysis
-                </button>
               </div>
             )}
           </div>
@@ -1222,17 +1203,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-foreground mb-2">Industry Benchmarking Analysis</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Compare your AI visibility performance against industry leaders and identify strategic opportunities to outperform competitors.
+                <h4 className="page-title text-lg font-medium mb-2">Industry Benchmarking Analysis</h4>
+                <p className="body-copy text-sm mb-4">
+                  Industry benchmark analysis will be performed automatically when you run a health check.
                 </p>
-                <button
-                  onClick={loadIndustryBenchmark}
-                  disabled={!company || results.length === 0}
-                  className="px-4 py-2 button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none disabled:opacity-50"
-                >
-                  {results.length === 0 ? 'Run Health Check First' : 'Analyze Benchmarks'}
-                </button>
               </div>
             )}
           </div>

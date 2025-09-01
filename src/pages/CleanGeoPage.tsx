@@ -1481,6 +1481,10 @@ export default function CleanGeoPage() {
       // Get trending opportunities for this company
       await getTrendingOpportunities();
 
+      // Load authority analysis and industry benchmark
+      await loadAuthorityAnalysis();
+      await loadIndustryBenchmark();
+
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
       
@@ -1624,6 +1628,58 @@ export default function CleanGeoPage() {
       setStrategyError(e?.message || 'Failed to generate strategy');
     } finally {
       setStrategyLoading(false);
+    }
+  };
+
+  // Load authority analysis during health check
+  const loadAuthorityAnalysis = async () => {
+    if (!company) return;
+    
+    try {
+      console.log('Loading authority analysis for:', company.company_name);
+      const { data, error } = await supabase.functions.invoke('analyze-competitive-authority', {
+        body: {
+          companyName: company.company_name,
+          industry: company.industry,
+          keyDifferentiators: company.key_differentiators
+        }
+      });
+
+      if (!error && data?.analysis) {
+        // Authority analysis will be handled by ResultsSection component
+        console.log('Authority analysis completed');
+      }
+    } catch (error) {
+      console.error('Error loading authority analysis:', error);
+    }
+  };
+
+  // Load industry benchmark during health check  
+  const loadIndustryBenchmark = async () => {
+    if (!company || testResults.length === 0) return;
+    
+    try {
+      console.log('Loading industry benchmark for:', company.company_name);
+      const mentionRate = testResults.length > 0 ? Math.round((testResults.filter(r => r.mentioned).length / testResults.length) * 100) : 0;
+      const avgPosition = testResults.filter(r => r.mentioned).length > 0 
+        ? Math.round(testResults.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / testResults.filter(r => r.mentioned).length)
+        : 0;
+
+      const { data, error } = await supabase.functions.invoke('industry-benchmarking', {
+        body: {
+          industry: company.industry,
+          companyName: company.company_name,
+          currentMentionRate: mentionRate,
+          currentAvgPosition: avgPosition
+        }
+      });
+
+      if (!error && data?.benchmark) {
+        // Industry benchmark will be handled by ResultsSection component
+        console.log('Industry benchmarking completed');
+      }
+    } catch (error) {
+      console.error('Error loading industry benchmark:', error);
     }
   };
 
