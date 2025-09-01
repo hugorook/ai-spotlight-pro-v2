@@ -60,16 +60,16 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-        <div className="bg-gray-100/90 backdrop-blur-xl border border-gray-200/50 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
+        <div className="bg-gray-100/90 backdrop-blur-xl border border-black/20 w-full max-w-3xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+          <div className="flex items-center justify-between p-6 border-b border-black/10">
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="text-xl font-serif font-semibold text-gray-800 tracking-tight">
+                <h2 className="text-xl font-serif font-semibold text-black tracking-tight">
                   Recommendations
                 </h2>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-black">
                   {getSentimentIcon(result.sentiment)}
                   <span className="capitalize">{result.sentiment}</span>
                   {result.mentioned && result.position && (
@@ -82,7 +82,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-black" />
             </button>
           </div>
 
@@ -90,11 +90,11 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
             {/* Prompt Context */}
             <div className="mb-6">
-              <h3 className="text-lg font-serif font-medium text-gray-800 mb-3 tracking-tight">
+              <h3 className="text-lg font-serif font-medium text-black mb-3 tracking-tight">
                 Query Context
               </h3>
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                <p className="font-serif text-gray-800 text-sm">{result.prompt}</p>
+              <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                <p className="font-serif text-black text-sm">{result.prompt}</p>
               </div>
             </div>
 
@@ -102,42 +102,42 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             {result.failureAnalysis ? (
               <div className="space-y-4">
                 {/* Why you didn't rank */}
-                <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-gray-800 mb-2">
+                <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                  <h4 className="font-serif font-medium text-black mb-2">
                     Why you didn't rank:
                   </h4>
-                  <p className="body-copy text-sm text-gray-700 leading-relaxed">
+                  <p className="body-copy text-sm text-black leading-relaxed">
                     {result.failureAnalysis.primaryReason}
                   </p>
                 </div>
 
                 {/* Quick Fix */}
-                <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-gray-800 mb-2">
+                <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                  <h4 className="font-serif font-medium text-black mb-2">
                     Quick Fix ({result.failureAnalysis.timeToFix}):
                   </h4>
-                  <p className="body-copy text-sm text-gray-700 leading-relaxed">
+                  <p className="body-copy text-sm text-black leading-relaxed">
                     {result.failureAnalysis.quickFix}
                   </p>
                 </div>
 
                 {/* Expected Impact */}
-                <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-gray-800 mb-2">
+                <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                  <h4 className="font-serif font-medium text-black mb-2">
                     Expected Impact:
                   </h4>
-                  <p className="body-copy text-sm text-gray-700 leading-relaxed">
+                  <p className="body-copy text-sm text-black leading-relaxed">
                     {result.failureAnalysis.expectedImpact}
                   </p>
                 </div>
 
                 {/* Competitor Insight */}
                 {result.failureAnalysis.competitorInsight && (
-                  <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                    <h4 className="font-serif font-medium text-gray-800 mb-2">
+                  <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                    <h4 className="font-serif font-medium text-black mb-2">
                       Competitor Insight:
                     </h4>
-                    <p className="body-copy text-sm text-gray-700 leading-relaxed">
+                    <p className="body-copy text-sm text-black leading-relaxed">
                       {result.failureAnalysis.competitorInsight}
                     </p>
                   </div>
@@ -145,37 +145,37 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
 
                 {/* Difficulty & Category */}
                 <div className="flex gap-2">
-                  <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-3 rounded-lg flex-1 text-center">
-                    <div className="font-serif text-sm text-gray-800">Difficulty</div>
-                    <div className="text-xs text-gray-600 capitalize">
+                  <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-3 rounded-lg flex-1 text-center">
+                    <div className="font-serif text-sm text-black">Difficulty</div>
+                    <div className="text-xs text-black capitalize">
                       {result.failureAnalysis.difficulty}
                     </div>
                   </div>
-                  <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-3 rounded-lg flex-1 text-center">
-                    <div className="font-serif text-sm text-gray-800">Category</div>
-                    <div className="text-xs text-gray-600 capitalize">
+                  <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-3 rounded-lg flex-1 text-center">
+                    <div className="font-serif text-sm text-black">Category</div>
+                    <div className="text-xs text-black capitalize">
                       {result.failureAnalysis.category}
                     </div>
                   </div>
                 </div>
               </div>
             ) : result.mentioned ? (
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-6 rounded-lg text-center">
+              <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
-                <h4 className="font-serif font-medium text-gray-800 mb-2">
+                <h4 className="font-serif font-medium text-black mb-2">
                   Great Success!
                 </h4>
-                <p className="body-copy text-sm text-gray-700">
+                <p className="body-copy text-sm text-black">
                   Your company was mentioned at position #{result.position} with {result.sentiment} sentiment.
                 </p>
               </div>
             ) : (
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-6 rounded-lg text-center">
+              <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-                <h4 className="font-serif font-medium text-gray-800 mb-2">
+                <h4 className="font-serif font-medium text-black mb-2">
                   Not Mentioned
                 </h4>
-                <p className="body-copy text-sm text-gray-700">
+                <p className="body-copy text-sm text-black">
                   Your company was not mentioned in the AI response. Consider optimizing your content for this query.
                 </p>
               </div>

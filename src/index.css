@@ -22,29 +22,29 @@
 
 @layer base {
   :root {
-    /* New Design System: White background with navy text */
+    /* Updated Design System: White background with black text and purple accent */
     --background: 255 255 255; /* #FFFFFF */
-    --foreground: 218 61 39; /* #111E63 */
+    --foreground: 0 0 0; /* #000000 */
 
-    --card: 231 226 249; /* #E7E2F9 - Pink boxes */
-    --card-foreground: 218 61 39;
+    --card: 249 251 253; /* #F9FBFD - Off grey boxes */
+    --card-foreground: 0 0 0;
 
-    --popover: 231 226 249;
-    --popover-foreground: 218 61 39;
+    --popover: 249 251 253;
+    --popover-foreground: 0 0 0;
 
-    /* Primary color for buttons - navy */
-    --primary: 218 61 39; /* #111E63 */
+    /* Primary color for buttons - purple */
+    --primary: 146 51 235; /* #9233EB */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 218 61 39;
+    --primary-glow: 146 51 235;
 
-    --secondary: 249 224 249;
-    --secondary-foreground: 218 61 39;
+    --secondary: 249 251 253;
+    --secondary-foreground: 0 0 0;
 
     --muted: 240 5% 84%;
-    --muted-foreground: 218 30% 30%;
+    --muted-foreground: 0 0 0;
 
-    --accent: 249 224 249;
-    --accent-foreground: 218 61 39;
+    --accent: 249 251 253;
+    --accent-foreground: 0 0 0;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -60,9 +60,9 @@
     --font-serif: "Playfair Display", Georgia, serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    /* Design tokens updated for navy theme */
-    --gradient-ai: #111E63; /* Navy blue instead of gradient */
-    --gradient-subtle-purple: #E7E2F9;
+    /* Design tokens updated for purple theme */
+    --gradient-ai: #9233EB; /* Purple instead of navy */
+    --gradient-subtle-grey: #F9FBFD;
     --shadow-glass: none;
     --shadow-glass-hover: 0 4px 20px rgba(31, 38, 135, 0.15);
     --blur-glass: blur(8px);
@@ -94,7 +94,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased leading-relaxed;
     background: #FFFFFF;
-    color: #111E63;
+    color: #000000;
     min-height: 100vh;
   }
 
@@ -106,54 +106,67 @@
     font-family: var(--font-serif), serif;
     font-weight: 600;
     letter-spacing: -0.02em;
-    color: #111E63;
+    color: #000000;
   }
   
   /* Only body copy uses Inter - paragraphs and long content */
   .body-copy, .prose p, .content p {
     font-family: var(--font-sans), sans-serif;
     font-weight: 400;
-    color: #111E63;
+    color: #000000;
   }
   
   /* Most UI elements use Playfair Display */
   p, span, div, a, li, button, label {
     font-family: var(--font-serif), serif;
     font-weight: 400;
-    color: #111E63;
+    color: #000000;
   }
 
-  /* Glassmorphism card styling with faint purple gradient */
+  /* Card styling with off-grey background and black border */
   .bg-card, .bg-popover, .card, .panel, .box {
-    background: var(--gradient-subtle-purple) !important;
+    background: var(--gradient-subtle-grey) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(196, 181, 253, 0.2) !important;
-    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   }
 
-  /* Remove hover effects from card containers */
+  /* No hover effects on card containers */
+  .bg-card:hover, .bg-popover:hover, .card:hover, .panel:hover, .box:hover {
+    background: var(--gradient-subtle-grey) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  }
 
   /* Special glassmorphism utility classes */
   .glass {
-    background: var(--gradient-subtle-purple);
+    background: var(--gradient-subtle-grey);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(196, 181, 253, 0.2);
-    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
-  /* Remove hover effects from glass containers */
+  /* No hover effects on glass containers */
+  .glass:hover {
+    background: var(--gradient-subtle-grey);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
 
   .glass-strong {
-    background: linear-gradient(135deg, rgba(196, 181, 253, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%);
+    background: var(--gradient-subtle-grey);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(196, 181, 253, 0.25);
-    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-strong:hover {
+    background: var(--gradient-subtle-grey);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   /* Remove hover effects from glass-strong containers */
@@ -163,9 +176,9 @@
     box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1) !important;
   }
 
-  /* Navy blue background utilities */
+  /* Purple background utilities */
   .bg-gradient-ai {
-    background: #111E63 !important;
+    background: #9233EB !important;
     color: white !important;
   }
 
@@ -176,62 +189,65 @@
 
   /* Special glass effects for different elements */
   .glass-card {
-    background: var(--gradient-subtle-purple);
+    background: var(--gradient-subtle-grey);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(196, 181, 253, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
-  /* Remove hover effects from glass-card containers */
+  .glass-card:hover {
+    background: var(--gradient-subtle-grey);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
 
-  /* Navy accent classes */
+  /* Purple accent classes */
   .gradient-accent {
-    background: #111E63 !important;
+    background: #9233EB !important;
     color: white !important;
   }
 
-  /* New button styling with instant navy hover */
+  /* New button styling with instant purple hover */
   button {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #111E63;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    color: #000000;
     transition: none !important;
   }
   
   button:hover,
   button:focus,
   button:active {
-    background: #111E63 !important;
+    background: #9233EB !important;
     color: white !important;
-    border-color: #111E63 !important;
+    border-color: #9233EB !important;
     box-shadow: none !important;
     transform: none !important;
     transition: none !important;
   }
 
-  /* Force white text on any navy background */
+  /* Force white text on any purple background */
   button:hover *,
   button:focus *,
   button:active *,
-  .bg-\[\#111E63\]:hover *,
-  .hover\:bg-\[\#111E63\]:hover *,
-  [style*="background: #111E63"]:hover *,
-  [style*="background-color: #111E63"]:hover * {
+  .bg-\[\#9233EB\]:hover *,
+  .hover\:bg-\[\#9233EB\]:hover *,
+  [style*="background: #9233EB"]:hover *,
+  [style*="background-color: #9233EB"]:hover * {
     color: white !important;
   }
 
-  /* Instant navy hover for toggles and tabs */
+  /* Instant purple hover for toggles and tabs */
   [role="tab"], .toggle, .tab {
     transition: none !important;
   }
 
   [role="tab"]:hover, .toggle:hover, .tab:hover {
-    background: #111E63 !important;
+    background: #9233EB !important;
     color: white !important;
     box-shadow: none !important;
     transform: none !important;
@@ -246,23 +262,23 @@
   }
 
   /* Comprehensive hover rules for all interactive elements */
-  .hover\:bg-\[\#111E63\]:hover,
-  .hover\:bg-\[\#111E63\]:focus,
-  button[class*="hover:bg-[#111E63]"]:hover,
-  button[class*="hover:bg-[#111E63]"]:focus {
-    background: #111E63 !important;
+  .hover\:bg-\[\#9233EB\]:hover,
+  .hover\:bg-\[\#9233EB\]:focus,
+  button[class*="hover:bg-[#9233EB]"]:hover,
+  button[class*="hover:bg-[#9233EB]"]:focus {
+    background: #9233EB !important;
     color: white !important;
     transition: none !important;
   }
 
-  .hover\:bg-\[\#111E63\]:hover *,
-  .hover\:bg-\[\#111E63\]:focus *,
-  button[class*="hover:bg-[#111E63]"]:hover *,
-  button[class*="hover:bg-[#111E63]"]:focus *,
-  .hover\:bg-\[\#111E63\]:hover svg,
-  .hover\:bg-\[\#111E63\]:focus svg,
-  button[class*="hover:bg-[#111E63]"]:hover svg,
-  button[class*="hover:bg-[#111E63]"]:focus svg {
+  .hover\:bg-\[\#9233EB\]:hover *,
+  .hover\:bg-\[\#9233EB\]:focus *,
+  button[class*="hover:bg-[#9233EB]"]:hover *,
+  button[class*="hover:bg-[#9233EB]"]:focus *,
+  .hover\:bg-\[\#9233EB\]:hover svg,
+  .hover\:bg-\[\#9233EB\]:focus svg,
+  button[class*="hover:bg-[#9233EB]"]:hover svg,
+  button[class*="hover:bg-[#9233EB]"]:focus svg {
     color: white !important;
     fill: white !important;
     stroke: white !important;
@@ -273,29 +289,29 @@
     color: white !important;
   }
 
-  /* Input styling with navy colors */
+  /* Input styling with black text and purple focus */
   input, select, textarea {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #111E63;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    color: #000000;
     transition: none !important;
   }
 
   input:focus, select:focus, textarea:focus {
     background: rgba(255, 255, 255, 0.3);
-    border-color: #111E63;
-    box-shadow: 0 0 0 3px rgba(17, 30, 99, 0.1);
+    border-color: #9233EB;
+    box-shadow: 0 0 0 3px rgba(146, 51, 235, 0.1);
     transition: none !important;
   }
 
-  /* Replace any leftover gradient utilities with navy */
-  .bg-\[\#BF5700\] { background: #111E63 !important; color: white !important; }
+  /* Replace any leftover gradient utilities with purple */
+  .bg-\[\#BF5700\] { background: #9233EB !important; color: white !important; }
   
-  /* Ensure all gradient classes use navy */
+  /* Ensure all gradient classes use purple */
   .bg-gradient-to-r, .bg-gradient-to-l, .bg-gradient-to-t, .bg-gradient-to-b {
-    background: #111E63 !important;
+    background: #9233EB !important;
     color: white !important;
   }
 
@@ -411,12 +427,12 @@
     }
   }
 
-  /* IMPORTANT: Final catch-all rule for navy hover states */
-  *[class*="hover:bg-[#111E63]"]:hover,
-  *[class*="hover:bg-[#111E63]"]:hover *,
-  *[class*="hover:bg-[#111E63]"]:hover svg,
-  .bg-\[\#111E63\] *,
-  .bg-\[\#111E63\] svg {
+  /* IMPORTANT: Final catch-all rule for purple hover states */
+  *[class*="hover:bg-[#9233EB]"]:hover,
+  *[class*="hover:bg-[#9233EB]"]:hover *,
+  *[class*="hover:bg-[#9233EB]"]:hover svg,
+  .bg-\[\#9233EB\] *,
+  .bg-\[\#9233EB\] svg {
     color: white !important;
     fill: currentColor !important;
     stroke: currentColor !important;

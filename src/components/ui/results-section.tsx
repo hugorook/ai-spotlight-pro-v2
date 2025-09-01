@@ -601,7 +601,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 };
 
                 return (
-                  <div key={index} className="p-3 glass rounded-lg hover:bg-white/10 transition-colors">
+                  <div key={index} className="p-3 glass rounded-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 mr-4">
                         <div className="font-serif font-medium text-foreground mb-1 text-sm">
@@ -633,7 +633,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         {/* Two Action Buttons */}
                         <button
                           onClick={() => handleOpenAnswerModal(result)}
-                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors rounded border border-gray-300"
+                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#9233EB] hover:text-white transition-colors rounded border border-gray-300"
                           title="See full answer"
                         >
                           See full answer
@@ -641,7 +641,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         
                         <button
                           onClick={() => handleOpenRecommendationsModal(result)}
-                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#E7E2F9] hover:text-white transition-colors rounded border border-gray-300"
+                          className="px-2 py-1 text-xs font-serif bg-transparent hover:bg-[#9233EB] hover:text-white transition-colors rounded border border-gray-300"
                           title="View recommendations"
                         >
                           Recommendations

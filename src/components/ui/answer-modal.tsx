@@ -47,16 +47,16 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-        <div className="bg-gray-100/90 backdrop-blur-xl border border-gray-200/50 w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
+        <div className="bg-gray-100/90 backdrop-blur-xl border border-black/20 w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+          <div className="flex items-center justify-between p-6 border-b border-black/10">
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="text-xl font-serif font-semibold text-gray-800 tracking-tight">
+                <h2 className="text-xl font-serif font-semibold text-black tracking-tight">
                   Full AI Response
                 </h2>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-black">
                   {getSentimentIcon(result.sentiment)}
                   <span className="capitalize">{result.sentiment}</span>
                   {result.mentioned && result.position && (
@@ -69,7 +69,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-black" />
             </button>
           </div>
 
@@ -77,22 +77,22 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
             {/* Prompt */}
             <div className="mb-6">
-              <h3 className="text-lg font-serif font-medium text-gray-800 mb-3 tracking-tight">
+              <h3 className="text-lg font-serif font-medium text-black mb-3 tracking-tight">
                 Test Prompt
               </h3>
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
-                <p className="font-serif text-gray-800">{result.prompt}</p>
+              <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
+                <p className="font-serif text-black">{result.prompt}</p>
               </div>
             </div>
 
             {/* Full Response */}
             <div>
-              <h3 className="text-lg font-serif font-medium text-gray-800 mb-3 tracking-tight">
+              <h3 className="text-lg font-serif font-medium text-black mb-3 tracking-tight">
                 AI Response
               </h3>
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200/50 p-4 rounded-lg">
+              <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 {result.response ? (
-                  <div className="body-copy text-sm leading-relaxed text-gray-700">
+                  <div className="body-copy text-sm leading-relaxed text-black">
                     {result.response.split('\n').map((paragraph, index) => (
                       <p key={index} className="mb-3 last:mb-0">
                         {paragraph}
@@ -100,12 +100,12 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
                     ))}
                   </div>
                 ) : result.context ? (
-                  <div className="body-copy text-sm leading-relaxed text-gray-700">
+                  <div className="body-copy text-sm leading-relaxed text-black">
                     <p className="mb-3"><strong>Context where mentioned:</strong></p>
                     <p>{result.context}</p>
                   </div>
                 ) : (
-                  <p className="body-copy text-sm text-gray-500">
+                  <p className="body-copy text-sm text-black">
                     No detailed response available
                   </p>
                 )}

@@ -34,7 +34,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
             "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-colors mb-6",
             isRunning 
               ? "bg-gray-400 text-white cursor-not-allowed"
-              : "bg-transparent text-foreground hover:bg-[#E7E2F9] hover:text-white border border-gray-300"
+              : "bg-transparent text-foreground hover:bg-[#9233EB] hover:text-white border border-gray-300"
           )}
         >
           <Play className="w-4 h-4" />
@@ -51,8 +51,8 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
                 className={cn(
                   "w-full flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors",
                   activeTab === tab.id 
-                    ? 'bg-[#E7E2F9] text-foreground' 
-                    : 'bg-transparent text-foreground hover:bg-[#E7E2F9] hover:text-white'
+                    ? 'bg-[#F9FBFD] text-foreground' 
+                    : 'bg-transparent text-foreground hover:bg-[#9233EB] hover:text-white'
                 )}
               >
                 <div className="w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center">
