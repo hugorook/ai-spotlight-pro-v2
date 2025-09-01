@@ -98,25 +98,14 @@
     min-height: 100vh;
   }
 
-  /* Use Inter for most text (body) */
-  * { font-family: var(--font-sans), sans-serif; }
+  /* Playfair Display as default for most elements */
+  * { 
+    font-family: var(--font-serif), serif; 
+    color: #5F209B;
+  }
   
-  /* Headers use Inter by default (will be overridden for specific elements) */
+  /* All headers use Playfair Display and purple */
   h1, h2, h3, h4, h5, h6, .heading {
-    font-family: var(--font-sans), sans-serif;
-    font-weight: 600;
-    color: #000000;
-  }
-  
-  /* Body copy uses Inter */
-  .body-copy, .prose p, .content p, p, span, div, a, li, label {
-    font-family: var(--font-sans), sans-serif;
-    font-weight: 400;
-    color: #000000;
-  }
-  
-  /* Playfair Display for specific elements - purple color */
-  .playfair-title, .page-title, .prompt-text, .modal-title, .button-text {
     font-family: var(--font-serif), serif;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -127,6 +116,21 @@
   button {
     font-family: var(--font-serif), serif;
     color: #5F209B;
+  }
+  
+  /* Labels, navigation, and important UI text use Playfair Display */
+  label, .nav-text, .tab-text, .page-title, .prompt-text, .modal-title {
+    font-family: var(--font-serif), serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #5F209B;
+  }
+  
+  /* Only body copy and summaries use Inter with black text */
+  .body-copy, .summary-text, .response-text, p.content {
+    font-family: var(--font-sans), sans-serif;
+    font-weight: 400;
+    color: #000000;
   }
   
   button:hover, button:focus, button:active {
@@ -460,7 +464,7 @@
     stroke-width: 1.5 !important;
   }
 
-  /* Sidebar and navigation buttons - no borders */
+  /* Sidebar and navigation buttons - no borders except Run Health Check */
   .sidebar-button, [role="tab"], .nav-button {
     background: transparent !important;
     border: none !important;
@@ -472,6 +476,23 @@
     color: white !important;
     border: none !important;
     box-shadow: none !important;
+  }
+  
+  /* Run Health Check button always has border */
+  .health-check-button {
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    background: transparent !important;
+  }
+  
+  .health-check-button:hover {
+    background: #5F209B !important;
+    color: white !important;
+    border: 1px solid #5F209B !important;
+  }
+  
+  /* Top nav bar border separator */
+  .top-nav-border {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
   
   /* Sidebar flush to top nav */

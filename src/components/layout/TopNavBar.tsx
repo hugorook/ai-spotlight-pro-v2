@@ -45,7 +45,7 @@ const TopNavBar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[110] glass-strong backdrop-blur-xl border-b border-white/20">
+    <div className="fixed top-0 left-0 right-0 z-[110] glass-strong backdrop-blur-xl top-nav-border">
       <div className="flex items-center justify-between px-6 py-3">
         {/* Left Side: Logo and Navigation */}
         <div className="flex items-center gap-8">

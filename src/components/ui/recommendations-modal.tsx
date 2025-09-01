@@ -103,30 +103,30 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
               <div className="space-y-4">
                 {/* Why you didn't rank */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-black mb-2">
+                  <h4 className="modal-title font-medium mb-2">
                     Why you didn't rank:
                   </h4>
-                  <p className="body-copy text-sm text-black leading-relaxed">
+                  <p className="body-copy text-sm leading-relaxed">
                     {result.failureAnalysis.primaryReason}
                   </p>
                 </div>
 
                 {/* Quick Fix */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-black mb-2">
+                  <h4 className="modal-title font-medium mb-2">
                     Quick Fix ({result.failureAnalysis.timeToFix}):
                   </h4>
-                  <p className="body-copy text-sm text-black leading-relaxed">
+                  <p className="body-copy text-sm leading-relaxed">
                     {result.failureAnalysis.quickFix}
                   </p>
                 </div>
 
                 {/* Expected Impact */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="font-serif font-medium text-black mb-2">
+                  <h4 className="modal-title font-medium mb-2">
                     Expected Impact:
                   </h4>
-                  <p className="body-copy text-sm text-black leading-relaxed">
+                  <p className="body-copy text-sm leading-relaxed">
                     {result.failureAnalysis.expectedImpact}
                   </p>
                 </div>
@@ -134,10 +134,10 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                 {/* Competitor Insight */}
                 {result.failureAnalysis.competitorInsight && (
                   <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                    <h4 className="font-serif font-medium text-black mb-2">
+                    <h4 className="modal-title font-medium mb-2">
                       Competitor Insight:
                     </h4>
-                    <p className="body-copy text-sm text-black leading-relaxed">
+                    <p className="body-copy text-sm leading-relaxed">
                       {result.failureAnalysis.competitorInsight}
                     </p>
                   </div>
@@ -162,20 +162,20 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             ) : result.mentioned ? (
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
-                <h4 className="font-serif font-medium text-black mb-2">
+                <h4 className="modal-title font-medium mb-2">
                   Great Success!
                 </h4>
-                <p className="body-copy text-sm text-black">
+                <p className="body-copy text-sm">
                   Your company was mentioned at position #{result.position} with {result.sentiment} sentiment.
                 </p>
               </div>
             ) : (
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-                <h4 className="font-serif font-medium text-black mb-2">
+                <h4 className="modal-title font-medium mb-2">
                   Not Mentioned
                 </h4>
-                <p className="body-copy text-sm text-black">
+                <p className="body-copy text-sm">
                   Your company was not mentioned in the AI response. Consider optimizing your content for this query.
                 </p>
               </div>

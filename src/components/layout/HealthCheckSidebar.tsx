@@ -34,7 +34,7 @@ const HealthCheckSidebar: React.FC<HealthCheckSidebarProps> = ({
             "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-colors mb-6",
             isRunning 
               ? "bg-gray-400 text-white cursor-not-allowed"
-              : "sidebar-button text-foreground hover:bg-[#5F209B] hover:text-white"
+              : "health-check-button text-foreground hover:bg-[#5F209B] hover:text-white"
           )}
         >
           <Play className="w-4 h-4" />
