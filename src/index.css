@@ -546,6 +546,15 @@
     margin-left: 16rem !important; /* Don't cover sidebar (w-64 = 16rem) */
   }
   
+  /* Section title styling - right aligned and vertically centered to content */
+  .section-title {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 100px; /* Ensure consistent height for alignment */
+  }
+  
   .modal-text {
     font-size: 0.75rem !important; /* text-xs - smaller */
     line-height: 1rem !important;

@@ -708,7 +708,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               <div className="space-y-6">
                 {/* Content Summary */}
                 <div className="flex gap-6">
-                  <div className="w-48 flex-shrink-0 flex items-start justify-center">
+                  <div className="w-48 flex-shrink-0 section-title">
                     <h4 className="page-title text-2xl font-bold">Content Summary</h4>
                   </div>
                   <div className="flex-1">
@@ -723,7 +723,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Key Topics */}
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
                   <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 flex items-start justify-center">
+                    <div className="w-48 flex-shrink-0 section-title">
                       <h4 className="page-title text-2xl font-bold">Key Topics</h4>
                     </div>
                     <div className="flex-1">
@@ -742,46 +742,64 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* AI Optimization Opportunities */}
                 {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="page-title text-sm font-semibold mb-2">AI Optimization Opportunities</h4>
-                    <ul className="space-y-2">
-                      {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
-                        <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-2 h-2 bg-[#5F209B] rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {opportunity}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">AI Optimization Opportunities</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <ul className="space-y-2">
+                          {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
+                            <li key={index} className="body-copy text-sm flex items-start">
+                              <span className="w-2 h-2 bg-[#5F209B] rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              {opportunity}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {/* Content Gaps */}
                 {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="page-title text-sm font-semibold mb-2">Content Gaps</h4>
-                    <ul className="space-y-2">
-                      {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
-                        <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {gap}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Content Gaps</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <ul className="space-y-2">
+                          {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
+                            <li key={index} className="body-copy text-sm flex items-start">
+                              <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              {gap}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {/* Recommendations */}
                 {websiteAnalysis.analysis?.recommendations?.length > 0 && (
-                  <div className="glass p-4 rounded-lg">
-                    <h4 className="page-title text-sm font-semibold mb-2">Recommendations</h4>
-                    <ul className="space-y-2">
-                      {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
-                        <li key={index} className="body-copy text-sm flex items-start">
-                          <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {rec}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex gap-6">
+                    <div className="w-48 flex-shrink-0 section-title">
+                      <h4 className="page-title text-2xl font-bold">Recommendations</h4>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass p-4 rounded-lg">
+                        <ul className="space-y-2">
+                          {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
+                            <li key={index} className="body-copy text-sm flex items-start">
+                              <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              {rec}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -814,33 +832,40 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {authorityAnalysis ? (
               <div className="space-y-6">
                 {/* Authority Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-8 h-8 text-muted-foreground" />
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.authorityOpportunities.length}</div>
-                        <div className="text-sm text-muted-foreground">Opportunities</div>
-                      </div>
-                    </div>
+                <div className="flex gap-6">
+                  <div className="w-48 flex-shrink-0 section-title">
+                    <h4 className="page-title text-2xl font-bold">Authority Overview</h4>
                   </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Award className="w-8 h-8 text-green-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.actionPlan.immediate.length}</div>
-                        <div className="text-sm text-muted-foreground">Quick Wins</div>
+                  <div className="flex-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Users className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <div className="text-2xl font-bold text-foreground">{authorityAnalysis.authorityOpportunities.length}</div>
+                            <div className="text-sm text-muted-foreground">Opportunities</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="glass p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Target className="w-8 h-8 text-purple-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-foreground">{authorityAnalysis.competitorMentions.length}</div>
-                        <div className="text-sm text-muted-foreground">Competitor Insights</div>
+                      
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Award className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <div className="text-2xl font-bold text-foreground">{authorityAnalysis.actionPlan.immediate.length}</div>
+                            <div className="text-sm text-muted-foreground">Quick Wins</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="glass p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Target className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <div className="text-2xl font-bold text-foreground">{authorityAnalysis.competitorMentions.length}</div>
+                            <div className="text-sm text-muted-foreground">Competitor Insights</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
