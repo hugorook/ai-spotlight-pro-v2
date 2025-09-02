@@ -123,7 +123,7 @@ const LandingPage = () => {
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="text-2xl font-bold text-foreground">Lex</span>
+              <span className="h3">Lex</span>
             </div>
 
             {/* Navigation */}
@@ -167,12 +167,12 @@ const LandingPage = () => {
           <div className="text-center max-w-5xl mx-auto">
             <div className="space-y-8">
               <div className="space-y-6">
-                <h1 className="text-4xl md:text-7xl font-bold leading-tight">
+                <h1 className="h1">
                   Cheat the Internet.
                 </h1>
                 
                 <div className="space-y-4">
-                  <h2 className="text-2xl md:text-4xl font-semibold text-[#5F209B]">
+                  <h2 className="h2">
                     Meet Lex. The Generative SEO tool.
                   </h2>
                   
@@ -214,7 +214,7 @@ const LandingPage = () => {
       <section className="py-20 px-4 bg-[#E7F0F6]">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8 text-center">
+            <h2 className="h2 mb-8 text-center">
               "What the **** is Generative SEO?"
             </h2>
             
@@ -253,7 +253,7 @@ const LandingPage = () => {
       <section id="how" className="py-20 px-4">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8 text-center">
+            <h2 className="h2 mb-8 text-center">
               How does Lex help me win?
             </h2>
             
@@ -335,7 +335,7 @@ const LandingPage = () => {
       <section id="traffic" className="py-20 px-4 bg-[#E7F0F6]">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+            <h2 className="h2 mb-8">
               How Much Traffic Can I actually get?
             </h2>
             
@@ -370,7 +370,7 @@ const LandingPage = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+            <h2 className="h2 mb-8">
               Will I get a promotion?
             </h2>
             
@@ -391,7 +391,7 @@ const LandingPage = () => {
       <section className="py-20 px-4 bg-[#E7F0F6]">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+            <h2 className="h2 mb-8">
               Why does nobody know about this?
             </h2>
             
@@ -406,7 +406,7 @@ const LandingPage = () => {
       <section id="pricing" className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            <h2 className="h2 mb-6">
               Pricing
             </h2>
           </div>
@@ -421,7 +421,7 @@ const LandingPage = () => {
                 )}
                 
                 <CardHeader className="p-0 mb-6">
-                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <CardTitle className="h3">{plan.name}</CardTitle>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-bold text-foreground">{plan.price}</span>
                     <span className="text-muted-foreground">/{plan.period}</span>
@@ -461,7 +461,7 @@ const LandingPage = () => {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-[#5F209B]">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="h2 text-white mb-6">
             Ready to Own Your Category?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
@@ -502,7 +502,7 @@ const LandingPage = () => {
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="text-2xl font-bold text-foreground">Lex</span>
+              <span className="h3">Lex</span>
             </div>
             
             <div className="flex gap-6 text-sm text-muted-foreground">

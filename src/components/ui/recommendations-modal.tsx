@@ -66,7 +66,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="modal-title modal-title-text font-semibold tracking-tight">
+                <h2 className="h3">
                   Recommendations
                 </h2>
                 <div className="flex items-center gap-2 body-copy text-sm">
@@ -90,9 +90,9 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
           <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
             {/* Prompt Context */}
             <div className="mb-6">
-              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
+              <h4 className="h4 mb-3">
                 Query Context
-              </h3>
+              </h4>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 <p className="prompt-text text-sm">{result.prompt}</p>
               </div>
@@ -103,7 +103,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
               <div className="space-y-4">
                 {/* Why you didn't rank */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="modal-title font-medium mb-2">
+                  <h4 className="h4 mb-2">
                     Why you didn't rank:
                   </h4>
                   <p className="body-copy modal-text leading-relaxed">
@@ -113,7 +113,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
 
                 {/* Quick Fix */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="modal-title font-medium mb-2">
+                  <h4 className="h4 mb-2">
                     Quick Fix ({result.failureAnalysis.timeToFix}):
                   </h4>
                   <p className="body-copy modal-text leading-relaxed">
@@ -123,7 +123,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
 
                 {/* Expected Impact */}
                 <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                  <h4 className="modal-title font-medium mb-2">
+                  <h4 className="h4 mb-2">
                     Expected Impact:
                   </h4>
                   <p className="body-copy modal-text leading-relaxed">
@@ -134,7 +134,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
                 {/* Competitor Insight */}
                 {result.failureAnalysis.competitorInsight && (
                   <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
-                    <h4 className="modal-title font-medium mb-2">
+                    <h4 className="h4 mb-2">
                       Competitor Insight:
                     </h4>
                     <p className="body-copy modal-text leading-relaxed">
@@ -162,7 +162,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             ) : result.mentioned ? (
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
-                <h4 className="modal-title font-medium mb-2">
+                <h4 className="h4 mb-2">
                   Great Success!
                 </h4>
                 <p className="body-copy">
@@ -172,7 +172,7 @@ const RecommendationsModal: React.FC<RecommendationsModalProps> = ({ isOpen, onC
             ) : (
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-6 rounded-lg text-center">
                 <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-                <h4 className="modal-title font-medium mb-2">
+                <h4 className="h4 mb-2">
                   Not Mentioned
                 </h4>
                 <p className="body-copy">

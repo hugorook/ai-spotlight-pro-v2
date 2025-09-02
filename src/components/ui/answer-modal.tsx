@@ -53,7 +53,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
             <div className="flex items-center gap-4">
               {getStatusIcon(result.mentioned)}
               <div>
-                <h2 className="modal-title modal-title-text font-semibold tracking-tight">
+                <h2 className="h3">
                   Full AI Response
                 </h2>
                 <div className="flex items-center gap-2 body-copy text-sm">
@@ -77,9 +77,9 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
           <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
             {/* Prompt */}
             <div className="mb-6">
-              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
+              <h4 className="h4 mb-3">
                 Test Prompt
-              </h3>
+              </h4>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 <p className="prompt-text">{result.prompt}</p>
               </div>
@@ -87,9 +87,9 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isOpen, onClose, result }) =>
 
             {/* Full Response */}
             <div>
-              <h3 className="modal-title modal-text font-medium mb-3 tracking-tight">
+              <h4 className="h4 mb-3">
                 AI Response
-              </h3>
+              </h4>
               <div className="bg-white/70 backdrop-blur-sm border border-black/20 p-4 rounded-lg">
                 {result.response ? (
                   <div className="body-copy modal-text leading-relaxed">

@@ -55,9 +55,9 @@
     --ring: 218 61 39;
 
     --radius: 0.75rem;
-    /* Global fonts: Inter for body, Playfair Display for titles */
-    --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-serif: "Playfair Display", Georgia, serif;
+    /* Global fonts: Source Sans Pro for body, Libre Baskerville for titles */
+    --font-sans: "Source Sans Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: "Libre Baskerville", Georgia, serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Design tokens updated for purple theme */
@@ -98,39 +98,150 @@
     min-height: 100vh;
   }
 
-  /* Playfair Display as default for most elements */
+  /* Typography System with Libre Baskerville for titles, Source Sans Pro for body */
   * { 
-    font-family: var(--font-serif), serif; 
-    color: #5F209B;
+    font-family: var(--font-sans), sans-serif; 
+    color: #000000;
+    letter-spacing: normal;
   }
   
-  /* All headers use Playfair Display and purple */
-  h1, h2, h3, h4, h5, h6, .heading {
+  /* H1 - Main page titles */
+  h1, .h1 {
     font-family: var(--font-serif), serif;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: normal;
     color: #5F209B;
   }
   
-  /* Buttons use Playfair Display and purple */
+  /* H2 - Section titles */
+  h2, .h2 {
+    font-family: var(--font-serif), serif;
+    font-size: 2rem;
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: #5F209B;
+  }
+  
+  /* H3 - Subsection titles */
+  h3, .h3 {
+    font-family: var(--font-serif), serif;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: #5F209B;
+  }
+  
+  /* H4 - Small headings */
+  h4, .h4 {
+    font-family: var(--font-serif), serif;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: #5F209B;
+  }
+  
+  /* Body text */
+  body, p, .body {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: normal;
+    color: #000000;
+  }
+  
+  /* Buttons use Source Sans Pro for better readability */
   button {
-    font-family: var(--font-serif), serif;
-    color: #5F209B;
-  }
-  
-  /* Labels, navigation, and important UI text use Playfair Display */
-  label, .nav-text, .tab-text, .page-title, .prompt-text, .modal-title {
-    font-family: var(--font-serif), serif;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: normal;
     color: #5F209B;
   }
   
-  /* Only body copy and summaries use Inter with black text */
+  /* Labels and UI text */
+  label {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: #000000;
+  }
+  
+  /* Navigation text */
+  .nav-text {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: #000000;
+  }
+  
+  /* Tab text */
+  .tab-text {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: #000000;
+  }
+  
+  /* Page titles should use h1, h2, h3, or h4 classes */
+  .page-title {
+    font-family: var(--font-serif), serif;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: #5F209B;
+  }
+  
+  /* Body copy classes */
   .body-copy, .summary-text, .response-text, p.content {
     font-family: var(--font-sans), sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
     font-weight: 400;
+    letter-spacing: normal;
     color: #000000;
+  }
+  
+  /* Small text */
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  /* Extra small text */
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+  
+  /* Large text */
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  
+  /* Modal titles should use h3 or h4 */
+  .modal-title {
+    font-family: var(--font-serif), serif;
+    font-weight: 700;
+    letter-spacing: normal;
+    color: #5F209B;
+  }
+  
+  /* Prompt text */
+  .prompt-text {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: #5F209B;
   }
   
   /* Consistent off-grey styling for all cards and elements */
@@ -616,22 +727,22 @@
     font-family: var(--font-mono), monospace !important;
   }
 
-  /* Title-specific classes with tighter kerning */
-  .title, .title-large, .title-small {
-    font-family: var(--font-serif), serif !important;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-
-  .title-large {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
-    letter-spacing: -0.03em;
-  }
-
-  .title-small {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-    letter-spacing: -0.01em;
+  /* Responsive typography */
+  @media (max-width: 768px) {
+    h1, .h1 {
+      font-size: 2rem;
+    }
+    
+    h2, .h2 {
+      font-size: 1.5rem;
+    }
+    
+    h3, .h3 {
+      font-size: 1.25rem;
+    }
+    
+    h4, .h4 {
+      font-size: 1.125rem;
+    }
   }
 }

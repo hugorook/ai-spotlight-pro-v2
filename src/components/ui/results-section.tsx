@@ -594,9 +594,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {trendingOpportunities.map((opportunity, index) => (
                   <div key={index} className="glass p-4 rounded-lg">
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="text-sm font-semibold text-foreground pr-2">
+                      <h4 className="h4 pr-2">
                         "{opportunity.query}"
-                      </h4>
+                      </h3>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <TrendingUp className="w-3 h-3 text-green-600" />
                         <span className="text-xs font-medium text-green-600">
@@ -644,7 +644,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Content Summary */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">Content Summary</h4>
+                    <h3 className="h3">Content Summary</h3>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
@@ -659,7 +659,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Key Topics</h4>
+                      <h3 className="h3">Key Topics</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -679,7 +679,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">AI Optimization Opportunities</h4>
+                      <h3 className="h3">AI Optimization Opportunities</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -700,7 +700,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Content Gaps</h4>
+                      <h3 className="h3">Content Gaps</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -721,7 +721,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.recommendations?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Recommendations</h4>
+                      <h3 className="h3">Recommendations</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -746,7 +746,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="page-title text-lg font-medium mb-2">No Website Analysis Available</h4>
+                <h4 className="h4 mb-2">No Website Analysis Available</h3>
                 <p className="body-copy text-sm mb-4">
                   Website analysis will be performed when you run a health check with a company website URL configured.
                 </p>
@@ -768,7 +768,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Authority Overview */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">Authority Overview</h4>
+                    <h3 className="h3">Authority Overview</h3>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -808,7 +808,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Quick Action Plan */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">30-Day Action Plan</h4>
+                    <h3 className="h3">30-Day Action Plan</h3>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
@@ -856,7 +856,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {authorityAnalysis.industryAuthorities.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Key Industry Authorities</h4>
+                      <h3 className="h3">Key Industry Authorities</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -876,7 +876,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {authorityAnalysis.competitorMentions.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">How Competitors Get Mentioned</h4>
+                      <h3 className="h3">How Competitors Get Mentioned</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -903,7 +903,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* All Authority Opportunities */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">All Authority Building Opportunities</h4>
+                    <h3 className="h3">All Authority Building Opportunities</h3>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
@@ -943,7 +943,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="page-title text-lg font-medium mb-2">Authority Intelligence Analysis</h4>
+                <h4 className="h4 mb-2">Authority Intelligence Analysis</h3>
                 <p className="body-copy text-sm mb-4">
                   Authority analysis will be performed automatically when you run a health check.
                 </p>
@@ -960,7 +960,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Performance Analysis Overview */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">Performance Analysis Overview</h4>
+                    <h3 className="h3">Performance Analysis Overview</h3>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1008,7 +1008,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Industry Comparison */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">Industry Comparison</h4>
+                    <h3 className="h3">Industry Comparison</h3>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
@@ -1036,12 +1036,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Gap Analysis */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h4 className="page-title text-2xl font-bold">Gap Analysis</h4>
+                    <h3 className="h3">Gap Analysis</h3>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="glass p-4 rounded-lg">
-                        <h4 className="text-sm font-semibold mb-3 text-foreground">Performance Gaps</h4>
+                        <h4 className="h4 mb-3">Performance Gaps</h3>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between p-2 glass rounded">
                             <span className="text-sm text-muted-foreground">Gap to Leaders</span>
@@ -1057,7 +1057,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       </div>
 
                       <div className="glass p-4 rounded-lg">
-                        <h4 className="text-sm font-semibold mb-3 text-foreground">Industry Challenges</h4>
+                        <h4 className="h4 mb-3">Industry Challenges</h3>
                         <ul className="space-y-2">
                           {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
                             <li key={index} className="body-copy text-sm flex items-start">
@@ -1075,7 +1075,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {(industryBenchmark.competitiveLandscape.leaders.length > 0 || industryBenchmark.competitiveLandscape.emerging.length > 0) && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Industry Leaders</h4>
+                      <h3 className="h3">Industry Leaders</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -1131,7 +1131,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {industryBenchmark.actionableInsights.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h4 className="page-title text-2xl font-bold">Strategic Insights</h4>
+                      <h3 className="h3">Strategic Insights</h3>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -1166,7 +1166,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {industryBenchmark.benchmarkingRecommendations.length > 0 && (
                   <div className="flex gap-6">
                     <div className="w-48 flex-shrink-0 section-title">
-                      <h4 className="page-title text-2xl font-bold">Next Steps</h4>
+                      <h3 className="h3">Next Steps</h3>
                     </div>
                     <div className="flex-1">
                       <div className="glass p-4 rounded-lg">
@@ -1188,7 +1188,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="page-title text-lg font-medium mb-2">Industry Benchmarking Analysis</h4>
+                <h4 className="h4 mb-2">Industry Benchmarking Analysis</h3>
                 <p className="body-copy text-sm mb-4">
                   Industry benchmark analysis will be performed automatically when you run a health check.
                 </p>

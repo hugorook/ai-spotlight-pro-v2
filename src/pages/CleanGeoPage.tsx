@@ -1813,7 +1813,7 @@ export default function CleanGeoPage() {
       <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models">
           <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-80">⚠️</div>
-          <h2 className="text-2xl font-semibold text-foreground mb-2">Company Profile Required</h2>
+          <h2 className="h2 mb-2">Company Profile Required</h2>
           <p className="text-muted-foreground mb-6">Set up your company profile to start using AI Visibility testing and analysis.</p>
           <button
             onClick={() => setShowCompanySetup(true)}
@@ -1912,7 +1912,7 @@ export default function CleanGeoPage() {
         {false && (
           <div className="rounded-2xl border border-border bg-card p-8">
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <h3 className="h3 mb-2 flex items-center gap-2">
                 <span className="text-primary">📄</span>
                 Content Strategy Opportunities
               </h3>
@@ -1939,7 +1939,7 @@ export default function CleanGeoPage() {
                   <div className="mt-4 space-y-3">
                     <p className="text-sm text-muted-foreground">{opportunity.description}</p>
                     <div>
-                      <h5 className="text-sm font-semibold text-foreground mb-2">Expected Impact:</h5>
+                      <h5 className="h4 mb-2">Expected Impact:</h5>
                       <p className="text-sm text-muted-foreground">{opportunity.expectedImpact}</p>
                     </div>
                   </div>
