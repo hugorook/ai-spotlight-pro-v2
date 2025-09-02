@@ -1101,6 +1101,33 @@ export default function CleanGeoPage() {
     }
   }, []); // Run only once on mount
 
+  // Load persisted health check data on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('geo_health_check_data');
+    if (stored) {
+      try {
+        const healthData = JSON.parse(stored);
+        // Only load if data is less than 24 hours old
+        if (healthData.timestamp && Date.now() - healthData.timestamp < 24 * 60 * 60 * 1000) {
+          if (healthData.authorityAnalysis) {
+            setAuthorityAnalysis(healthData.authorityAnalysis);
+          }
+          if (healthData.industryBenchmark) {
+            setIndustryBenchmark(healthData.industryBenchmark);
+          }
+          if (healthData.trendingOpportunities) {
+            setTrendingOpportunities(healthData.trendingOpportunities);
+          }
+          if (healthData.websiteAnalysis) {
+            setWebsiteAnalysis(healthData.websiteAnalysis);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading persisted health data:', error);
+      }
+    }
+  }, []);
+
   const calculateHealthScore = (results: TestResult[]) => {
     if (results.length === 0) {
       setHealthScore(0);
@@ -1535,6 +1562,12 @@ export default function CleanGeoPage() {
 
       if (data?.opportunities) {
         setTrendingOpportunities(data.opportunities);
+        // Persist to localStorage
+        const stored = localStorage.getItem('geo_health_check_data');
+        const healthData = stored ? JSON.parse(stored) : {};
+        healthData.trendingOpportunities = data.opportunities;
+        healthData.timestamp = Date.now();
+        localStorage.setItem('geo_health_check_data', JSON.stringify(healthData));
         console.log(`Found ${data.opportunities.length} trending opportunities`);
       }
     } catch (error) {
@@ -1593,6 +1626,12 @@ export default function CleanGeoPage() {
       const websiteAnalysisData = await getWebsiteAnalysis();
       if (websiteAnalysisData) {
         setWebsiteAnalysis(websiteAnalysisData);
+        // Persist to localStorage
+        const stored = localStorage.getItem('geo_health_check_data');
+        const healthData = stored ? JSON.parse(stored) : {};
+        healthData.websiteAnalysis = websiteAnalysisData;
+        healthData.timestamp = Date.now();
+        localStorage.setItem('geo_health_check_data', JSON.stringify(healthData));
       }
       
       const payload = {
@@ -1651,6 +1690,12 @@ export default function CleanGeoPage() {
 
       if (!error && data?.analysis) {
         setAuthorityAnalysis(data.analysis);
+        // Persist to localStorage
+        const stored = localStorage.getItem('geo_health_check_data');
+        const healthData = stored ? JSON.parse(stored) : {};
+        healthData.authorityAnalysis = data.analysis;
+        healthData.timestamp = Date.now();
+        localStorage.setItem('geo_health_check_data', JSON.stringify(healthData));
         console.log('Authority analysis completed:', data.analysis);
       }
     } catch (error) {
@@ -1680,6 +1725,12 @@ export default function CleanGeoPage() {
 
       if (!error && data?.benchmark) {
         setIndustryBenchmark(data.benchmark);
+        // Persist to localStorage
+        const stored = localStorage.getItem('geo_health_check_data');
+        const healthData = stored ? JSON.parse(stored) : {};
+        healthData.industryBenchmark = data.benchmark;
+        healthData.timestamp = Date.now();
+        localStorage.setItem('geo_health_check_data', JSON.stringify(healthData));
         console.log('Industry benchmarking completed:', data.benchmark);
       }
     } catch (error) {

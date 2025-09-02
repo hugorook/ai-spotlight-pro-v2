@@ -3,6 +3,9 @@ import { Target, TrendingUp, BarChart3, CheckCircle, FileText, Lightbulb, Downlo
 import { supabase } from '@/integrations/supabase/client';
 import AnswerModal from './answer-modal';
 import RecommendationsModal from './recommendations-modal';
+import ExportButtons from './export-buttons';
+
+// ... (keeping all the interfaces exactly the same)
 
 interface TestResult {
   prompt: string;
@@ -149,7 +152,7 @@ interface ResultsSectionProps {
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
   isVisible,
-  results,
+  results = [],
   healthScore,
   onNewTest,
   strategies = [],
@@ -161,42 +164,35 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onCopyResults,
   websiteAnalysis,
   trendingOpportunities = [],
-  authorityAnalysis: externalAuthorityAnalysis,
-  industryBenchmark: externalIndustryBenchmark,
+  authorityAnalysis,
+  industryBenchmark,
   activeTab: externalActiveTab,
   onTabChange: externalOnTabChange
 }) => {
-  const [internalActiveTab, setInternalActiveTab] = useState('results');
-  
-  // Use external activeTab if provided, otherwise use internal
-  const activeTab = externalActiveTab || internalActiveTab;
-  const setActiveTab = externalOnTabChange || setInternalActiveTab;
-  const [showAllResults, setShowAllResults] = useState(false);
+  const [activeTab, setActiveTab] = useState(externalActiveTab || 'results');
   const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
+  const [showSmartFix, setShowSmartFix] = useState<{[key: number]: boolean}>({});
+  const [smartFixes, setSmartFixes] = useState<{[key: number]: SmartFix}>({});
+  const [isGenerating, setIsGenerating] = useState<{[key: number]: boolean}>({});
   const [cmsDetection, setCmsDetection] = useState<CMSDetection | null>(null);
-  const [smartFixes, setSmartFixes] = useState<{ [key: string]: SmartFix }>({});
-  const [generatingFix, setGeneratingFix] = useState<string | null>(null);
-  // Use external authority and benchmark data from props
-  const authorityAnalysis = externalAuthorityAnalysis;
-  const industryBenchmark = externalIndustryBenchmark;
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
   const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
   const [isRecommendationsModalOpen, setIsRecommendationsModalOpen] = useState(false);
-  
-  // Persist active tab in localStorage (only when using internal state)
+
   useEffect(() => {
-    if (!externalActiveTab) {
-      const savedTab = localStorage.getItem('activeResultsTab');
-      if (savedTab && (savedTab === 'results' || savedTab === 'website' || savedTab === 'benchmark' || savedTab === 'authority' || savedTab === 'trending')) {
-        setInternalActiveTab(savedTab);
-      }
+    if (externalActiveTab) {
+      setActiveTab(externalActiveTab);
     }
   }, [externalActiveTab]);
 
-
-  // Reset show all results when results change
   useEffect(() => {
-    setShowAllResults(false);
+    if (externalOnTabChange && activeTab !== externalActiveTab) {
+      externalOnTabChange(activeTab);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    // Reset expanded results when results change
     setExpandedResults(new Set());
   }, [results.length]);
 
@@ -253,265 +249,118 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     setIsRecommendationsModalOpen(true);
   };
 
-  const handleCloseAnswerModal = () => {
-    setIsAnswerModalOpen(false);
-    setSelectedResult(null);
-  };
-
-  const handleCloseRecommendationsModal = () => {
-    setIsRecommendationsModalOpen(false);
-    setSelectedResult(null);
-  };
-
-  const handleGenerateFix = async (result: TestResult, fixType: 'faq' | 'content' | 'schema' | 'authority') => {
-    if (!result.failureAnalysis || !company) return;
-
-    const fixKey = `${result.prompt}-${fixType}`;
-    setGeneratingFix(fixKey);
-
+  const generateSmartFix = async (result: TestResult, category: string) => {
+    if (!company || !result.failureAnalysis) return;
+    
+    const key = results.indexOf(result);
+    setIsGenerating(prev => ({ ...prev, [key]: true }));
+    
     try {
-      const { data, error } = await supabase.functions.invoke('generate-smart-fixes', {
+      const { data, error } = await supabase.functions.invoke('generate-smart-fix', {
         body: {
-          failureReason: result.failureAnalysis.primaryReason,
+          companyInfo: {
+            name: company.company_name,
+            industry: company.industry,
+            description: company.description,
+            website: company.website_url,
+            differentiators: company.key_differentiators
+          },
           prompt: result.prompt,
-          companyName: company.company_name,
-          industry: company.industry,
-          cms: cmsDetection?.cms || 'custom',
-          fixType
+          failureAnalysis: result.failureAnalysis,
+          cmsDetection: cmsDetection
         }
       });
 
-      if (!error && data?.smartFix) {
-        setSmartFixes(prev => ({
-          ...prev,
-          [fixKey]: data.smartFix
-        }));
+      if (!error && data?.fix) {
+        setSmartFixes(prev => ({ ...prev, [key]: data.fix }));
+        console.log('Smart fix generated:', data.fix);
       }
     } catch (error) {
       console.error('Error generating smart fix:', error);
     } finally {
-      setGeneratingFix(null);
+      setIsGenerating(prev => ({ ...prev, [key]: false }));
     }
   };
-  if (!isVisible) return null;
 
-  const mentionRate = results.length > 0 ? Math.round((results.filter(r => r.mentioned).length / results.length) * 100) : 0;
-  const avgPosition = results.filter(r => r.mentioned).length > 0 
-    ? Math.round(results.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / results.filter(r => r.mentioned).length)
-    : 0;
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 75) return 'text-green-600';
-    if (score >= 50) return 'text-yellow-600';
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    if (score >= 40) return 'text-orange-600';
     return 'text-red-600';
   };
 
-  const getHealthScoreGrade = (score: number) => {
-    if (score >= 90) return 'A+';
-    if (score >= 80) return 'A';
-    if (score >= 70) return 'B';
-    if (score >= 60) return 'C';
-    if (score >= 50) return 'D';
-    return 'F';
-  };
-
-  const getGradeDescription = (grade: string) => {
-    switch (grade) {
-      case 'A+': return 'Excellent AI visibility - you appear consistently';
-      case 'A': return 'Strong AI visibility - appearing in most relevant queries';
-      case 'B': return 'Good AI visibility - room for improvement';
-      case 'C': return 'Moderate AI visibility - several gaps to address';
-      case 'D': return 'Poor AI visibility - significant improvements needed';
-      case 'F': return 'Minimal AI visibility - urgent action required';
-      default: return 'AI visibility assessment';
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'content': return 'bg-blue-100 text-blue-700';
+      case 'authority': return 'bg-purple-100 text-purple-700';
+      case 'technical': return 'bg-orange-100 text-orange-700';
+      case 'competition': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
-  const getIndustryBenchmark = (industry: string) => {
-    // Industry benchmarks based on typical AI mention rates
-    const benchmarks = {
-      'Technology/Software': 45,
-      'Professional Services': 38,
-      'Marketing/Advertising': 42,
-      'Finance/Banking': 35,
-      'Healthcare': 32,
-      'Manufacturing': 28,
-      'E-commerce/Retail': 40,
-      'Education': 36,
-      'Real Estate': 30,
-      'Other': 35
-    };
-    return benchmarks[industry as keyof typeof benchmarks] || 35;
-  };
-
-
-  const copyToClipboard = (text: string) => {
-    try {
-      navigator.clipboard.writeText(text);
-    } catch (error) {
-      console.error('Copy failed:', error);
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return 'bg-green-100 text-green-700';
+      case 'moderate': return 'bg-yellow-100 text-yellow-700';
+      case 'needs-dev': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
-  // FailureAnalysisCard component
-  const FailureAnalysisCard = ({ result, company, onGenerateFix }: { 
-    result: TestResult; 
-    company: any; 
-    onGenerateFix: (fixType: 'faq' | 'content' | 'schema' | 'authority') => void; 
-  }) => {
-    const [showSmartFix, setShowSmartFix] = useState(false);
-    const fixKey = `${result.prompt}-${result.failureAnalysis?.category}`;
-    const smartFix = smartFixes[fixKey];
-    const isGenerating = generatingFix === fixKey;
+  if (!isVisible) return null;
 
-    return (
-      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-        <div className="flex items-start gap-3">
-          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-            result.failureAnalysis?.severity === 'critical' ? 'bg-red-500' :
-            result.failureAnalysis?.severity === 'moderate' ? 'bg-yellow-500' :
-            'bg-blue-500'
-          }`}></div>
-          <div className="flex-1">
-            <div className="text-sm font-medium text-red-800 mb-2">
-              Why you didn't rank: {result.failureAnalysis?.primaryReason}
-            </div>
-            <div className="text-xs text-red-700 space-y-1">
-              <div><strong>Quick Fix ({result.failureAnalysis?.timeToFix}):</strong> {result.failureAnalysis?.quickFix}</div>
-              <div><strong>Expected Impact:</strong> {result.failureAnalysis?.expectedImpact}</div>
-              {result.failureAnalysis?.competitorInsight && (
-                <div><strong>Competitor Insight:</strong> {result.failureAnalysis.competitorInsight}</div>
-              )}
-            </div>
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  result.failureAnalysis?.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                  result.failureAnalysis?.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
-                  {result.failureAnalysis?.difficulty}
-                </span>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  result.failureAnalysis?.category === 'content' ? 'bg-blue-100 text-blue-700' :
-                  result.failureAnalysis?.category === 'authority' ? 'bg-purple-100 text-purple-700' :
-                  result.failureAnalysis?.category === 'technical' ? 'bg-orange-100 text-orange-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
-                  {result.failureAnalysis?.category}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    if (!smartFix) {
-                      onGenerateFix(result.failureAnalysis?.category as any);
-                    }
-                    setShowSmartFix(!showSmartFix);
-                  }}
-                  disabled={isGenerating}
-                  className="px-3 py-1 text-xs button-text bg-[#5F209B] text-white rounded hover:opacity-90 transition-none flex items-center gap-1"
-                >
-                  <Wrench className="w-3 h-3" />
-                  {isGenerating ? 'Generating...' : smartFix ? 'Show Fix' : 'Get Fix'}
-                </button>
-              </div>
-            </div>
-
-            {/* Smart Fix Display */}
-            {showSmartFix && smartFix && (
-              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
-                <div className="text-sm font-medium text-green-800 mb-2">{smartFix.title}</div>
-                <div className="text-xs text-green-700 mb-3">{smartFix.description}</div>
-                
-                {smartFix.code && (
-                  <div className="mb-3">
-                    <div className="text-xs font-medium text-green-800 mb-1">Code to Copy:</div>
-                    <div className="bg-gray-800 text-green-400 p-2 rounded text-xs font-mono overflow-x-auto">
-                      {smartFix.code}
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(smartFix.code!)}
-                      className="mt-1 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
-                    >
-                      <Copy className="w-3 h-3" />
-                      Copy Code
-                    </button>
-                  </div>
-                )}
-
-                {smartFix.content && (
-                  <div className="mb-3">
-                    <div className="text-xs font-medium text-green-800 mb-1">Content to Add:</div>
-                    <div className="bg-white p-2 rounded border text-xs">
-                      {smartFix.content}
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(smartFix.content!)}
-                      className="mt-1 px-2 py-1 text-xs button-text bg-green-600 text-white rounded hover:opacity-90 flex items-center gap-1"
-                    >
-                      <Copy className="w-3 h-3" />
-                      Copy Content
-                    </button>
-                  </div>
-                )}
-
-                <div className="text-xs text-green-700">
-                  <div className="font-medium">Implementation ({smartFix.timeToImplement}):</div>
-                  <ol className="list-decimal list-inside ml-2 space-y-1">
-                    {smartFix.instructions.steps.map((step, i) => (
-                      <li key={i}>{step}</li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
+  // Create export functions for each tab
+  const exportWebsiteAnalysis = () => {
+    if (!websiteAnalysis) return;
+    const data = JSON.stringify(websiteAnalysis, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'website-analysis.json';
+    a.click();
   };
+
+  const exportAuthorityAnalysis = () => {
+    if (!authorityAnalysis) return;
+    const data = JSON.stringify(authorityAnalysis, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'authority-analysis.json';
+    a.click();
+  };
+
+  const exportBenchmarkData = () => {
+    if (!industryBenchmark) return;
+    const data = JSON.stringify(industryBenchmark, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'benchmark-data.json';
+    a.click();
+  };
+
+  // Animation classes for tab transitions
+  const tabContentClass = "animate-fade-in";
 
   return (
-    <div className="w-full animate-fade-in">
-      {/* Tab Content */}
+    <div className="relative">
       <div className="w-full">
         {activeTab === 'results' && (
-          <div>
-
-            <div className="flex items-center justify-end mb-4">
-              <div className="flex items-center gap-2">
-                {onExportCsv && (
-                  <button
-                    onClick={onExportCsv}
-                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
-                  >
-                    <Download className="w-3 h-3" />
-                    Export CSV
-                  </button>
-                )}
-                {onPrintReport && (
-                  <button
-                    onClick={onPrintReport}
-                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
-                  >
-                    <Printer className="w-3 h-3" />
-                    Print PDF
-                  </button>
-                )}
-                {onCopyResults && (
-                  <button
-                    onClick={onCopyResults}
-                    className="flex items-center gap-2 px-3 py-1.5 button-text text-xs glass rounded-md hover:bg-[#5F209B] hover:text-white transition-none"
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy
-                  </button>
-                )}
-              </div>
-            </div>
-
-
+          <div className={tabContentClass}>
             {/* Simplified Results List */}
             <div className="space-y-2">
               {results.map((result, index) => {
@@ -529,14 +378,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       return <Minus className="w-4 h-4 text-yellow-600" />;
                   }
                 };
-
+                
                 return (
-                  <div key={index} className="p-3 glass rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 mr-4">
-                        <div className="prompt-text mb-1 text-sm">
+                  <div key={index} className="glass rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="prompt-text text-xs font-medium mb-1 truncate">
                           {result.prompt}
-                        </div>
+                        </h4>
                         <div className="body-copy text-xs text-muted-foreground leading-tight">
                           {displaySummary}
                         </div>
@@ -582,13 +431,20 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 );
               })}
             </div>
+            
+            {/* Export buttons at bottom */}
+            <ExportButtons
+              onExportCsv={onExportCsv}
+              onPrintReport={onPrintReport}
+              onCopyResults={onCopyResults}
+              className="mt-6"
+            />
           </div>
         )}
 
 
         {activeTab === 'trending' && (
-          <div>
-            
+          <div className={tabContentClass}>
             {trendingOpportunities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {trendingOpportunities.map((opportunity, index) => (
@@ -637,18 +493,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
 
         {activeTab === 'website' && (
-          <div>
-            
+          <div className={tabContentClass}>
             {websiteAnalysis ? (
               <div className="space-y-6">
                 {/* Content Summary */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">Content Summary</h3>
+                    <h4 className="h4">Content Summary</h4>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
-                      <p className="body-copy text-sm leading-relaxed">
+                      <p className="body-copy text-xs leading-relaxed">
                         {websiteAnalysis.analysis?.contentSummary || 'No summary available'}
                       </p>
                     </div>
@@ -659,7 +514,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.keyTopics?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Key Topics</h3>
+                      <h4 className="h4">Key Topics</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -679,13 +534,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.aiOptimizationOpportunities?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">AI Optimization Opportunities</h3>
+                      <h4 className="h4">AI Optimization Opportunities</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.aiOptimizationOpportunities.map((opportunity: string, index: number) => (
-                            <li key={index} className="body-copy text-sm flex items-start">
+                            <li key={index} className="body-copy text-xs flex items-start">
                               <span className="w-2 h-2 bg-[#5F209B] rounded-full mt-2 mr-2 flex-shrink-0"></span>
                               {opportunity}
                             </li>
@@ -700,13 +555,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.contentGaps?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Content Gaps</h3>
+                      <h4 className="h4">Content Gaps</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.contentGaps.map((gap: string, index: number) => (
-                            <li key={index} className="body-copy text-sm flex items-start">
+                            <li key={index} className="body-copy text-xs flex items-start">
                               <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                               {gap}
                             </li>
@@ -721,13 +576,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {websiteAnalysis.analysis?.recommendations?.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Recommendations</h3>
+                      <h4 className="h4">Recommendations</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
                           {websiteAnalysis.analysis.recommendations.map((rec: string, index: number) => (
-                            <li key={index} className="body-copy text-sm flex items-start">
+                            <li key={index} className="body-copy text-xs flex items-start">
                               <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                               {rec}
                             </li>
@@ -742,12 +597,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <div className="text-xs text-muted-foreground text-center">
                   Analysis completed: {new Date(websiteAnalysis.fetchedAt).toLocaleString()}
                 </div>
+                
+                {/* Export buttons at bottom */}
+                <ExportButtons
+                  onExportCsv={() => exportWebsiteAnalysis()}
+                  onPrintReport={onPrintReport}
+                  className="mt-6"
+                />
               </div>
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h4 className="h4 mb-2">No Website Analysis Available</h4>
-                <p className="body-copy text-sm mb-4">
+                <p className="body-copy text-xs mb-4">
                   Website analysis will be performed when you run a health check with a company website URL configured.
                 </p>
                 {!company?.website_url && (
@@ -761,14 +623,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
 
         {activeTab === 'authority' && (
-          <div>
-            
+          <div className={tabContentClass}>
             {authorityAnalysis ? (
               <div className="space-y-6">
                 {/* Authority Overview */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">Authority Overview</h3>
+                    <h4 className="h4">Authority Overview</h4>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -808,23 +669,24 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Quick Action Plan */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">30-Day Action Plan</h3>
+                    <h4 className="h4">30-Day Action Plan</h4>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <div className="space-y-3">
-                        {authorityAnalysis.actionPlan.immediate.map((opportunity, index) => (
-                          <div key={index} className="authority-card flex items-start gap-3 p-3 rounded-lg">
-                            <div className="status-dot w-2 h-2 rounded-full mt-2 flex-shrink-0"></div>
-                            <div className="flex-1">
-                              <div className="page-title text-sm font-medium mb-1">
-                                {opportunity.source}
-                              </div>
-                              <div className="body-copy text-xs mb-2">
-                                {opportunity.description}
-                              </div>
-                              <div className="body-copy text-xs">
-                                <strong>Action:</strong> {opportunity.actionRequired}
+                        {authorityAnalysis.actionPlan.immediate.map((opportunity: any, index: number) => (
+                          <div key={index} className="p-3 authority-card rounded-lg">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="page-title text-sm font-medium mb-1">
+                                  {opportunity.source}
+                                </div>
+                                <div className="body-copy text-xs mb-2">
+                                  {opportunity.description}
+                                </div>
+                                <div className="body-copy text-xs">
+                                  <strong>Action:</strong> {opportunity.actionRequired}
+                                </div>
                               </div>
                               {opportunity.url && (
                                 <a
@@ -856,12 +718,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {authorityAnalysis.industryAuthorities.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Key Industry Authorities</h3>
+                      <h4 className="h4">Key Industry Authorities</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="flex flex-wrap gap-2">
-                          {authorityAnalysis.industryAuthorities.map((authority, index) => (
+                          {authorityAnalysis.industryAuthorities.map((authority: string, index: number) => (
                             <span key={index} className="px-2 py-1 bg-[#5F209B] text-white rounded-full text-xs">
                               {authority}
                             </span>
@@ -876,12 +738,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {authorityAnalysis.competitorMentions.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">How Competitors Get Mentioned</h3>
+                      <h4 className="h4">How Competitors Get Mentioned</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="space-y-3">
-                          {authorityAnalysis.competitorMentions.map((mention, index) => (
+                          {authorityAnalysis.competitorMentions.map((mention: any, index: number) => (
                             <div key={index} className="authority-card p-3 rounded-lg">
                               <div className="page-title text-sm font-medium mb-1">
                                 {mention.competitor} → {mention.source}
@@ -903,12 +765,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* All Authority Opportunities */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">All Authority Building Opportunities</h3>
+                    <h4 className="h4">All Authority Building Opportunities</h4>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
                       <div className="space-y-3">
-                        {authorityAnalysis.authorityOpportunities.map((opportunity, index) => (
+                        {authorityAnalysis.authorityOpportunities.map((opportunity: any, index: number) => (
                           <div key={index} className="authority-card p-3 rounded-lg">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -928,8 +790,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                             )}
                           </div>
                           <div className="flex flex-col gap-1 ml-3">
-                            <span className="info-badge px-2 py-1 rounded-full text-xs">
-                              {opportunity.type.replace('_', ' ')}
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              opportunity.estimatedEffort === 'low' ? 'bg-green-100 text-green-700' :
+                              opportunity.estimatedEffort === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {opportunity.estimatedEffort} effort
+                            </span>
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              opportunity.potentialImpact === 'high' ? 'bg-green-100 text-green-700' :
+                              opportunity.potentialImpact === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {opportunity.potentialImpact} impact
                             </span>
                           </div>
                         </div>
@@ -939,12 +812,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                   </div>
                 </div>
+                
+                {/* Export buttons at bottom */}
+                <ExportButtons
+                  onExportCsv={() => exportAuthorityAnalysis()}
+                  onPrintReport={onPrintReport}
+                  className="mt-6"
+                />
               </div>
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h4 className="h4 mb-2">Authority Intelligence Analysis</h4>
-                <p className="body-copy text-sm mb-4">
+                <p className="body-copy text-xs mb-4">
                   Authority analysis will be performed automatically when you run a health check.
                 </p>
               </div>
@@ -953,14 +833,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
 
         {activeTab === 'benchmark' && (
-          <div>
-            
+          <div className={tabContentClass}>
             {industryBenchmark ? (
               <div className="space-y-6">
                 {/* Performance Analysis Overview */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">Performance Analysis Overview</h3>
+                    <h4 className="h4">Performance Analysis Overview</h4>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1008,7 +887,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Industry Comparison */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">Industry Comparison</h3>
+                    <h4 className="h4">Industry Comparison</h4>
                   </div>
                   <div className="content-box">
                     <div className="glass p-4 rounded-lg">
@@ -1036,7 +915,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {/* Gap Analysis */}
                 <div className="section-container">
                   <div className="section-title">
-                    <h3 className="h3">Gap Analysis</h3>
+                    <h4 className="h4">Gap Analysis</h4>
                   </div>
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1059,8 +938,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       <div className="glass p-4 rounded-lg">
                         <h4 className="h4 mb-3">Industry Challenges</h4>
                         <ul className="space-y-2">
-                          {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
-                            <li key={index} className="body-copy text-sm flex items-start">
+                          {industryBenchmark.competitiveLandscape.challenges.map((challenge: string, index: number) => (
+                            <li key={index} className="body-copy text-xs flex items-start">
                               <span className="w-2 h-2 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
                               {challenge}
                             </li>
@@ -1075,7 +954,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {(industryBenchmark.competitiveLandscape.leaders.length > 0 || industryBenchmark.competitiveLandscape.emerging.length > 0) && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Industry Leaders</h3>
+                      <h4 className="h4">Industry Leaders</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
@@ -1083,7 +962,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           <div className="mb-4">
                             <div className="text-xs font-medium text-muted-foreground mb-2">Industry Leaders</div>
                             <div className="space-y-2">
-                              {industryBenchmark.competitiveLandscape.leaders.map((leader, index) => (
+                              {industryBenchmark.competitiveLandscape.leaders.map((leader: CompetitorProfile, index: number) => (
                                 <div key={index} className="p-3 glass rounded-lg">
                                   <div className="flex items-center justify-between mb-2">
                                     <div className="text-sm font-medium text-foreground">{leader.name}</div>
@@ -1105,7 +984,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                           <div>
                             <div className="text-xs font-medium text-muted-foreground mb-2">Emerging Competitors</div>
                             <div className="space-y-2">
-                              {industryBenchmark.competitiveLandscape.emerging.map((competitor, index) => (
+                              {industryBenchmark.competitiveLandscape.emerging.map((competitor: CompetitorProfile, index: number) => (
                                 <div key={index} className="p-3 glass rounded-lg">
                                   <div className="flex items-center justify-between mb-2">
                                     <div className="text-sm font-medium text-foreground">{competitor.name}</div>
@@ -1131,29 +1010,29 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 {industryBenchmark.actionableInsights.length > 0 && (
                   <div className="section-container">
                     <div className="section-title">
-                      <h3 className="h3">Strategic Insights</h3>
+                      <h4 className="h4">Strategic Insights</h4>
                     </div>
                     <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <div className="space-y-3">
-                          {industryBenchmark.actionableInsights.map((insight, index) => (
-                            <div key={index} className="p-3 glass rounded-lg">
-                              <div className="flex items-start gap-3">
-                                <span className="px-2 py-1 rounded-full text-xs flex-shrink-0 bg-[#5F209B] text-white">
+                          {industryBenchmark.actionableInsights.map((insight: any, index: number) => (
+                            <div key={index} className={`p-3 rounded-lg ${
+                              insight.priority === 'high' ? 'bg-red-50 border border-red-200' :
+                              insight.priority === 'medium' ? 'bg-yellow-50 border border-yellow-200' :
+                              'bg-green-50 border border-green-200'
+                            }`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  insight.priority === 'high' ? 'bg-red-100 text-red-700' :
+                                  insight.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-green-100 text-green-700'
+                                }`}>
                                   {insight.priority} priority
                                 </span>
-                                <div className="flex-1">
-                                  <div className="text-sm font-medium text-foreground mb-1">
-                                    {insight.insight}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground mb-1">
-                                    <strong>Why it matters:</strong> {insight.rationale}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    <strong>Expected impact:</strong> {insight.expectedImpact}
-                                  </div>
-                                </div>
                               </div>
+                              <h5 className="text-sm font-medium mb-1">{insight.insight}</h5>
+                              <p className="text-xs text-muted-foreground mb-2">{insight.rationale}</p>
+                              <p className="text-xs"><strong>Expected impact:</strong> {insight.expectedImpact}</p>
                             </div>
                           ))}
                         </div>
@@ -1164,18 +1043,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
                 {/* Next Steps */}
                 {industryBenchmark.benchmarkingRecommendations.length > 0 && (
-                  <div className="flex gap-6">
-                    <div className="w-48 flex-shrink-0 section-title">
-                      <h3 className="h3">Next Steps</h3>
+                  <div className="section-container">
+                    <div className="section-title">
+                      <h4 className="h4">Next Steps</h4>
                     </div>
-                    <div className="flex-1">
+                    <div className="content-box">
                       <div className="glass p-4 rounded-lg">
                         <ul className="space-y-2">
-                          {industryBenchmark.benchmarkingRecommendations.map((rec, index) => (
-                            <li key={index} className="body-copy text-sm flex items-start">
-                              <span className="w-6 h-6 bg-[#5F209B] text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-                                {index + 1}
-                              </span>
+                          {industryBenchmark.benchmarkingRecommendations.map((rec: string, index: number) => (
+                            <li key={index} className="body-copy text-xs flex items-start">
+                              <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
                               {rec}
                             </li>
                           ))}
@@ -1184,13 +1061,20 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     </div>
                   </div>
                 )}
+                
+                {/* Export buttons at bottom */}
+                <ExportButtons
+                  onExportCsv={() => exportBenchmarkData()}
+                  onPrintReport={onPrintReport}
+                  className="mt-6"
+                />
               </div>
             ) : (
               <div className="glass p-6 rounded-lg text-center">
-                <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h4 className="h4 mb-2">Industry Benchmarking Analysis</h4>
-                <p className="body-copy text-sm mb-4">
-                  Industry benchmark analysis will be performed automatically when you run a health check.
+                <p className="body-copy text-xs mb-4">
+                  Industry benchmarking will be performed automatically when you run a health check.
                 </p>
               </div>
             )}
@@ -1198,17 +1082,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         )}
       </div>
 
-      {/* Answer Modal */}
+      {/* Modals */}
       <AnswerModal
         isOpen={isAnswerModalOpen}
-        onClose={handleCloseAnswerModal}
+        onClose={() => setIsAnswerModalOpen(false)}
         result={selectedResult}
       />
 
-      {/* Recommendations Modal */}
       <RecommendationsModal
         isOpen={isRecommendationsModalOpen}
-        onClose={handleCloseRecommendationsModal}
+        onClose={() => setIsRecommendationsModalOpen(false)}
         result={selectedResult}
       />
     </div>
