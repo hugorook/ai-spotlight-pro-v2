@@ -63,8 +63,8 @@ export default function AppShell({
       )}
       
       {/* Main Content Area */}
-      <div className={`flex flex-col pt-20 ${showHealthCheckSidebar ? 'ml-64' : ''}`}>
-        <div className="flex-1 px-6 py-4">
+      <div className={`flex flex-col pt-16 ${showHealthCheckSidebar ? 'ml-64' : ''}`}>
+        <div className="flex-1 px-6 py-2">
           {children}
         </div>
       </div>
