@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, 
   TrendingUp, 
@@ -18,7 +17,11 @@ import {
   Check,
   Users,
   Globe,
-  Star
+  Star,
+  ChevronDown,
+  Lightbulb,
+  Award,
+  TrendingDownIcon
 } from "lucide-react";
 import heroImage from "@/assets/hero-ai-visibility.jpg";
 import GhostAnimation from "@/components/GhostAnimation";
@@ -36,106 +39,64 @@ const LandingPage = () => {
     window.location.href = '/auth';
   };
 
-  const features = [
-    {
-      icon: Search,
-      title: "AI Prompt Discovery",
-      description: "Identify exactly what your customers ask AI about your industry",
-      benefits: ["500+ relevant prompts discovered", "Intent analysis", "Difficulty scoring"]
-    },
-    {
-      icon: TestTube,
-      title: "Multi-Model Testing",
-      description: "Test your visibility across ChatGPT, Claude, Gemini, and more",
-      benefits: ["Real-time AI testing", "Competitor comparison", "Position tracking"]
-    },
-    {
-      icon: FileText,
-      title: "AI Content Creator",
-      description: "Generate content optimized for AI training data inclusion",
-      benefits: ["Press releases", "Case studies", "Expert commentary"]
-    },
-    {
-      icon: BarChart3,
-      title: "Visibility Analytics",
-      description: "Track your AI mention frequency and ranking improvements",
-      benefits: ["Weekly reports", "Trend analysis", "ROI tracking"]
-    }
+  const aiSearchStats = [
+    { metric: "180M+", label: "ChatGPT Monthly Users" },
+    { metric: "10x", label: "Higher Intent Traffic" },
+    { metric: "67%", label: "Trust AI Recommendations" },
+    { metric: "2024", label: "AI Search Gold Rush" }
   ];
 
   const pricingPlans = [
     {
       name: "Starter",
-      price: "$29",
-      period: "per month",
-      description: "Perfect for small businesses getting started with AI visibility",
+      price: "$19.99",
+      period: "per month", 
+      description: "Test the waters. See if AI even knows you exist.",
       features: [
-        "Up to 50 AI tests per month",
-        "Basic visibility tracking",
+        "Basic AI visibility checks",
+        "ChatGPT, Claude, Gemini testing",
+        "Monthly reports",
         "Email support",
-        "Standard AI models (GPT-3.5, Claude)",
-        "Monthly reports"
+        "Up to 50 prompts tested"
       ],
       highlighted: false,
-      buttonText: "Start Free Trial"
+      buttonText: "Start Testing"
     },
     {
-      name: "Professional",
-      price: "$99",
+      name: "Pro",
+      price: "$50",
       period: "per month",
-      description: "Advanced features for growing companies",
+      description: "Get serious. Track competitors, publish smarter content, measure results.",
       features: [
-        "Up to 500 AI tests per month",
-        "Advanced analytics & insights",
-        "Competitor tracking",
-        "All AI models (GPT-4, Claude-3, Gemini)",
+        "Everything in Starter",
+        "Competitor tracking & analysis", 
+        "Content gap analysis",
+        "Smart content recommendations",
+        "Weekly reports & insights",
+        "Up to 500 prompts tested",
         "Priority support",
-        "Custom content recommendations",
-        "API access"
+        "Content creation tools"
       ],
       highlighted: true,
-      buttonText: "Get Started"
+      buttonText: "Get Serious"
     },
     {
       name: "Enterprise",
       price: "Custom",
       period: "pricing",
-      description: "Custom solutions for large organizations",
+      description: "Need integrations, dashboards, or a dedicated manager? Lex scales with you.",
       features: [
-        "Unlimited AI tests",
-        "White-label dashboard",
-        "Dedicated account manager",
+        "Everything in Pro",
+        "Unlimited prompts tested",
         "Custom integrations",
-        "Advanced reporting",
+        "White-label dashboards",
+        "Dedicated account manager",
+        "Custom reporting",
         "SLA guarantee",
         "Training & onboarding"
       ],
       highlighted: false,
-      buttonText: "Contact Sales"
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Chen",
-      role: "Marketing Director",
-      company: "TechFlow Solutions",
-      avatar: "SC",
-      content: "Our AI mentions increased by 300% in just 2 months. This platform is a game-changer for our digital strategy."
-    },
-    {
-      name: "Michael Torres",
-      role: "CEO",
-      company: "InnovateLab",
-      avatar: "MT",
-      content: "Finally, we can track how AI models recommend us to customers. The insights are invaluable for our positioning."
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Head of Growth",
-      company: "DataVantage",
-      avatar: "ER",
-      content: "The competitor analysis feature helped us identify gaps and opportunities we never knew existed."
+      buttonText: "Let's Talk"
     }
   ];
 
@@ -146,6 +107,7 @@ const LandingPage = () => {
         isActive={flashlightActive} 
         onToggle={setFlashlightActive} 
       />
+      
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4">
@@ -154,28 +116,26 @@ const LandingPage = () => {
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <svg 
-                  className="w-6 h-6 text-[#111E63]" 
+                  className="w-8 h-8 text-[#5F209B]" 
                   viewBox="0 0 24 24" 
                   fill="currentColor"
                 >
-                  <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                  <circle fill="white" cx="9" cy="9.5" r="0.5"/>
-                  <circle fill="white" cx="15" cy="9.5" r="0.5"/>
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold text-foreground">Ghost AI</span>
+              <span className="text-2xl font-bold text-foreground">Lex</span>
             </div>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
-                Features
+              <a href="#how" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
+                How it Works
               </a>
-              <a href="#pricing" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
+              <a href="#traffic" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
+                Traffic
+              </a>
+              <a href="#pricing" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
                 Pricing
-              </a>
-              <a href="#testimonials" className="text-muted-foreground hover:bg-[#E7E2F9] hover:text-[#111E63] px-3 py-2 rounded-md transition-none">
-                Testimonials
               </a>
             </nav>
 
@@ -185,10 +145,10 @@ const LandingPage = () => {
                 Login
               </Button>
               <Button 
-                className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+                className="bg-[#5F209B] text-white hover:bg-[#4A1A7D] transition-none"
                 onClick={handleGetStarted}
               >
-                Get Started
+                Cheat the Internet
               </Button>
             </div>
           </div>
@@ -196,7 +156,7 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-48 pb-20 px-4 relative overflow-hidden">
+      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         {/* Ghost Animation Overlay - Hero section only */}
         <div className="absolute inset-0 pointer-events-none z-50">
           <GhostAnimation />
@@ -204,35 +164,26 @@ const LandingPage = () => {
         
         <div className="container mx-auto relative z-10">
           {/* Centered Hero Content */}
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="text-center max-w-5xl mx-auto">
             <div className="space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-                  Your Audience is searching{" "}
-                  <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                    Can they Find You?
-                  </span>
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-7xl font-bold leading-tight">
+                  Cheat the Internet.
                 </h1>
                 
-                <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                  Optimize your company's presence in ChatGPT, Claude, and other AI models. 
-                  Get recommended when your customers ask AI for solutions.
-                </p>
-              </div>
-
-              {/* Value Props */}
-              <div className="space-y-3 max-w-2xl mx-auto">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
-                  <span className="text-foreground">Monitor mentions across all major AI models</span>
-                </div>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
-                  <span className="text-foreground">Identify gaps in your current digital presence</span>
-                </div>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-2 h-2 bg-[#111E63] rounded-full" />
-                  <span className="text-foreground">Automate content to Increase AI recommendations</span>
+                <div className="space-y-4">
+                  <h2 className="text-2xl md:text-4xl font-semibold text-[#5F209B]">
+                    Meet Lex. The Generative SEO tool.
+                  </h2>
+                  
+                  <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                    AI tools are funneling huge volumes of super high intent traffic — and the big brands aren't competing.
+                  </p>
+                  
+                  <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                    Lex is your shovel in the AI search gold rush. It helps you teach AI tools to recommend you. 
+                    Show up early. Own your category. Become the default choice.
+                  </p>
                 </div>
               </div>
 
@@ -240,172 +191,242 @@ const LandingPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="group bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none" 
+                  className="group bg-[#5F209B] text-white hover:bg-[#4A1A7D] transition-none text-lg px-8 py-4" 
                   onClick={handleGetStarted}
                 >
-                  Start Free Trial
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Start Cheating
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform ml-2" />
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+                  className="border-[#5F209B] text-[#5F209B] hover:bg-[#5F209B] hover:text-white transition-none text-lg px-8 py-4"
                 >
-                  Watch Demo (3 min)
+                  See How (3 min demo)
                 </Button>
               </div>
-
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4">
+      {/* What is Generative SEO Section */}
+      <section className="py-20 px-4 bg-[#E7F0F6]">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              Everything You Need to{" "}
-              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Dominate AI
-              </span>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8 text-center">
+              "What the **** is Generative SEO?"
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our comprehensive platform gives you all the tools to optimize, monitor, 
-              and improve your company's visibility in AI model recommendations.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <Card key={index} className="p-8 bg-[#E7E2F9] border-border/50 hover:border-primary/30 transition-all duration-300 group shadow-soft">
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 rounded-xl bg-primary/20 text-primary group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                          {feature.title}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      {feature.benefits.map((benefit, benefitIndex) => (
-                        <div key={benefitIndex} className="flex items-center gap-3">
-                          <div className="w-1.5 h-1.5 bg-success rounded-full" />
-                          <span className="text-sm text-muted-foreground">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Process Flow */}
-          <div className="bg-muted/20 rounded-2xl p-8 md:p-12">
-            <div className="text-center mb-12">
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                How It Works
-              </h3>
-              <p className="text-muted-foreground">
-                Simple 4-step process to AI visibility dominance
+            
+            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                People use AI tools to search, ChatGPT alone has over 180M monthly users.
+              </p>
+              <p>
+                People trust AI recommendations, so the traffic is way more valuable. You're not an option, 
+                you're a recommendation. Fewer impressions — way higher intent.
+              </p>
+              <p>
+                First movers win, and win big. Companies in SaaS and consumer products have already become 
+                the "default" answer to certain prompts. Once a model learns you as the go-to example, it tends to stick.
               </p>
             </div>
+            
+            {/* AI Search Stats */}
+            <div className="grid md:grid-cols-4 gap-6 mt-12">
+              {aiSearchStats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-[#5F209B] mb-2">
+                    {stat.metric}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid md:grid-cols-4 gap-8">
-              {[
-                {
-                  step: "01",
-                  icon: Target,
-                  title: "Setup Profile",
-                  description: "Tell us about your company, industry, and target customers"
-                },
-                {
-                  step: "02", 
-                  icon: Search,
-                  title: "Discover Prompts",
-                  description: "We identify relevant AI prompts for your business"
-                },
-                {
-                  step: "03",
-                  icon: Bot,
-                  title: "Test Visibility",
-                  description: "See how often you're mentioned across AI models"
-                },
-                {
-                  step: "04",
-                  icon: FileText,
-                  title: "Optimize Content",
-                  description: "Generate and publish AI-optimized content"
-                }
-              ].map((step, index) => {
-                const IconComponent = step.icon;
-                return (
-                  <div key={index} className="text-left group">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-[#E7E2F9] rounded-lg flex items-center justify-center group-hover:bg-[#111E63] group-hover:text-white transition-none">
-                          <IconComponent className="w-6 h-6" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-xs font-bold text-[#111E63] mb-1">STEP {step.step}</div>
-                        <h4 className="text-lg font-semibold text-foreground mb-2">
-                          {step.title}
-                        </h4>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground text-sm ml-16">
-                      {step.description}
+      {/* How Lex Helps Section */}
+      <section id="how" className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8 text-center">
+              How does Lex help me win?
+            </h2>
+            
+            <p className="text-lg text-muted-foreground leading-relaxed mb-12 text-center">
+              Generative SEO is about teaching AI models to know you, trust you, and recommend you when 
+              customers ask. Most marketers find it confusing. Lex makes it simple:
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="p-8 bg-white border border-gray-200">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Lex checks whether you're mentioned across ChatGPT, Claude, and Gemini.
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Get real-time visibility into how AI models see your brand across all major platforms.
                     </p>
                   </div>
-                );
-              })}
+                </div>
+              </Card>
+              
+              <Card className="p-8 bg-white border border-gray-200">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
+                    <Target className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Analyses the gaps Where has ChatGPT missed recommending you and why.
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Understand exactly why AI models aren't recommending you and what's missing.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-8 bg-white border border-gray-200">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Guides you step by step so models start recommending customers to you.
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Get actionable recommendations and content strategies that actually work.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-8 bg-white border border-gray-200">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
+                    <TrendingUp className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Tracks your growth as your brand gets recommended more often.
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Monitor your progress and see how your AI visibility improves over time.
+                    </p>
+                  </div>
+                </div>
+              </Card>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Traffic Section */}
+      <section id="traffic" className="py-20 px-4 bg-[#E7F0F6]">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+              How Much Traffic Can I actually get?
+            </h2>
+            
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 mb-8">
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-[#5F209B] mb-2">432%</div>
+                  <div className="text-sm text-muted-foreground">Growth in AI search queries</div>
+                  <div className="text-xs text-muted-foreground mt-1">vs. 2023</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-[#5F209B] mb-2">$2.3B</div>
+                  <div className="text-sm text-muted-foreground">Value of AI search traffic</div>
+                  <div className="text-xs text-muted-foreground mt-1">projected 2024</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-[#5F209B] mb-2">73%</div>
+                  <div className="text-sm text-muted-foreground">Of marketers unaware</div>
+                  <div className="text-xs text-muted-foreground mt-1">of this opportunity</div>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-lg text-muted-foreground">
+              [Stats on AI search market growth]
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Promotion Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+              Will I get a promotion?
+            </h2>
+            
+            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                You're not chasing vanity numbers—you're positioning your brand to be the authority AI names by default. 
+                When that happens, you own the moment—and that's worth way more than millions of passive visits.
+              </p>
+              <p className="text-xl font-semibold text-[#5F209B]">
+                Also, Lex helps you with regular SEO and reporting too.. So yes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Nobody Knows Section */}
+      <section className="py-20 px-4 bg-[#E7F0F6]">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+              Why does nobody know about this?
+            </h2>
+            
+            <p className="text-2xl font-bold text-[#5F209B]">
+              Because they are dumb.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 bg-muted/5">
+      <section id="pricing" className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              Choose Your{" "}
-              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Plan
-              </span>
+              Pricing
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Start free and scale as you grow. All plans include our core AI visibility features.
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`relative p-8 flex flex-col ${plan.highlighted ? 'border-primary shadow-glow bg-primary/5' : ''}`}>
+              <Card key={index} className={`relative p-8 flex flex-col ${plan.highlighted ? 'border-[#5F209B] shadow-xl bg-[#5F209B]/5' : 'bg-white border-gray-200'}`}>
                 {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-ai text-white">
+                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#5F209B] text-white">
                     Most Popular
                   </Badge>
                 )}
                 
                 <CardHeader className="p-0 mb-6">
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-bold text-foreground">{plan.price}</span>
                     <span className="text-muted-foreground">/{plan.period}</span>
                   </div>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-base mt-4 leading-relaxed">
                     {plan.description}
                   </CardDescription>
                 </CardHeader>
@@ -414,14 +435,18 @@ const LandingPage = () => {
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center gap-3">
-                        <Check className="w-4 h-4 text-success flex-shrink-0" />
+                        <Check className="w-4 h-4 text-[#5F209B] flex-shrink-0" />
                         <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Button 
-                    className="w-full bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none mt-auto"
+                    className={`w-full transition-none mt-auto ${
+                      plan.highlighted 
+                        ? 'bg-[#5F209B] text-white hover:bg-[#4A1A7D]' 
+                        : 'bg-white text-[#5F209B] border-[#5F209B] border hover:bg-[#5F209B] hover:text-white'
+                    }`}
                     onClick={handleGetStarted}
                   >
                     {plan.buttonText}
@@ -433,100 +458,51 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              Trusted by{" "}
-              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Industry Leaders
-              </span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              See how companies are using AI Visibility Hub to dominate their markets.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6 bg-card/50 backdrop-blur">
-                <CardContent className="p-0">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-[#E7E2F9] text-[#E7E2F9]" />
-                    ))}
-                  </div>
-                  
-                  <p className="text-muted-foreground mb-6">
-                    "{testimonial.content}"
-                  </p>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-ai rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-foreground">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {testimonial.role} at {testimonial.company}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-ai">
+      <section className="py-20 px-4 bg-[#5F209B]">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            Ready to Dominate AI Recommendations?
+            Ready to Own Your Category?
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Join thousands of companies already optimizing their AI visibility. 
-            Start your free trial today and see results in 24 hours.
+          <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
+            Join the companies already teaching AI models to recommend them. 
+            The gold rush is happening now. Don't get left behind.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+              className="bg-white text-[#5F209B] hover:bg-gray-100 transition-none text-lg px-8 py-4"
               onClick={handleGetStarted}
             >
-              Start Free Trial
-              <ArrowRight className="w-4 h-4 ml-2" />
+              Start Cheating Today
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
               size="lg" 
-              className="bg-[#E7E2F9] text-foreground hover:bg-[#111E63] hover:text-white transition-none"
+              className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#5F209B] transition-none text-lg px-8 py-4"
             >
-              Schedule Demo
+              See Demo
             </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-muted/10 border-t border-border">
+      <footer className="py-12 px-4 bg-background border-t border-border">
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <svg 
-                  className="w-6 h-6 text-[#111E63]" 
+                  className="w-8 h-8 text-[#5F209B]" 
                   viewBox="0 0 24 24" 
                   fill="currentColor"
                 >
-                  <path d="M12 2C7.037 2 3 6.037 3 11c0 2.05.68 3.936 1.827 5.451L12 22l7.173-5.549C20.32 14.936 21 13.05 21 11c0-4.963-4.037-9-9-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                  <circle fill="white" cx="9" cy="9.5" r="0.5"/>
-                  <circle fill="white" cx="15" cy="9.5" r="0.5"/>
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold text-foreground">Ghost AI</span>
+              <span className="text-2xl font-bold text-foreground">Lex</span>
             </div>
             
             <div className="flex gap-6 text-sm text-muted-foreground">
@@ -537,7 +513,7 @@ const LandingPage = () => {
           </div>
           
           <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2024 Ghost AI. All rights reserved.
+            © 2024 Lex. All rights reserved.
           </div>
         </div>
       </footer>
