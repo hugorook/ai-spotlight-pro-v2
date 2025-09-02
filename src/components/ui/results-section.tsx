@@ -596,7 +596,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="h4 pr-2">
                         "{opportunity.query}"
-                      </h3>
+                      </h4>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <TrendingUp className="w-3 h-3 text-green-600" />
                         <span className="text-xs font-medium text-green-600">
@@ -746,7 +746,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="h4 mb-2">No Website Analysis Available</h3>
+                <h4 className="h4 mb-2">No Website Analysis Available</h4>
                 <p className="body-copy text-sm mb-4">
                   Website analysis will be performed when you run a health check with a company website URL configured.
                 </p>
@@ -943,7 +943,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="h4 mb-2">Authority Intelligence Analysis</h3>
+                <h4 className="h4 mb-2">Authority Intelligence Analysis</h4>
                 <p className="body-copy text-sm mb-4">
                   Authority analysis will be performed automatically when you run a health check.
                 </p>
@@ -1041,7 +1041,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   <div className="content-box">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="glass p-4 rounded-lg">
-                        <h4 className="h4 mb-3">Performance Gaps</h3>
+                        <h4 className="h4 mb-3">Performance Gaps</h4>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between p-2 glass rounded">
                             <span className="text-sm text-muted-foreground">Gap to Leaders</span>
@@ -1057,7 +1057,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                       </div>
 
                       <div className="glass p-4 rounded-lg">
-                        <h4 className="h4 mb-3">Industry Challenges</h3>
+                        <h4 className="h4 mb-3">Industry Challenges</h4>
                         <ul className="space-y-2">
                           {industryBenchmark.competitiveLandscape.challenges.map((challenge, index) => (
                             <li key={index} className="body-copy text-sm flex items-start">
@@ -1188,7 +1188,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             ) : (
               <div className="glass p-6 rounded-lg text-center">
                 <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="h4 mb-2">Industry Benchmarking Analysis</h3>
+                <h4 className="h4 mb-2">Industry Benchmarking Analysis</h4>
                 <p className="body-copy text-sm mb-4">
                   Industry benchmark analysis will be performed automatically when you run a health check.
                 </p>
