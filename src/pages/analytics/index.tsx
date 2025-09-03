@@ -368,7 +368,7 @@ export default function Analytics() {
             return (
               <div 
                 key={tab.id}
-                className={`p-6 border-2 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-lg ${
+                className={`p-4 border-2 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-lg ${
                   activeTab === tab.id 
                     ? 'border-purple-600 bg-purple-50 shadow-lg' 
                     : 'border-gray-200 hover:border-gray-300 bg-white'
@@ -376,15 +376,15 @@ export default function Analytics() {
                 onClick={() => setActiveTab(tab.id)}
               >
                 <div className="text-center">
-                  <Icon className={`w-8 h-8 mx-auto mb-3 ${
+                  <Icon className={`w-6 h-6 mx-auto mb-2 ${
                     activeTab === tab.id ? 'text-purple-600' : 'text-gray-600'
                   }`} />
-                  <h2 className={`h2 mb-2 ${
+                  <h2 className={`h2 mb-1 ${
                     activeTab === tab.id ? 'text-purple-900' : 'text-gray-900'
                   }`}>
                     {tab.label}
                   </h2>
-                  <p className={`text-sm leading-relaxed ${
+                  <p className={`text-xs leading-relaxed ${
                     activeTab === tab.id ? 'text-purple-700' : 'text-gray-600'
                   }`}>
                     {descriptions[tab.id as keyof typeof descriptions]}
