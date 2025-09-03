@@ -259,8 +259,8 @@ export default function TodayDashboard() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Page Header */}
         <div className="text-center">
-          <h1 className="h1 mb-2">Today</h1>
-          <p className="body text-gray-600">Your AI visibility at a glance</p>
+          <h1 className="h1 mb-2">Today's Dashboard</h1>
+          <p className="body text-gray-600">Your AI visibility at a glance - simplified view</p>
         </div>
 
         {/* Three Core Cards */}
