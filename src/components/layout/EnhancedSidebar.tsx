@@ -71,7 +71,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl flex flex-col">
+    <div className="fixed left-0 top-0 h-screen w-64 z-[100] bg-transparent flex flex-col">
       {/* Logo */}
       <div className="p-2">
         <div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center justify-between px-2 py-1 text-left transition-none group text-sm bg-transparent",
+                  "w-full flex items-center justify-between px-2 py-1 text-left transition-none group text-sm bg-transparent border-0",
                   isActive(item.path)
                     ? "text-gray-900"
                     : "text-gray-700 hover:text-gray-900"
@@ -140,7 +140,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                       <button
                         onClick={() => onHealthTabChange?.(child.path)}
                         className={cn(
-                          "relative w-full flex items-center gap-2 pl-8 pr-2 py-1 text-left transition-none text-xs ml-0 bg-transparent",
+                          "relative w-full flex items-center gap-2 pl-8 pr-2 py-1 text-left transition-none text-xs ml-0 bg-transparent border-0",
                           activeHealthTab === child.path
                             ? "text-gray-900"
                             : "text-gray-600 hover:text-gray-900"

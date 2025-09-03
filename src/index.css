@@ -300,17 +300,17 @@
   }
 
   .glass-strong {
-    background: var(--gradient-subtle-grey);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: none;
-    box-shadow: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   .glass-strong:hover {
-    background: var(--gradient-subtle-grey);
-    border: none;
-    box-shadow: none;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   /* Remove hover effects from glass-strong containers */
@@ -605,7 +605,7 @@
   }
 
   /* Sidebar and navigation buttons - no borders except Run Health Check */
-  .sidebar-button, [role="tab"], .nav-button {
+  .sidebar-button, [role="tab"], .nav-button, .glass-strong button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
