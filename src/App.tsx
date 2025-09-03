@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -36,13 +36,7 @@ const App = () => (
                 </ErrorBoundary>
               </ProtectedRoute>
             } />
-            <Route path="/geo" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <CleanGeoPage />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
+            <Route path="/geo" element={<Navigate to="/analytics" replace />} />
             <Route path="/prompts" element={
               <ProtectedRoute>
                 <ErrorBoundary>
