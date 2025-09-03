@@ -271,7 +271,7 @@ const PromptsPage = () => {
         </div>
 
         {/* Company Info */}
-        <div className="glass p-3 rounded-lg">
+        <div className="glass p-2 rounded-lg">
           <h3 className="h4 mb-2">Company: {company.company_name}</h3>
           <p className="body text-xs">
             Industry: {company.industry} | Target: {company.target_customers || 'Not specified'}
@@ -281,7 +281,7 @@ const PromptsPage = () => {
         {/* Prompts List */}
         <div className="space-y-2">
           {prompts.map((prompt, index) => (
-            <div key={prompt.id} className="glass px-3 py-2 rounded-md">
+            <div key={prompt.id} className="glass px-2 py-1.5 rounded-md">
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 flex-1 items-center">
                   {/* Left side: Number and Tag */}
@@ -366,7 +366,7 @@ const PromptsPage = () => {
         </div>
 
         {/* Info */}
-        <div className="glass p-3 rounded-lg">
+        <div className="glass p-2 rounded-lg">
           <h4 className="h4 mb-2">How This Works</h4>
           <ul className="body text-xs space-y-1">
             <li>These prompts are used by the automated health check to test your AI visibility</li>

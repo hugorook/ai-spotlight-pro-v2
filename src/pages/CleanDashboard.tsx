@@ -241,7 +241,7 @@ const CleanDashboard = () => {
       {/* Row 1: Visibility Trend and Recent Performance */}
       <div className="grid md:grid-cols-2 gap-3 mb-4">
         {/* Visibility Trend */}
-        <div id="dashboard-trend-report" className="rounded-lg bg-card p-4">
+        <div id="dashboard-trend-report" className="rounded-lg bg-card p-2">
           <div className="flex items-center justify-between mb-2">
             <h3 className="h3">Visibility trend</h3>
             <select value={trendTimeframe} onChange={(e) => setTrendTimeframe(e.target.value as any)} className="h-8 rounded-md border border-input bg-background px-2 text-xs">
@@ -270,7 +270,7 @@ const CleanDashboard = () => {
           )}
         </div>
         {/* Recent Performance (tiles) */}
-        <div className="rounded-lg bg-card p-4">
+        <div className="rounded-lg bg-card p-2">
           <h3 className="h3 mb-3">Recent Performance</h3>
           <Tiles 
             mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
@@ -282,7 +282,7 @@ const CleanDashboard = () => {
       </div>
 
       {/* Row 2: Recent Test Results full width */}
-      <div className="rounded-lg bg-card p-4">
+      <div className="rounded-lg bg-card p-2">
         <div className="flex items-center justify-between mb-3">
           <h3 className="h3">Recent Test Results</h3>
           <div className="flex items-center gap-2">

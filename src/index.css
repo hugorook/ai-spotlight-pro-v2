@@ -308,7 +308,7 @@
   }
 
   .glass-strong:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--gradient-subtle-grey);
     border: none;
     box-shadow: none;
   }
@@ -456,6 +456,18 @@
   /* Ensure all gradient classes use purple */
   .bg-gradient-to-r, .bg-gradient-to-l, .bg-gradient-to-t, .bg-gradient-to-b {
     background: #5F209B !important;
+    color: white !important;
+  }
+
+  /* Ensure purple backgrounds have white text */
+  .bg-\[\#5F209B\],
+  [class*="bg-[#5F209B]"] {
+    background: #5F209B !important;
+    color: white !important;
+  }
+  
+  .bg-\[\#5F209B\] *,
+  [class*="bg-[#5F209B]"] * {
     color: white !important;
   }
 

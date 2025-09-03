@@ -77,7 +77,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Data Management Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4">
+        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-2">
           <h2 className="h2 mb-4">
             Data Management
           </h2>
@@ -107,7 +107,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Account Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4">
+        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-2">
           <h2 className="h2 mb-4">
             Account Information
           </h2>
