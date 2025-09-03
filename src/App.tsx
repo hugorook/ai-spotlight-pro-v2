@@ -12,11 +12,6 @@ import SettingsPage from "./pages/SettingsPage";
 import ConnectionsSettings from "./pages/settings/connections";
 import Analytics from "./pages/analytics";
 import HealthCheckAnalytics from "./pages/analytics/health-check";
-import PromptsAnalytics from "./pages/analytics/prompts";
-import RecommendationsAnalytics from "./pages/analytics/recommendations";
-import BenchmarkAnalytics from "./pages/analytics/benchmark";
-import AuthorityAnalytics from "./pages/analytics/authority";
-import TrendingAnalytics from "./pages/analytics/trending";
 import PublicSnapshot from "./pages/PublicSnapshot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
@@ -89,41 +84,6 @@ const App = () => (
               <ProtectedRoute>
                 <ErrorBoundary>
                   <HealthCheckAnalytics />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics/prompts" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <PromptsAnalytics />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics/recommendations" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <RecommendationsAnalytics />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics/benchmark" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <BenchmarkAnalytics />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics/authority" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <AuthorityAnalytics />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics/trending" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <TrendingAnalytics />
                 </ErrorBoundary>
               </ProtectedRoute>
             } />

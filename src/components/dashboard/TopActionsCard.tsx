@@ -139,7 +139,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
       )}
 
       <button 
-        onClick={() => navigate('/analytics/recommendations')}
+        onClick={() => navigate('/analytics?tab=results')}
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
         Show more →

@@ -126,7 +126,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
       )}
 
       <button 
-        onClick={() => navigate('/analytics/prompts')}
+        onClick={() => navigate('/analytics?tab=results')}
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
         View all wins →
