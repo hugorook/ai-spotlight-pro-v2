@@ -20,7 +20,7 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ["Inter", "ui-sans-serif", "system-ui"],
-				serif: ["Playfair Display", "Georgia", "serif"],
+				serif: ["Hedvig", "Georgia", "serif"],
 				mono: ["JetBrains Mono", "ui-monospace"],
 			},
 			letterSpacing: {
