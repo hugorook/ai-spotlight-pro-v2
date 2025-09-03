@@ -71,7 +71,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 z-[100] bg-white flex flex-col">
+    <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl flex flex-col">
       {/* Logo */}
       <div className="p-3">
         <div className="flex items-center gap-2">
