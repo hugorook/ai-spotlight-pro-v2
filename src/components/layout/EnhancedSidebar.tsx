@@ -73,7 +73,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   return (
     <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl flex flex-col">
       {/* Logo */}
-      <div className="p-3">
+      <div className="p-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center">
             <span className="text-white font-bold text-sm">L</span>
@@ -83,11 +83,11 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </div>
 
       {/* Run Health Check Button */}
-      <div className="p-3">
+      <div className="p-2">
         <button
           onClick={onRunHealthCheck || (() => navigate('/geo'))}
           disabled={isRunning}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#5F209B] text-white rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm"
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#5F209B] text-white rounded-md hover:opacity-90 transition-opacity font-semibold text-sm"
         >
           <Activity className={`w-4 h-4 ${isRunning ? 'animate-spin' : ''}`} />
           {isRunning ? 'Running Health Check...' : 'Run Health Check'}
@@ -95,8 +95,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-1 overflow-y-auto">
-        <div className="space-y-0.5">
+      <nav className="flex-1 px-2 py-1 overflow-y-auto">
+        <div className="space-y-0">
           {navItems.map((item) => (
             <div key={item.path}>
               <button
@@ -108,10 +108,10 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center justify-between px-2 py-0.5 text-left transition-none group text-sm",
+                  "w-full flex items-center justify-between px-2 py-1 text-left transition-none group text-sm bg-transparent",
                   isActive(item.path)
-                    ? "bg-gray-100 text-gray-900"
-                    : "hover:bg-gray-50"
+                    ? "text-gray-900"
+                    : "text-gray-700 hover:text-gray-900"
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -132,18 +132,18 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               {item.children && isActive(item.path) && isHealthCheckExpanded && (
                 <div className="relative">
                   {/* Vertical connecting line */}
-                  <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-300"></div>
+                  <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-200"></div>
                   {item.children.map((child, index) => (
                     <div key={child.path} className="relative">
                       {/* Horizontal connecting line */}
-                      <div className="absolute left-4 top-3 w-4 h-px bg-gray-300"></div>
+                      <div className="absolute left-4 top-3 w-4 h-px bg-gray-200"></div>
                       <button
                         onClick={() => onHealthTabChange?.(child.path)}
                         className={cn(
-                          "relative w-full flex items-center gap-2 pl-8 pr-2 py-0.5 text-left transition-none text-xs ml-0",
+                          "relative w-full flex items-center gap-2 pl-8 pr-2 py-1 text-left transition-none text-xs ml-0 bg-transparent",
                           activeHealthTab === child.path
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            ? "text-gray-900"
+                            : "text-gray-600 hover:text-gray-900"
                         )}
                         style={{ maxWidth: 'calc(100% - 16px)' }}
                       >
@@ -160,15 +160,15 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </nav>
 
       {/* User Profile at Bottom */}
-      <div className="p-3 space-y-2">
+      <div className="p-2 space-y-1">
         {/* Settings */}
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-2 px-2 py-0.5 text-left transition-none text-sm",
+            "w-full flex items-center gap-2 px-2 py-1 text-left transition-none text-sm bg-transparent",
             isActive("/settings")
-              ? "bg-gray-100 text-gray-900"
-              : "hover:bg-gray-50"
+              ? "text-gray-900"
+              : "text-gray-700 hover:text-gray-900"
           )}
         >
           <Settings className="w-4 h-4" />
