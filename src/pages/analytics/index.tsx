@@ -379,7 +379,7 @@ export default function Analytics() {
                   <Icon className={`w-6 h-6 mx-auto mb-2 ${
                     activeTab === tab.id ? 'text-purple-600' : 'text-gray-600'
                   }`} />
-                  <h2 className={`h2 mb-1 ${
+                  <h2 className={`h3 mb-1 ${
                     activeTab === tab.id ? 'text-purple-900' : 'text-gray-900'
                   }`}>
                     {tab.label}
