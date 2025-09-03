@@ -18,15 +18,15 @@ import { NoHealthCheckResults } from "@/components/ui/empty-states";
 function RecentTestsTable({ tests }: { tests: any[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full body text-xs">
         <thead>
           <tr className="border-b border-input">
-            <th className="text-left py-2 pr-3">Prompt</th>
-            <th className="text-left py-2 pr-3">Model</th>
-            <th className="text-left py-2 pr-3">Mentioned</th>
-            <th className="text-left py-2 pr-3">Position</th>
-            <th className="text-left py-2 pr-3">Sentiment</th>
-            <th className="text-left py-2">Timestamp</th>
+            <th className="text-left py-2 pr-3 body font-semibold">Prompt</th>
+            <th className="text-left py-2 pr-3 body font-semibold">Model</th>
+            <th className="text-left py-2 pr-3 body font-semibold">Mentioned</th>
+            <th className="text-left py-2 pr-3 body font-semibold">Position</th>
+            <th className="text-left py-2 pr-3 body font-semibold">Sentiment</th>
+            <th className="text-left py-2 body font-semibold">Timestamp</th>
           </tr>
         </thead>
         <tbody>
@@ -210,7 +210,7 @@ const CleanDashboard = () => {
       {company && (
         <button
           onClick={() => (window.location.href = '/geo?edit=true')}
-          className="text-xs px-2 py-1 border border-input rounded"
+          className="glass rounded-md px-3 py-1.5 text-xs hover:bg-[#5F209B] hover:text-white transition-none"
         >
           Edit Company
         </button>
@@ -243,7 +243,7 @@ const CleanDashboard = () => {
         {/* Visibility Trend */}
         <div id="dashboard-trend-report" className="rounded-xl bg-card p-6 shadow-soft">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">📈 Visibility trend</h3>
+            <h3 className="h3">Visibility trend</h3>
             <select value={trendTimeframe} onChange={(e) => setTrendTimeframe(e.target.value as any)} className="h-8 rounded-md border border-input bg-background px-2 text-xs">
               <option value="30d">Last 30d</option>
               <option value="90d">Last 90d</option>
@@ -251,7 +251,7 @@ const CleanDashboard = () => {
             </select>
           </div>
           <div className="flex justify-end mb-2">
-            <button onClick={() => printReport('dashboard-trend-report')} className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground">Print PDF</button>
+            <button onClick={() => printReport('dashboard-trend-report')} className="glass rounded-md px-3 py-1.5 text-xs hover:bg-[#5F209B] hover:text-white transition-none">Print PDF</button>
           </div>
           {trendData.length > 2 ? (
             <div style={{ height: 240 }}>
@@ -266,12 +266,12 @@ const CleanDashboard = () => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-sm text-muted-foreground">Not enough data yet. Run more tests to see the trend.</div>
+            <div className="body text-sm text-gray-600">Not enough data yet. Run more tests to see the trend.</div>
           )}
         </div>
         {/* Recent Performance (tiles) */}
         <div className="rounded-xl bg-card p-6 shadow-soft">
-          <h3 className="text-lg font-semibold mb-3">📊 Recent Performance</h3>
+          <h3 className="h3 mb-3">Recent Performance</h3>
           <Tiles 
             mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
             avgPosition={weekly?.avg_position ?? null}
@@ -284,10 +284,10 @@ const CleanDashboard = () => {
       {/* Row 2: Recent Test Results full width */}
       <div className="rounded-xl bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold">🧪 Recent Test Results</h3>
+          <h3 className="h3">Recent Test Results</h3>
           <div className="flex items-center gap-2">
-            <button onClick={() => window.location.href = '/geo'} className="text-xs px-2 py-1 border border-input rounded">Run Health Check</button>
-            <button onClick={() => downloadCsv('ai_tests.csv', testResults as any)} className="text-xs px-2 py-1 border border-input rounded">Export CSV</button>
+            <button onClick={() => window.location.href = '/geo'} className="glass rounded-md px-3 py-1.5 text-xs hover:bg-[#5F209B] hover:text-white transition-none">Run Health Check</button>
+            <button onClick={() => downloadCsv('ai_tests.csv', testResults as any)} className="glass rounded-md px-3 py-1.5 text-xs hover:bg-[#5F209B] hover:text-white transition-none">Export CSV</button>
           </div>
         </div>
         {testResults.length === 0 ? (

@@ -230,8 +230,8 @@ const PromptsPage = () => {
       <AppShell>
         <div className="text-center py-12">
           <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">No Company Profile Found</h2>
-          <p className="text-muted-foreground mb-4">
+          <h2 className="h2 mb-2">No Company Profile Found</h2>
+          <p className="body mb-4">
             Please set up your company profile first to generate test prompts.
           </p>
         </div>
@@ -245,8 +245,8 @@ const PromptsPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Test Prompts</h1>
-            <p className="text-muted-foreground">
+            <h1 className="h1">Test Prompts</h1>
+            <p className="body">
               Manage the search queries used for AI health checks
             </p>
           </div>
@@ -254,7 +254,7 @@ const PromptsPage = () => {
             <button
               onClick={regeneratePrompts}
               disabled={generating}
-              className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-[#111E63] hover:text-white transition-none"
+              className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-[#5F209B] hover:text-white transition-none"
             >
               <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
               {generating ? 'Generating...' : 'Regenerate'}
@@ -262,7 +262,7 @@ const PromptsPage = () => {
             <button
               onClick={savePrompts}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-[#111E63] text-white rounded-lg hover:opacity-90 transition-none"
+              className="flex items-center gap-2 px-4 py-2 bg-[#5F209B] text-white rounded-lg hover:opacity-90 transition-none"
             >
               <Save className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save Changes'}
@@ -272,8 +272,8 @@ const PromptsPage = () => {
 
         {/* Company Info */}
         <div className="glass p-4 rounded-lg">
-          <h3 className="text-sm font-semibold text-foreground mb-2">Company: {company.company_name}</h3>
-          <p className="text-xs text-muted-foreground">
+          <h3 className="h4 mb-2">Company: {company.company_name}</h3>
+          <p className="body text-xs">
             Industry: {company.industry} | Target: {company.target_customers || 'Not specified'}
           </p>
         </div>
@@ -286,7 +286,7 @@ const PromptsPage = () => {
                 <div className="flex gap-4 flex-1 items-center">
                   {/* Left side: Number and Tag */}
                   <div className="flex items-center gap-2 min-w-[100px]">
-                    <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
+                    <span className="body text-sm font-medium">#{index + 1}</span>
                     <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
                       {prompt.category}
                     </span>
@@ -295,7 +295,7 @@ const PromptsPage = () => {
                   {/* Right side: Prompt content */}
                   {!prompt.isEditing && (
                     <div className="flex-1">
-                      <p className="text-foreground font-medium">"{prompt.text}"</p>
+                      <p className="body font-medium">"{prompt.text}"</p>
                     </div>
                   )}
                 </div>
@@ -304,13 +304,13 @@ const PromptsPage = () => {
                     <>
                       <button
                         onClick={() => toggleEdit(prompt.id)}
-                        className="p-1 text-green-600 hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
+                        className="p-1 text-green-600 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
                       >
                         <Check className="w-3 h-3" />
                       </button>
                       <button
                         onClick={() => removePrompt(prompt.id)}
-                        className="p-1 text-red-600 hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
+                        className="p-1 text-red-600 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -318,7 +318,7 @@ const PromptsPage = () => {
                   ) : (
                     <button
                       onClick={() => toggleEdit(prompt.id)}
-                      className="p-1 text-muted-foreground hover:bg-[#111E63] hover:text-white rounded transition-none flex items-center justify-center"
+                      className="p-1 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
                     >
                       <Edit2 className="w-3 h-3" />
                     </button>
@@ -329,7 +329,7 @@ const PromptsPage = () => {
               {prompt.isEditing && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-foreground mb-1">Search Query</label>
+                    <label className="block text-xs font-medium body mb-1">Search Query</label>
                     <textarea
                       value={prompt.text}
                       onChange={(e) => updatePrompt(prompt.id, 'text', e.target.value)}
@@ -358,7 +358,7 @@ const PromptsPage = () => {
           {/* Add New Prompt Button */}
           <button
             onClick={addNewPrompt}
-            className="w-full p-4 glass rounded-lg border-2 border-dashed border-white/30 hover:border-white/50 hover:bg-[#111E63] hover:text-white transition-none flex items-center justify-center gap-2 text-muted-foreground"
+            className="w-full p-4 glass rounded-lg border-2 border-dashed border-black/20 hover:border-black/40 hover:bg-[#5F209B] hover:text-white transition-none flex items-center justify-center gap-2 body"
           >
             <Plus className="w-4 h-4" />
             Add New Prompt
@@ -367,12 +367,12 @@ const PromptsPage = () => {
 
         {/* Info */}
         <div className="glass p-4 rounded-lg">
-          <h4 className="text-sm font-semibold text-foreground mb-2">How This Works</h4>
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li>• These prompts are used by the automated health check to test your AI visibility</li>
-            <li>• Focus on realistic searches your potential customers would actually make</li>
-            <li>• Edit prompts to better match your target audience and use cases</li>
-            <li>• Prompts are automatically generated when you save company information</li>
+          <h4 className="h4 mb-2">How This Works</h4>
+          <ul className="body text-xs space-y-1">
+            <li>These prompts are used by the automated health check to test your AI visibility</li>
+            <li>Focus on realistic searches your potential customers would actually make</li>
+            <li>Edit prompts to better match your target audience and use cases</li>
+            <li>Prompts are automatically generated when you save company information</li>
           </ul>
         </div>
       </div>

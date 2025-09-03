@@ -313,19 +313,19 @@ const CompanyProfilePage = () => {
 
   return (
     <AppShell>
-      <div className="max-w-4xl mx-auto">
+      <div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Company Profile</h1>
-          <p className="text-muted-foreground">
+          <h1 className="h1 mb-2">Company Profile</h1>
+          <p className="body">
             Manage your company information to improve AI visibility and content generation.
           </p>
         </div>
 
-        <div className="glass-card p-8">
+        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-8 shadow-soft">
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-medium body mb-2">
                   Company Name *
                 </label>
                 <input
@@ -338,7 +338,7 @@ const CompanyProfilePage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-medium body mb-2">
                   Website URL *
                 </label>
                 <div className="flex gap-2">
@@ -353,12 +353,12 @@ const CompanyProfilePage = () => {
                     type="button"
                     onClick={analyzeWebsite}
                     disabled={analyzingWebsite || !formData.website.trim()}
-                    className="px-4 py-3 bg-[#111E63] text-white rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity whitespace-nowrap"
+                    className="px-4 py-3 bg-[#5F209B] text-white rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity whitespace-nowrap"
                   >
                     {analyzingWebsite ? 'Analyzing...' : 'Auto-Fill'}
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs body mt-1">
                   Click "Auto-Fill" to analyze your website and populate the form fields automatically
                 </p>
               </div>
@@ -439,7 +439,7 @@ const CompanyProfilePage = () => {
             <button
               onClick={handleSubmit}
               disabled={!formData.companyName || !formData.industry || saving}
-              className="px-6 py-3 bg-[#111E63] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#111E63] hover:text-white transition-none"
+              className="px-6 py-3 bg-[#5F209B] text-white rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity"
             >
               {saving ? (
                 <>

@@ -67,75 +67,27 @@ const SettingsPage = () => {
 
   return (
     <AppShell>
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto', 
-        padding: '40px 20px',
-        fontFamily: '"Inter", sans-serif'
-      }}>
+      <div className="space-y-6">
         {/* Header */}
-        <div style={{ marginBottom: '40px' }}>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            margin: '0 0 8px 0',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            Settings
-          </h1>
-          <p style={{ 
-            color: '#888', 
-            margin: 0,
-            fontSize: '16px'
-          }}>
+        <div className="mb-6">
+          <h1 className="h1 mb-2">Settings</h1>
+          <p className="body text-black">
             Manage your account and data preferences
           </p>
         </div>
 
         {/* Data Management Section */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid #333',
-          borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '24px'
-        }}>
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            margin: '0 0 16px 0',
-            color: '#fff'
-          }}>
+        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-6 shadow-soft">
+          <h2 className="h2 mb-4">
             Data Management
           </h2>
           
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-          }}>
+          <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg">
             <div>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                margin: '0 0 4px 0',
-                color: '#fff'
-              }}>
+              <h3 className="h4 mb-1">
                 Clear All Data
               </h3>
-              <p style={{
-                fontSize: '14px',
-                color: '#999',
-                margin: 0
-              }}>
+              <p className="body text-sm text-gray-600">
                 Permanently delete all your AI test results and metrics. This action cannot be undone.
               </p>
             </div>
@@ -143,24 +95,11 @@ const SettingsPage = () => {
             <button
               onClick={clearAllData}
               disabled={loading}
-              style={{
-                background: '#ef4444',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '12px 24px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) e.target.style.background = '#dc2626';
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) e.target.style.background = '#ef4444';
-              }}
+              className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
+                loading 
+                  ? 'bg-red-300 text-white cursor-not-allowed' 
+                  : 'bg-red-500 text-white hover:bg-red-600'
+              }`}
             >
               {loading ? 'Clearing...' : 'Clear All Data'}
             </button>
@@ -168,27 +107,16 @@ const SettingsPage = () => {
         </div>
 
         {/* Account Section */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid #333',
-          borderRadius: '12px',
-          padding: '24px'
-        }}>
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            margin: '0 0 16px 0',
-            color: '#fff'
-          }}>
+        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-6 shadow-soft">
+          <h2 className="h2 mb-4">
             Account Information
           </h2>
           
-          <div style={{ color: '#ccc' }}>
-            <p style={{ margin: '0 0 8px 0' }}>
+          <div className="space-y-2">
+            <p className="body">
               <strong>Email:</strong> {user.email}
             </p>
-            <p style={{ margin: '0 0 8px 0' }}>
+            <p className="body">
               <strong>User ID:</strong> {user.id}
             </p>
           </div>
