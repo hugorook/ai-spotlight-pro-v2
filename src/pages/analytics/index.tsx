@@ -73,13 +73,17 @@ export default function Analytics() {
   // Tab management
   const [activeTab, setActiveTab] = useState('results')
   const [showResultsSection, setShowResultsSection] = useState(false)
+  
+  // Historical data for progress tracking
+  const [historicalTests, setHistoricalTests] = useState<any[]>([])
 
   const tabs = [
     { id: 'results', label: 'Results', icon: BarChart3 },
     { id: 'website', label: 'Website Analysis', icon: Globe },
     { id: 'benchmark', label: 'Benchmarking', icon: Activity },
     { id: 'authority', label: 'Authority', icon: Award },
-    { id: 'trending', label: 'Trending', icon: TrendingUp }
+    { id: 'trending', label: 'Trending', icon: TrendingUp },
+    { id: 'progress', label: 'Progress Tracking', icon: TrendingUp }
   ]
 
   // Check URL parameters for initial tab
@@ -128,27 +132,15 @@ export default function Analytics() {
       setCompany(company)
 
       if (company) {
-        // Load AI test results
+        // Load historical AI test results for progress tracking
         const { data: aiTests } = await supabase
           .from('ai_tests')
           .select('*')
           .eq('company_id', company.id)
           .order('test_date', { ascending: false })
 
-        if (aiTests && aiTests.length > 0) {
-          const results = aiTests.map((test) => ({
-            prompt: test.prompt_id || 'Custom prompt',
-            mentioned: test.company_mentioned,
-            position: test.mention_position || 0,
-            sentiment: (test.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-            context: test.mention_context || '',
-            response: test.ai_response || ''
-          }))
-          
-          setTestResults(results)
-          setShowResultsSection(true)
-          calculateHealthScore(results)
-          generateContentOpportunities(results, company)
+        if (aiTests) {
+          setHistoricalTests(aiTests)
         }
       }
     } catch (error) {
@@ -391,7 +383,8 @@ export default function Analytics() {
                 website: 'Content analysis and optimization opportunities',
                 benchmark: 'Industry comparison and competitive positioning',
                 authority: 'Authority building and trust signal analysis',
-                trending: 'Trending topics and content opportunities'
+                trending: 'Trending topics and content opportunities',
+                progress: 'Historical test results and progress over time'
               }
               
               return (
@@ -435,20 +428,113 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Results Section - Always show, it handles its own tab switching */}
-        <ResultsSection
-          isVisible={true}
-          activeTab={activeTab}
-          results={testResults}
-          healthScore={healthScore}
-          company={company}
-          websiteAnalysis={websiteAnalysis}
-          authorityAnalysis={authorityAnalysis}
-          industryBenchmark={industryBenchmark}
-          trendingOpportunities={trendingOpportunities}
-          strategies={autoStrategies}
-          onTabChange={setActiveTab}
-        />
+        {/* Progress Tracking Tab Content */}
+        {activeTab === 'progress' ? (
+          <div className="bg-white rounded-lg border">
+            <div className="p-6">
+              <h3 className="h3 mb-4">Progress Tracking</h3>
+              <p className="body text-gray-600 mb-6">Historical AI visibility test results and performance over time</p>
+              
+              {historicalTests.length === 0 ? (
+                <div className="text-center py-12">
+                  <TrendingUp className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <h4 className="h4 mb-2">No Historical Data</h4>
+                  <p className="body text-gray-600 mb-4">
+                    Run health checks to build your progress tracking history.
+                  </p>
+                  <button
+                    onClick={runHealthCheck}
+                    disabled={!company}
+                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                  >
+                    <Play className="w-5 h-5 mr-2 inline" />
+                    Run First Health Check
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-gray-900">{historicalTests.length}</div>
+                      <div className="text-sm text-gray-600">Total Tests</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {historicalTests.filter(t => t.company_mentioned).length}
+                      </div>
+                      <div className="text-sm text-gray-600">Mentions Found</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {Math.round((historicalTests.filter(t => t.company_mentioned).length / historicalTests.length) * 100) || 0}%
+                      </div>
+                      <div className="text-sm text-gray-600">Success Rate</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">All Test Results</h4>
+                    <div className="max-h-96 overflow-y-auto space-y-2">
+                      {historicalTests.map((test, index) => (
+                        <div key={test.id || index} className="flex items-center justify-between p-4 border rounded-lg bg-white hover:bg-gray-50">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {test.prompt_id || 'Custom Test'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              {new Date(test.test_date).toLocaleDateString()} - {test.ai_model || 'Unknown Model'}
+                            </p>
+                            {test.mention_context && (
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                {test.mention_context}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 ml-4">
+                            <div className={`w-3 h-3 rounded-full ${
+                              test.company_mentioned ? 'bg-green-500' : 'bg-red-500'
+                            }`}></div>
+                            {test.company_mentioned && test.mention_position && (
+                              <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                                Position #{test.mention_position}
+                              </span>
+                            )}
+                            {test.sentiment && (
+                              <span className={`px-2 py-1 text-xs rounded capitalize ${
+                                test.sentiment === 'positive' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : test.sentiment === 'negative'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {test.sentiment}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Results Section - Show for all other tabs */
+          <ResultsSection
+            isVisible={true}
+            activeTab={activeTab}
+            results={testResults}
+            healthScore={healthScore}
+            company={company}
+            websiteAnalysis={websiteAnalysis}
+            authorityAnalysis={authorityAnalysis}
+            industryBenchmark={industryBenchmark}
+            trendingOpportunities={trendingOpportunities}
+            strategies={autoStrategies}
+            onTabChange={setActiveTab}
+          />
+        )}
       </div>
     </AppShell>
   )
