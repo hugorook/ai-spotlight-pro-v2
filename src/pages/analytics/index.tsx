@@ -240,9 +240,41 @@ export default function Analytics() {
           })}
         </div>
 
+        {/* Default Overview Cards */}
+        {activeTab === 'results' && !showResultsSection && testResults.length === 0 && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              const descriptions = {
+                results: 'View detailed test results and AI visibility analysis',
+                website: 'Content analysis and optimization opportunities',
+                benchmark: 'Industry comparison and competitive positioning',
+                authority: 'Authority building and trust signal analysis',
+                trending: 'Trending topics and content opportunities'
+              }
+              
+              return (
+                <div 
+                  key={tab.id}
+                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <Icon className="w-5 h-5 text-purple-600" />
+                    <h3 className="font-medium">{tab.label}</h3>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {descriptions[tab.id as keyof typeof descriptions]}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {/* Tab Content */}
         <div className="bg-white rounded-lg border">
-          {!showResultsSection && testResults.length === 0 ? (
+          {!showResultsSection && testResults.length === 0 && activeTab === 'results' ? (
             <div className="p-8 text-center">
               <BarChart3 className="w-16 h-16 mx-auto text-gray-400 mb-4" />
               <h3 className="h3 mb-4">No Data Available</h3>
@@ -257,6 +289,35 @@ export default function Analytics() {
                 <Play className="w-5 h-5 mr-2 inline" />
                 Run Your First Health Check
               </button>
+            </div>
+          ) : activeTab !== 'results' && !showResultsSection && testResults.length === 0 ? (
+            <div className="p-8 text-center">
+              {(() => {
+                const Icon = tabs.find(t => t.id === activeTab)?.icon || BarChart3
+                const tabNames = {
+                  website: 'Website Analysis',
+                  benchmark: 'Benchmarking',
+                  authority: 'Authority',
+                  trending: 'Trending'
+                }
+                return (
+                  <>
+                    <Icon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h3 className="h3 mb-4">{tabNames[activeTab as keyof typeof tabNames]} Data</h3>
+                    <p className="body text-gray-600 mb-6">
+                      Run a health check to generate {activeTab} analysis and insights.
+                    </p>
+                    <button
+                      onClick={runHealthCheck}
+                      disabled={!company}
+                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                    >
+                      <Play className="w-5 h-5 mr-2 inline" />
+                      Run Health Check
+                    </button>
+                  </>
+                )
+              })()}
             </div>
           ) : (
             <ResultsSection
