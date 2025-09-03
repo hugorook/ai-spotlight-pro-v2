@@ -459,15 +459,13 @@
     color: white !important;
   }
 
-  /* Ensure purple backgrounds have white text */
-  .bg-\[\#5F209B\],
-  [class*="bg-[#5F209B]"] {
+  /* Ensure only specific purple backgrounds have white text - not hover states */
+  button[class*="bg-[#5F209B]"]:not([class*="hover:bg-[#5F209B]"]) {
     background: #5F209B !important;
     color: white !important;
   }
   
-  .bg-\[\#5F209B\] *,
-  [class*="bg-[#5F209B]"] * {
+  button[class*="bg-[#5F209B]"]:not([class*="hover:bg-[#5F209B]"]) * {
     color: white !important;
   }
 

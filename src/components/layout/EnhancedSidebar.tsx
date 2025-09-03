@@ -95,8 +95,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto">
-        <div className="space-y-0.5">
+      <nav className="flex-1 px-3 py-1 overflow-y-auto">
+        <div className="space-y-0">
           {navItems.map((item) => (
             <div key={item.path}>
               <button
@@ -108,7 +108,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center gap-2 px-2 py-1 rounded-md text-left transition-none group text-sm",
+                  "w-full flex items-center gap-2 px-2 py-0.5 text-left transition-none group text-sm",
                   isActive(item.path)
                     ? "bg-gray-200 text-gray-900"
                     : "text-foreground hover:bg-gray-100"
@@ -128,7 +128,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
               {/* Health Check Sub-items */}
               {item.children && isActive(item.path) && isHealthCheckExpanded && (
-                <div className="relative ml-3 mt-1">
+                <div className="relative ml-2 mt-0">
                   {/* Connecting vertical line */}
                   <div className="absolute left-2 top-0 bottom-0 w-px bg-gray-300"></div>
                   {item.children.map((child) => (
@@ -136,14 +136,14 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                       key={child.path}
                       onClick={() => onHealthTabChange?.(child.path)}
                       className={cn(
-                        "relative w-full flex items-center gap-2 px-2 py-1 ml-6 text-left transition-none text-xs rounded-md",
+                        "relative w-full flex items-center gap-2 px-1 py-0.5 ml-4 text-left transition-none text-xs",
                         activeHealthTab === child.path
                           ? "bg-gray-200 text-gray-900"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       )}
                     >
-                      {/* Horizontal connecting line */}
-                      <div className="absolute -left-6 top-1/2 w-4 h-px bg-gray-300"></div>
+                      {/* Horizontal connecting line - starts exactly from vertical line */}
+                      <div className="absolute -left-4 top-1/2 w-2 h-px bg-gray-300"></div>
                       <div className="flex-shrink-0 relative z-10">{React.cloneElement(child.icon as React.ReactElement, { className: "w-3 h-3" })}</div>
                       <div>{child.label}</div>
                     </button>
@@ -161,7 +161,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-2 px-2 py-1 rounded-md text-left transition-none text-sm",
+            "w-full flex items-center gap-2 px-2 py-0.5 text-left transition-none text-sm",
             isActive("/settings")
               ? "bg-gray-200 text-gray-900"
               : "text-foreground hover:bg-gray-100"
