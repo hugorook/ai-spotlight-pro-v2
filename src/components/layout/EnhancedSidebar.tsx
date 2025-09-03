@@ -71,22 +71,22 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl border-r border-black/20 flex flex-col">
+    <div className="fixed left-0 top-0 h-screen w-64 z-[100] glass-strong backdrop-blur-xl flex flex-col">
       {/* Run Health Check Button */}
-      <div className="p-4 border-b border-black/10">
+      <div className="p-3">
         <button
           onClick={onRunHealthCheck || (() => navigate('/geo'))}
           disabled={isRunning}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#5F209B] text-white rounded-lg hover:opacity-90 transition-opacity font-semibold"
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#5F209B] text-white rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm"
         >
-          <Activity className={`w-5 h-5 ${isRunning ? 'animate-spin' : ''}`} />
+          <Activity className={`w-4 h-4 ${isRunning ? 'animate-spin' : ''}`} />
           {isRunning ? 'Running Health Check...' : 'Run Health Check'}
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 overflow-y-auto">
-        <div className="space-y-1">
+      <nav className="flex-1 px-3 py-2 overflow-y-auto">
+        <div className="space-y-0.5">
           {navItems.map((item) => (
             <div key={item.path}>
               <button
@@ -98,14 +98,14 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-none group",
+                  "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-none group text-sm",
                   isActive(item.path)
-                    ? "bg-[#5F209B] text-white"
-                    : "text-foreground hover:text-white hover:bg-[#5F209B]"
+                    ? "bg-gray-200 text-gray-900"
+                    : "text-foreground hover:bg-gray-100"
                 )}
               >
-                <div className="flex-shrink-0">{item.icon}</div>
-                <div className="flex-1 font-medium">{item.label}</div>
+                <div className="flex-shrink-0">{React.cloneElement(item.icon as React.ReactElement, { className: "w-4 h-4" })}</div>
+                <div className="flex-1">{item.label}</div>
                 {item.children && (
                   <div className="flex-shrink-0">
                     {(isHealthCheckExpanded && isActive(item.path)) ? 
@@ -118,19 +118,19 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
               {/* Health Check Sub-items */}
               {item.children && isActive(item.path) && isHealthCheckExpanded && (
-                <div className="mt-1 ml-4 space-y-1">
+                <div className="ml-6 border-l border-gray-200 mt-0.5">
                   {item.children.map((child) => (
                     <button
                       key={child.path}
                       onClick={() => onHealthTabChange?.(child.path)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-none text-sm",
+                        "w-full flex items-center gap-2 px-2 py-1 text-left transition-none text-xs -ml-px pl-4",
                         activeHealthTab === child.path
-                          ? "bg-[#5F209B]/20 text-[#5F209B] font-medium"
-                          : "text-foreground/70 hover:text-foreground hover:bg-[#5F209B]/10"
+                          ? "bg-gray-100 text-gray-900 border-l-2 border-gray-400"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent"
                       )}
                     >
-                      <div className="flex-shrink-0">{child.icon}</div>
+                      <div className="flex-shrink-0">{React.cloneElement(child.icon as React.ReactElement, { className: "w-3 h-3" })}</div>
                       <div>{child.label}</div>
                     </button>
                   ))}
@@ -142,33 +142,33 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </nav>
 
       {/* User Profile at Bottom */}
-      <div className="p-4 border-t border-black/10 space-y-3">
+      <div className="p-3 space-y-2">
         {/* Settings */}
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-none",
+            "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-none text-sm",
             isActive("/settings")
-              ? "bg-[#5F209B] text-white"
-              : "text-foreground hover:text-white hover:bg-[#5F209B]"
+              ? "bg-gray-200 text-gray-900"
+              : "text-foreground hover:bg-gray-100"
           )}
         >
-          <Settings className="w-5 h-5" />
-          <span className="font-medium">Settings</span>
+          <Settings className="w-4 h-4" />
+          <span>Settings</span>
         </button>
 
         {/* User Avatar */}
         {user && (
-          <div className="flex items-center gap-3 px-3">
+          <div className="flex items-center gap-2 px-2">
             <button
               onClick={() => navigate('/settings')}
-              className="w-10 h-10 rounded-full bg-[#E7F0F6] hover:bg-[#5F209B] text-foreground hover:text-white flex items-center justify-center text-sm font-medium transition-colors"
+              className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-medium transition-colors flex-shrink-0"
               title={user.email || 'User'}
             >
               {getUserInitials(user.email || 'User')}
             </button>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium truncate">{user.email}</p>
+              <p className="text-xs truncate">{user.email}</p>
             </div>
           </div>
         )}

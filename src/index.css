@@ -288,14 +288,14 @@
     background: var(--gradient-subtle-grey);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: none;
     box-shadow: none;
   }
 
-  /* No hover effects on glass containers */
+  /* Subtle hover effects on glass containers */
   .glass:hover {
-    background: var(--gradient-subtle-grey);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
     box-shadow: none;
   }
 
@@ -303,13 +303,13 @@
     background: var(--gradient-subtle-grey);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: none;
     box-shadow: none;
   }
 
   .glass-strong:hover {
-    background: var(--gradient-subtle-grey);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
     box-shadow: none;
   }
 
@@ -336,14 +336,14 @@
     background: var(--gradient-subtle-grey);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: none;
     border-radius: 12px;
     box-shadow: none;
   }
 
   .glass-card:hover {
-    background: var(--gradient-subtle-grey);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
     box-shadow: none;
   }
 

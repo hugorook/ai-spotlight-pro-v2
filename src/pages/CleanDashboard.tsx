@@ -234,14 +234,14 @@ const CleanDashboard = () => {
     <AppShell title="AI Visibility Hub v1.1" subtitle="Monitor your company's AI mentions and performance" right={rightToggle}>
 
       {/* Header strip */}
-      <div className="mb-4">
+      <div className="mb-3">
         <HeaderStrip score={headerScore} delta={headerDelta} momentum={momentum} forecast={forecastVal ?? undefined} />
       </div>
 
       {/* Row 1: Visibility Trend and Recent Performance */}
-      <div className="grid md:grid-cols-2 gap-5 mb-6">
+      <div className="grid md:grid-cols-2 gap-3 mb-4">
         {/* Visibility Trend */}
-        <div id="dashboard-trend-report" className="rounded-xl bg-card p-6 shadow-soft">
+        <div id="dashboard-trend-report" className="rounded-lg bg-card p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="h3">Visibility trend</h3>
             <select value={trendTimeframe} onChange={(e) => setTrendTimeframe(e.target.value as any)} className="h-8 rounded-md border border-input bg-background px-2 text-xs">
@@ -270,7 +270,7 @@ const CleanDashboard = () => {
           )}
         </div>
         {/* Recent Performance (tiles) */}
-        <div className="rounded-xl bg-card p-6 shadow-soft">
+        <div className="rounded-lg bg-card p-4">
           <h3 className="h3 mb-3">Recent Performance</h3>
           <Tiles 
             mentionRate={weekly?.mention_rate ?? (testResults.length ? testResults.filter(t=>t.company_mentioned).length / testResults.length : 0)}
@@ -282,7 +282,7 @@ const CleanDashboard = () => {
       </div>
 
       {/* Row 2: Recent Test Results full width */}
-      <div className="rounded-xl bg-card p-6 shadow-soft">
+      <div className="rounded-lg bg-card p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="h3">Recent Test Results</h3>
           <div className="flex items-center gap-2">
@@ -297,7 +297,7 @@ const CleanDashboard = () => {
         )}
       </div>
       {/* Movers and Matrix */}
-      <div className="grid grid-cols-1 gap-4 mt-6">
+      <div className="grid grid-cols-1 gap-3 mt-4">
         <BigMovers wins={(weekly?.biggest_wins ?? []).slice(0, 5)} losses={(weekly?.biggest_losses ?? []).slice(0, 5)} />
         {(() => {
           const coverage = weekly?.model_coverage ?? {};

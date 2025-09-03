@@ -67,7 +67,7 @@ const SettingsPage = () => {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header */}
         <div className="mb-6">
           <h1 className="h1 mb-2">Settings</h1>
@@ -77,7 +77,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Data Management Section */}
-        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-6 shadow-soft">
+        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4">
           <h2 className="h2 mb-4">
             Data Management
           </h2>
@@ -107,7 +107,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Account Section */}
-        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-6 shadow-soft">
+        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4">
           <h2 className="h2 mb-4">
             Account Information
           </h2>

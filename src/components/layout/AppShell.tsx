@@ -40,7 +40,7 @@ export default function AppShell({
       
       {/* Main Content Area - always has left margin for sidebar */}
       <div className="flex flex-col ml-64">
-        <div className="flex-1 px-6 py-6">
+        <div className="flex-1 px-4 py-4">
           {children}
         </div>
       </div>

@@ -241,7 +241,7 @@ const PromptsPage = () => {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -271,7 +271,7 @@ const PromptsPage = () => {
         </div>
 
         {/* Company Info */}
-        <div className="glass p-4 rounded-lg">
+        <div className="glass p-3 rounded-lg">
           <h3 className="h4 mb-2">Company: {company.company_name}</h3>
           <p className="body text-xs">
             Industry: {company.industry} | Target: {company.target_customers || 'Not specified'}
@@ -279,9 +279,9 @@ const PromptsPage = () => {
         </div>
 
         {/* Prompts List */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {prompts.map((prompt, index) => (
-            <div key={prompt.id} className="glass px-3 py-2 rounded-lg">
+            <div key={prompt.id} className="glass px-3 py-2 rounded-md">
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 flex-1 items-center">
                   {/* Left side: Number and Tag */}
@@ -327,7 +327,7 @@ const PromptsPage = () => {
               </div>
 
               {prompt.isEditing && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
                     <label className="block text-xs font-medium body mb-1">Search Query</label>
                     <textarea
@@ -366,7 +366,7 @@ const PromptsPage = () => {
         </div>
 
         {/* Info */}
-        <div className="glass p-4 rounded-lg">
+        <div className="glass p-3 rounded-lg">
           <h4 className="h4 mb-2">How This Works</h4>
           <ul className="body text-xs space-y-1">
             <li>These prompts are used by the automated health check to test your AI visibility</li>

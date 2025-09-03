@@ -321,9 +321,9 @@ const CompanyProfilePage = () => {
           </p>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-sm border border-black/20 rounded-xl p-8 shadow-soft">
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium body mb-2">
                   Company Name *
@@ -435,7 +435,7 @@ const CompanyProfilePage = () => {
             </div>
           </div>
 
-          <div className="flex justify-end mt-8">
+          <div className="flex justify-end mt-6">
             <button
               onClick={handleSubmit}
               disabled={!formData.companyName || !formData.industry || saving}
