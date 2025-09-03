@@ -212,39 +212,58 @@ export default function Analytics() {
     }
 
     setIsRunningHealthCheck(true)
-    setTestProgress({ current: 0, total: 25 })
     
     try {
+      // Get company data from companies table
+      const { data: companies, error: companyError } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('user_id', user?.id)
+        .limit(1)
+
+      if (companyError || !companies || companies.length === 0) {
+        toast({
+          title: 'Error',
+          description: 'Company profile not found. Please set up your company profile first.',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      const companyData = companies[0]
+
       // Generate 25 relevant prompts based on company data
       const prompts = [
-        `What are the best companies in ${company.industry}?`,
-        `Who are the top players in ${company.industry}?`,
-        `Recommend solutions for ${company.target_customers}`,
-        `Best ${company.industry} providers`,
-        `${company.industry} market leaders`,
-        `How to choose ${company.industry} software`,
-        `${company.industry} comparison`,
-        `Top ${company.industry} vendors`,
-        `${company.industry} reviews`,
-        `Best practices for ${company.industry}`,
-        `${company.industry} implementation guide`,
-        `${company.industry} cost comparison`,
-        `${company.industry} features to look for`,
-        `${company.industry} trends 2024`,
-        `${company.industry} case studies`,
-        `${company.industry} success stories`,
-        `${company.industry} ROI analysis`,
-        `${company.industry} integration options`,
-        `${company.industry} security considerations`,
-        `${company.industry} scalability`,
-        `${company.industry} alternatives`,
-        `${company.industry} pricing models`,
-        `${company.industry} deployment options`,
-        `${company.industry} support and training`,
-        `${company.industry} future outlook`
+        `What are the best companies in ${companyData.industry}?`,
+        `Who are the top players in ${companyData.industry}?`,
+        `Recommend solutions for ${companyData.target_customers}`,
+        `Best ${companyData.industry} providers`,
+        `${companyData.industry} market leaders`,
+        `How to choose ${companyData.industry} software`,
+        `${companyData.industry} comparison`,
+        `Top ${companyData.industry} vendors`,
+        `${companyData.industry} reviews`,
+        `Best practices for ${companyData.industry}`,
+        `${companyData.industry} implementation guide`,
+        `${companyData.industry} cost comparison`,
+        `${companyData.industry} features to look for`,
+        `${companyData.industry} trends 2024`,
+        `${companyData.industry} case studies`,
+        `${companyData.industry} success stories`,
+        `${companyData.industry} ROI analysis`,
+        `${companyData.industry} integration options`,
+        `${companyData.industry} security considerations`,
+        `${companyData.industry} scalability`,
+        `${companyData.industry} alternatives`,
+        `${companyData.industry} pricing models`,
+        `${companyData.industry} deployment options`,
+        `${companyData.industry} support and training`,
+        `${companyData.industry} future outlook`
       ]
 
-      // Process prompts one by one
+      setTestProgress({ current: 0, total: prompts.length })
+
+      // Process prompts one by one with real AI testing
       const results: TestResult[] = []
       
       for (let i = 0; i < prompts.length; i++) {
@@ -252,20 +271,60 @@ export default function Analytics() {
         setCurrentTestPrompt(`Testing: "${currentPrompt}"`)
         setTestProgress({ current: i + 1, total: prompts.length })
         
-        // Simulate API call with realistic mock data
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        const mentioned = Math.random() > 0.6 // 40% chance of mention
-        const testResult: TestResult = {
-          prompt: currentPrompt,
-          mentioned,
-          position: mentioned ? Math.floor(Math.random() * 10) + 1 : 0,
-          sentiment: mentioned ? (['positive', 'neutral', 'negative'][Math.floor(Math.random() * 3)] as any) : 'neutral',
-          context: mentioned ? `${company.company_name} was mentioned as a leading solution...` : 'No mention found',
-          response: `Mock response for: ${currentPrompt}`
+        try {
+          // Make real API call to test AI models
+          const { data: result, error: testError } = await supabase.functions.invoke('test-ai-models', {
+            body: {
+              prompt: currentPrompt,
+              companyName: companyData.company_name,
+              industry: companyData.industry,
+              description: companyData.description,
+              differentiators: companyData.key_differentiators
+            }
+          })
+
+          if (testError) {
+            console.error('Error testing prompt:', testError)
+            continue
+          }
+
+          const testResult: TestResult = {
+            prompt: currentPrompt,
+            mentioned: result.mentioned || false,
+            position: result.position || 0,
+            sentiment: result.sentiment || 'neutral',
+            context: result.context || 'No mention found',
+            response: result.response || 'No response available'
+          }
+          
+          results.push(testResult)
+
+          // Store result in ai_tests table
+          await supabase.from('ai_tests').insert({
+            company_id: companyData.id,
+            prompt_text: currentPrompt,
+            ai_model: 'gpt-4o-mini',
+            company_mentioned: testResult.mentioned,
+            mention_position: testResult.position > 0 ? testResult.position : null,
+            sentiment: testResult.sentiment,
+            mention_context: testResult.context,
+            competitors_mentioned: [],
+            response_text: testResult.response,
+            test_date: new Date().toISOString()
+          })
+          
+        } catch (error) {
+          console.error('Error processing prompt:', currentPrompt, error)
+          // Add failed test result
+          results.push({
+            prompt: currentPrompt,
+            mentioned: false,
+            position: 0,
+            sentiment: 'neutral',
+            context: 'Test failed - please try again',
+            response: 'Error occurred during testing'
+          })
         }
-        
-        results.push(testResult)
         
         const currentMentions = results.filter(r => r.mentioned).length
         setCurrentTestPrompt(`Found ${currentMentions} mentions so far...`)
@@ -283,7 +342,7 @@ export default function Analytics() {
       setTestResults(results)
       setShowResultsSection(true)
       calculateHealthScore(results)
-      generateContentOpportunities(results, company)
+      generateContentOpportunities(results, companyData)
       
       // Persist results
       const persistData: PersistedLastRun = {
@@ -302,6 +361,9 @@ export default function Analytics() {
         title: 'Success',
         description: `Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate)`
       })
+
+      // Reload historical tests after completing new test
+      await loadCompanyData()
       
     } catch (error) {
       console.error('Error running health check:', error)
