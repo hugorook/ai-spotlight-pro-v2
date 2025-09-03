@@ -220,17 +220,17 @@ export default function Analytics() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-6 border-b border-gray-200">
+        <div className="flex flex-wrap gap-3 mb-6">
           {tabs.map((tab) => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'text-purple-600 border-purple-600'
-                    : 'text-gray-600 hover:text-gray-900 border-transparent hover:border-purple-300'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                 }`}
               >
                 <Icon className="w-4 h-4" />
