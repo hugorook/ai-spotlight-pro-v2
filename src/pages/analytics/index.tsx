@@ -352,65 +352,48 @@ export default function Analytics() {
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        {/* Analytics Section Boxes - 2 rows of 3 */}
+        <div className="grid grid-cols-3 gap-6 mb-8">
           {tabs.map((tab) => {
             const Icon = tab.icon
+            const descriptions = {
+              results: 'Current health check test results and AI visibility analysis',
+              website: 'Content analysis and optimization opportunities for your site',
+              benchmark: 'Industry comparison and competitive positioning insights',
+              authority: 'Authority building strategies and trust signal analysis',
+              trending: 'Trending topics and emerging content opportunities',
+              progress: 'Historical test results and performance tracking over time'
+            }
+            
             return (
-              <button
+              <div 
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm'
+                className={`p-6 border-2 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-lg ${
+                  activeTab === tab.id 
+                    ? 'border-purple-600 bg-purple-50 shadow-lg' 
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
+                onClick={() => setActiveTab(tab.id)}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Overview Cards when no data */}
-        {!showResultsSection && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {tabs.map((tab) => {
-              const Icon = tab.icon
-              const descriptions = {
-                results: 'View detailed test results and AI visibility analysis',
-                website: 'Content analysis and optimization opportunities',
-                benchmark: 'Industry comparison and competitive positioning',
-                authority: 'Authority building and trust signal analysis',
-                trending: 'Trending topics and content opportunities',
-                progress: 'Historical test results and progress over time'
-              }
-              
-              return (
-                <div 
-                  key={tab.id}
-                  className={`p-4 border rounded-lg transition-colors cursor-pointer ${
-                    activeTab === tab.id 
-                      ? 'border-purple-600 bg-purple-50' 
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-purple-600' : 'text-gray-600'}`} />
-                    <h3 className={`font-medium ${activeTab === tab.id ? 'text-purple-900' : 'text-gray-900'}`}>
-                      {tab.label}
-                    </h3>
-                  </div>
-                  <p className={`text-sm ${activeTab === tab.id ? 'text-purple-700' : 'text-gray-600'}`}>
+                <div className="text-center">
+                  <Icon className={`w-8 h-8 mx-auto mb-3 ${
+                    activeTab === tab.id ? 'text-purple-600' : 'text-gray-600'
+                  }`} />
+                  <h2 className={`h2 mb-2 ${
+                    activeTab === tab.id ? 'text-purple-900' : 'text-gray-900'
+                  }`}>
+                    {tab.label}
+                  </h2>
+                  <p className={`text-sm leading-relaxed ${
+                    activeTab === tab.id ? 'text-purple-700' : 'text-gray-600'
+                  }`}>
                     {descriptions[tab.id as keyof typeof descriptions]}
                   </p>
                 </div>
-              )
-            })}
-          </div>
-        )}
+              </div>
+            )
+          })}
+        </div>
 
         {/* Loading state during health check */}
         {isRunningHealthCheck && (
