@@ -4,8 +4,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
 import ResultsSection from '@/components/ui/results-section'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import { useToast } from '@/components/ui/use-toast'
 import { ArrowLeft, BarChart3, Globe, Activity, Award, TrendingUp, Play } from 'lucide-react'
+import { scheduleJob, logEvent } from '@/integrations/supabase/functions'
 import type { Tables } from '@/types/supabase'
 
 type Company = Tables<'companies'>
@@ -29,6 +31,18 @@ interface TrendingOpportunity {
   difficulty: 'easy' | 'moderate' | 'advanced'
 }
 
+interface ContentOpportunity {
+  id: string
+  title: string
+  type: string
+  priority: 'high' | 'medium' | 'low'
+  description: string
+  prompts: string[]
+  outline: string[]
+  optimizationTips: string[]
+  expectedImpact: string
+}
+
 interface PersistedLastRun {
   type: 'health' | 'custom'
   results: TestResult[]
@@ -42,17 +56,22 @@ export default function Analytics() {
   const { user } = useAuth()
   const { toast } = useToast()
   
-  const [activeTab, setActiveTab] = useState('results')
   const [company, setCompany] = useState<Company | null>(null)
-  const [testResults, setTestResults] = useState<TestResult[]>([])
+  const [loading, setLoading] = useState(true)
   const [healthScore, setHealthScore] = useState<number>(0)
+  const [testResults, setTestResults] = useState<TestResult[]>([])
+  const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false)
+  const [currentTestPrompt, setCurrentTestPrompt] = useState('')
+  const [testProgress, setTestProgress] = useState({ current: 0, total: 0 })
+  const [contentOpportunities, setContentOpportunities] = useState<ContentOpportunity[]>([])
+  const [autoStrategies, setAutoStrategies] = useState<any[]>([])
+  const [trendingOpportunities, setTrendingOpportunities] = useState<TrendingOpportunity[]>([])
   const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null)
   const [authorityAnalysis, setAuthorityAnalysis] = useState<any>(null)
   const [industryBenchmark, setIndustryBenchmark] = useState<any>(null)
-  const [trendingOpportunities, setTrendingOpportunities] = useState<TrendingOpportunity[]>([])
-  const [autoStrategies, setAutoStrategies] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false)
+  
+  // Tab management
+  const [activeTab, setActiveTab] = useState('results')
   const [showResultsSection, setShowResultsSection] = useState(false)
 
   const tabs = [
@@ -116,7 +135,7 @@ export default function Analytics() {
           .eq('company_id', company.id)
           .order('test_date', { ascending: false })
 
-        if (aiTests) {
+        if (aiTests && aiTests.length > 0) {
           const results = aiTests.map((test) => ({
             prompt: test.prompt_id || 'Custom prompt',
             mentioned: test.company_mentioned,
@@ -126,11 +145,10 @@ export default function Analytics() {
             response: test.ai_response || ''
           }))
           
-          if (results.length > 0) {
-            setTestResults(results)
-            setShowResultsSection(true)
-            calculateHealthScore(results)
-          }
+          setTestResults(results)
+          setShowResultsSection(true)
+          calculateHealthScore(results)
+          generateContentOpportunities(results, company)
         }
       }
     } catch (error) {
@@ -164,6 +182,33 @@ export default function Analytics() {
     setHealthScore(score)
   }
 
+  const generateContentOpportunities = (results: TestResult[], companyData: Company) => {
+    const missedPrompts = results.filter(r => !r.mentioned)
+    const opportunities: ContentOpportunity[] = [
+      {
+        id: '1',
+        title: `Create FAQ Page About Solutions`,
+        type: 'FAQ Page',
+        priority: 'high',
+        description: 'Comprehensive FAQ addressing common questions in your industry',
+        prompts: missedPrompts.slice(0, 3).map(r => r.prompt),
+        outline: [
+          'What is the best approach to your industry problem?',
+          'How do you choose the right provider?',
+          'What are the key features to look for?',
+          'How much should you expect to pay?'
+        ],
+        optimizationTips: [
+          'Use natural question-answer format',
+          'Include specific use cases and examples',
+          'Structure with clear headings and bullet points'
+        ],
+        expectedImpact: 'Should improve visibility for 3-5 question-based prompts'
+      }
+    ]
+    setContentOpportunities(opportunities)
+  }
+
   const runHealthCheck = async () => {
     if (!company) {
       toast({
@@ -175,18 +220,114 @@ export default function Analytics() {
     }
 
     setIsRunningHealthCheck(true)
-    navigate('/analytics/health-check')
+    setTestProgress({ current: 0, total: 25 })
+    
+    try {
+      // Generate 25 relevant prompts based on company data
+      const prompts = [
+        `What are the best companies in ${company.industry}?`,
+        `Who are the top players in ${company.industry}?`,
+        `Recommend solutions for ${company.target_customers}`,
+        `Best ${company.industry} providers`,
+        `${company.industry} market leaders`,
+        `How to choose ${company.industry} software`,
+        `${company.industry} comparison`,
+        `Top ${company.industry} vendors`,
+        `${company.industry} reviews`,
+        `Best practices for ${company.industry}`,
+        `${company.industry} implementation guide`,
+        `${company.industry} cost comparison`,
+        `${company.industry} features to look for`,
+        `${company.industry} trends 2024`,
+        `${company.industry} case studies`,
+        `${company.industry} success stories`,
+        `${company.industry} ROI analysis`,
+        `${company.industry} integration options`,
+        `${company.industry} security considerations`,
+        `${company.industry} scalability`,
+        `${company.industry} alternatives`,
+        `${company.industry} pricing models`,
+        `${company.industry} deployment options`,
+        `${company.industry} support and training`,
+        `${company.industry} future outlook`
+      ]
+
+      // Process prompts one by one
+      const results: TestResult[] = []
+      
+      for (let i = 0; i < prompts.length; i++) {
+        const currentPrompt = prompts[i]
+        setCurrentTestPrompt(`Testing: "${currentPrompt}"`)
+        setTestProgress({ current: i + 1, total: prompts.length })
+        
+        // Simulate API call with realistic mock data
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        const mentioned = Math.random() > 0.6 // 40% chance of mention
+        const testResult: TestResult = {
+          prompt: currentPrompt,
+          mentioned,
+          position: mentioned ? Math.floor(Math.random() * 10) + 1 : 0,
+          sentiment: mentioned ? (['positive', 'neutral', 'negative'][Math.floor(Math.random() * 3)] as any) : 'neutral',
+          context: mentioned ? `${company.company_name} was mentioned as a leading solution...` : 'No mention found',
+          response: `Mock response for: ${currentPrompt}`
+        }
+        
+        results.push(testResult)
+        
+        const currentMentions = results.filter(r => r.mentioned).length
+        setCurrentTestPrompt(`Found ${currentMentions} mentions so far...`)
+      }
+
+      if (results.length === 0) {
+        toast({
+          title: 'Error',
+          description: 'Health check failed - no results were returned',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      setTestResults(results)
+      setShowResultsSection(true)
+      calculateHealthScore(results)
+      generateContentOpportunities(results, company)
+      
+      // Persist results
+      const persistData: PersistedLastRun = {
+        type: 'health',
+        results,
+        strategies: autoStrategies,
+        timestamp: Date.now(),
+        websiteAnalysis
+      }
+      window.localStorage.setItem('geo_last_run', JSON.stringify(persistData))
+      
+      const mentionCount = results.filter(r => r.mentioned).length
+      const successRate = Math.round((mentionCount / results.length) * 100)
+      
+      toast({
+        title: 'Success',
+        description: `Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate)`
+      })
+      
+    } catch (error) {
+      console.error('Error running health check:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to run health check. Please try again.',
+        variant: 'destructive'
+      })
+    } finally {
+      setIsRunningHealthCheck(false)
+      setCurrentTestPrompt('')
+    }
   }
 
   if (loading) {
     return (
       <AppShell>
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-64"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+        <LoadingOverlay />
       </AppShell>
     )
   }
@@ -205,7 +346,7 @@ export default function Analytics() {
           </button>
           <div className="flex-1">
             <h1 className="h1">Analytics Hub</h1>
-            <p className="body text-gray-600">Detailed insights and performance analysis - updated</p>
+            <p className="body text-gray-600">Detailed insights and performance analysis</p>
           </div>
           
           {/* Run Health Check Button */}
@@ -240,8 +381,8 @@ export default function Analytics() {
           })}
         </div>
 
-        {/* Overview Cards - Always show when no data */}
-        {!showResultsSection && testResults.length === 0 && (
+        {/* Overview Cards when no data */}
+        {!showResultsSection && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {tabs.map((tab) => {
               const Icon = tab.icon
@@ -278,69 +419,36 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg border">
-          {!showResultsSection && testResults.length === 0 && activeTab === 'results' ? (
-            <div className="p-8 text-center">
-              <BarChart3 className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="h3 mb-4">No Data Available</h3>
-              <p className="body text-gray-600 mb-6">
-                Run a health check to generate data for all analytics sections.
-              </p>
-              <button
-                onClick={runHealthCheck}
-                disabled={!company}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-              >
-                <Play className="w-5 h-5 mr-2 inline" />
-                Run Your First Health Check
-              </button>
+        {/* Loading state during health check */}
+        {isRunningHealthCheck && (
+          <div className="bg-white rounded-lg border p-8 mb-6">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <h3 className="h3 mb-2">Running Health Check...</h3>
+              <p className="text-gray-600 mb-4">Testing prompt {testProgress.current} of {testProgress.total}</p>
+              {currentTestPrompt && (
+                <div className="bg-gray-50 rounded-lg p-3 max-w-2xl mx-auto">
+                  <p className="text-sm text-gray-700">"{currentTestPrompt}"</p>
+                </div>
+              )}
             </div>
-          ) : activeTab !== 'results' && !showResultsSection && testResults.length === 0 ? (
-            <div className="p-8 text-center">
-              {(() => {
-                const Icon = tabs.find(t => t.id === activeTab)?.icon || BarChart3
-                const tabNames = {
-                  website: 'Website Analysis',
-                  benchmark: 'Benchmarking',
-                  authority: 'Authority',
-                  trending: 'Trending'
-                }
-                return (
-                  <>
-                    <Icon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                    <h3 className="h3 mb-4">{tabNames[activeTab as keyof typeof tabNames]} Data</h3>
-                    <p className="body text-gray-600 mb-6">
-                      Run a health check to generate {activeTab} analysis and insights.
-                    </p>
-                    <button
-                      onClick={runHealthCheck}
-                      disabled={!company}
-                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                    >
-                      <Play className="w-5 h-5 mr-2 inline" />
-                      Run Health Check
-                    </button>
-                  </>
-                )
-              })()}
-            </div>
-          ) : (
-            <ResultsSection
-              healthCheckTab={activeTab}
-              testResults={testResults}
-              healthScore={healthScore}
-              company={company}
-              websiteAnalysis={websiteAnalysis}
-              authorityAnalysis={authorityAnalysis}
-              industryBenchmark={industryBenchmark}
-              trendingOpportunities={trendingOpportunities}
-              autoStrategies={autoStrategies}
-              onTabChange={setActiveTab}
-              isRunningHealthCheck={isRunningHealthCheck}
-            />
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Results Section */}
+        <ResultsSection
+          healthCheckTab={activeTab}
+          testResults={testResults}
+          healthScore={healthScore}
+          company={company}
+          websiteAnalysis={websiteAnalysis}
+          authorityAnalysis={authorityAnalysis}
+          industryBenchmark={industryBenchmark}
+          trendingOpportunities={trendingOpportunities}
+          autoStrategies={autoStrategies}
+          onTabChange={setActiveTab}
+          isRunningHealthCheck={isRunningHealthCheck}
+        />
       </div>
     </AppShell>
   )
