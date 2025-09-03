@@ -68,10 +68,11 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 border">
-      <h3 className="h3 mb-4">Your Top 3 for the next 30 days</h3>
+    <div className="bg-white rounded-lg p-3 border">
+      <h3 className="h3 mb-2">Your Top 3 for the next 30 days</h3>
+      <p className="text-sm text-gray-600 mb-3">Non-automatable, high-leverage actions</p>
       
-      <div className="space-y-4 mb-4">
+      <div className="space-y-3 mb-3">
         {actions.slice(0, 3).map((action, index) => (
           <div key={action.id || index} className="border-l-2 border-gray-200 pl-4 relative">
             {/* Priority indicator dot */}
@@ -128,12 +129,12 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
       </div>
 
       {actions.length === 0 && !isLoading && (
-        <div className="text-center py-6">
+        <div className="text-center py-4">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <ArrowRight className="w-6 h-6 text-gray-400" />
           </div>
-          <p className="body text-sm text-gray-600 mb-3">
-            No actions available yet. Run a health check to get personalized recommendations.
+          <p className="text-sm text-gray-600 mb-3">
+            No actions ready. Run a health check first.
           </p>
         </div>
       )}
@@ -142,7 +143,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
         onClick={() => navigate('/analytics?tab=results')}
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
-        Show more →
+        View details →
       </button>
     </div>
   )

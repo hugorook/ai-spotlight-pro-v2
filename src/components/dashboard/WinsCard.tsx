@@ -41,8 +41,8 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 border">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-lg p-3 border">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="h3">Where you're winning</h3>
         {wins.length > 0 && (
           <div className="flex items-center gap-1 text-green-600">
@@ -57,8 +57,8 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <TrendingUp className="w-6 h-6 text-gray-400" />
           </div>
-          <p className="body text-sm text-gray-600 mb-3">
-            No current rankings detected yet.
+          <p className="text-sm text-gray-600 mb-3">
+            No wins yet
           </p>
           <button
             onClick={onRefresh}
@@ -69,8 +69,8 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
         </div>
       ) : (
         <>
-          <div className="space-y-3 mb-4">
-            {wins.slice(0, 5).map((win, index) => (
+          <div className="space-y-2 mb-3">
+            {wins.slice(0, 8).map((win, index) => (
               <div key={win.id} className="group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -117,9 +117,9 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
             ))}
           </div>
           
-          {wins.length > 5 && (
-            <div className="text-xs text-gray-500 text-center mb-3">
-              Showing top 5 of {wins.length} wins
+          {wins.length > 8 && (
+            <div className="text-xs text-gray-500 text-center mb-2">
+              +{wins.length - 8} more wins
             </div>
           )}
         </>

@@ -256,45 +256,41 @@ export default function TodayDashboard() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="text-center">
-          <h1 className="h1 mb-2">Today's Dashboard</h1>
-          <p className="body text-gray-600">Your AI visibility at a glance - simplified view</p>
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Compact Header - no center alignment */}
+        <div className="mb-6">
+          <h1 className="h1 mb-1">Dashboard</h1>
+          <p className="body text-gray-600">Your AI visibility at a glance</p>
         </div>
 
-        {/* Three Core Cards */}
-        <AutopilotCard
-          isEnabled={data.project?.autopilot_enabled || false}
-          scriptConnected={data.project?.site_script_status === 'connected'}
-          recentChanges={data.recentChanges}
-          lastRunAt={data.lastRunAt}
-          isApplying={isApplying}
-          recentFixes={data.recentFixes}
-          onApplyFixes={handleApplyFixes}
-          onToggleAutopilot={handleToggleAutopilot}
-        />
+        {/* Mobile: Single column, Desktop: Autopilot full-width top, Wins + Top 3 in 2-col grid */}
+        <div className="space-y-4">
+          {/* Autopilot Card - Full width */}
+          <AutopilotCard
+            isEnabled={data.project?.autopilot_enabled || false}
+            scriptConnected={data.project?.site_script_status === 'connected'}
+            recentChanges={data.recentChanges}
+            lastRunAt={data.lastRunAt}
+            isApplying={isApplying}
+            recentFixes={data.recentFixes}
+            onApplyFixes={handleApplyFixes}
+            onToggleAutopilot={handleToggleAutopilot}
+          />
 
-        <WinsCard
-          wins={data.wins}
-          isLoading={isLoading}
-          onRefresh={handleRunHealthCheck}
-        />
+          {/* Wins + Top 3 Grid - 2 columns on md+ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <WinsCard
+              wins={data.wins}
+              isLoading={isLoading}
+              onRefresh={handleRunHealthCheck}
+            />
 
-        <TopActionsCard
-          actions={data.actions}
-          isLoading={isLoading}
-          onActionClick={handleActionClick}
-        />
-
-        {/* Quick Actions */}
-        <div className="flex justify-center pt-4">
-          <button
-            onClick={handleRunHealthCheck}
-            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-          >
-            Run Full Health Check
-          </button>
+            <TopActionsCard
+              actions={data.actions}
+              isLoading={isLoading}
+              onActionClick={handleActionClick}
+            />
+          </div>
         </div>
       </div>
     </AppShell>
