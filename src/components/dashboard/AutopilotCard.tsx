@@ -1,6 +1,6 @@
 import React from 'react'
 import { Activity, Settings, ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 
 interface AutopilotCardProps {
   isEnabled: boolean
@@ -27,7 +27,7 @@ export function AutopilotCard({
   onApplyFixes,
   onToggleAutopilot
 }: AutopilotCardProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   // Show setup state if not enabled or script missing
   if (!isEnabled || !scriptConnected) {
@@ -43,13 +43,13 @@ export function AutopilotCard({
         
         <div className="flex gap-2">
           <button 
-            onClick={!scriptConnected ? () => router.push('/settings/connections') : onToggleAutopilot}
+            onClick={!scriptConnected ? () => navigate('/settings/connections') : onToggleAutopilot}
             className="px-4 py-2 bg-[#5F209B] text-white rounded-md text-sm hover:opacity-90 transition-opacity font-medium"
           >
             {!scriptConnected ? 'Connect Site' : 'Enable Autopilot'}
           </button>
           <button 
-            onClick={() => router.push('/analytics')}
+            onClick={() => navigate('/analytics')}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-md transition-colors"
           >
             View details →
@@ -133,7 +133,7 @@ export function AutopilotCard({
           View details →
         </button>
         <button
-          onClick={() => router.push('/settings/connections')}
+          onClick={() => navigate('/settings/connections')}
           className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           title="Autopilot Settings"
         >

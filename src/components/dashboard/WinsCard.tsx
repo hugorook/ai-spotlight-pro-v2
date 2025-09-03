@@ -1,6 +1,6 @@
 import React from 'react'
 import { ExternalLink, TrendingUp } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 
 interface Win {
   id: string
@@ -17,7 +17,7 @@ interface WinsCardProps {
 }
 
 export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return (
@@ -126,7 +126,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
       )}
 
       <button 
-        onClick={() => router.push('/analytics/prompts')}
+        onClick={() => navigate('/analytics/prompts')}
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
         View all wins →

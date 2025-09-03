@@ -6,7 +6,7 @@ import { AutopilotCard } from '@/components/dashboard/AutopilotCard'
 import { WinsCard } from '@/components/dashboard/WinsCard'
 import { TopActionsCard } from '@/components/dashboard/TopActionsCard'
 import { useToast } from '@/components/ui/use-toast'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 
 interface Project {
   id: string
@@ -29,7 +29,7 @@ interface DashboardData {
 export default function TodayDashboard() {
   const { user } = useAuth()
   const { toast } = useToast()
-  const router = useRouter()
+  const navigate = useNavigate()
   
   const [data, setData] = useState<DashboardData>({
     project: null,

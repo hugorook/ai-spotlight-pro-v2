@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
@@ -22,7 +22,7 @@ interface TestResult {
 }
 
 export default function HealthCheckAnalytics() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
   
@@ -225,7 +225,7 @@ export default function HealthCheckAnalytics() {
           <p className="body text-gray-600 mb-6">
             Set up your company profile to start using AI Visibility testing.
           </p>
-          <Button onClick={() => router.push('/geo')}>
+          <Button onClick={() => navigate('/geo')}>
             Set Up Company Profile
           </Button>
         </div>
@@ -243,7 +243,7 @@ export default function HealthCheckAnalytics() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button 
-            onClick={() => router.push('/analytics')}
+            onClick={() => navigate('/analytics')}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

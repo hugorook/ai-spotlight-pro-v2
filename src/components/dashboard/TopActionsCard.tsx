@@ -1,6 +1,6 @@
 import React from 'react'
 import { ExternalLink, ArrowRight, Users, FileText, Code } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 
 interface Action {
   id: string
@@ -21,7 +21,7 @@ interface TopActionsCardProps {
 }
 
 export function TopActionsCard({ actions, isLoading = false, onActionClick }: TopActionsCardProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -139,7 +139,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
       )}
 
       <button 
-        onClick={() => router.push('/analytics/recommendations')}
+        onClick={() => navigate('/analytics/recommendations')}
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
       >
         Show more →

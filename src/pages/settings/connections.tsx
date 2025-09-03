@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
@@ -29,7 +29,7 @@ const AUTOPILOT_SCOPES = [
 ]
 
 export default function ConnectionsSettings() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
   
@@ -202,7 +202,7 @@ export default function ConnectionsSettings() {
           <p className="body text-gray-600 mb-6">
             Create a project to configure connections.
           </p>
-          <Button onClick={() => router.push('/dashboard')}>
+          <Button onClick={() => navigate('/dashboard')}>
             Back to Dashboard
           </Button>
         </div>
@@ -216,7 +216,7 @@ export default function ConnectionsSettings() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button 
-            onClick={() => router.push('/dashboard')}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
