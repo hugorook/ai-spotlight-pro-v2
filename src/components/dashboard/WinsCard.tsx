@@ -61,7 +61,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
             No wins yet
           </p>
           <button
-            onClick={() => navigate('/analytics')}
+            onClick={onRefresh}
             className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
           >
             Run health check
