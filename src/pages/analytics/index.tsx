@@ -240,8 +240,8 @@ export default function Analytics() {
           })}
         </div>
 
-        {/* Default Overview Cards */}
-        {activeTab === 'results' && !showResultsSection && testResults.length === 0 && (
+        {/* Overview Cards - Always show when no data */}
+        {!showResultsSection && testResults.length === 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {tabs.map((tab) => {
               const Icon = tab.icon
@@ -256,14 +256,20 @@ export default function Analytics() {
               return (
                 <div 
                   key={tab.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className={`p-4 border rounded-lg transition-colors cursor-pointer ${
+                    activeTab === tab.id 
+                      ? 'border-purple-600 bg-purple-50' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <Icon className="w-5 h-5 text-purple-600" />
-                    <h3 className="font-medium">{tab.label}</h3>
+                    <Icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-purple-600' : 'text-gray-600'}`} />
+                    <h3 className={`font-medium ${activeTab === tab.id ? 'text-purple-900' : 'text-gray-900'}`}>
+                      {tab.label}
+                    </h3>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className={`text-sm ${activeTab === tab.id ? 'text-purple-700' : 'text-gray-600'}`}>
                     {descriptions[tab.id as keyof typeof descriptions]}
                   </p>
                 </div>
