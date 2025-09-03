@@ -205,7 +205,7 @@ export default function Analytics() {
           </button>
           <div className="flex-1">
             <h1 className="h1">Analytics Hub</h1>
-            <p className="body text-gray-600">Detailed insights and performance analysis</p>
+            <p className="body text-gray-600">Detailed insights and performance analysis - updated</p>
           </div>
           
           {/* Run Health Check Button */}
