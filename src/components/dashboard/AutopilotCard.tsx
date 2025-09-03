@@ -116,7 +116,7 @@ export function AutopilotCard({
             <button
               onClick={onApplyFixes}
               disabled={isApplying}
-              className="px-4 py-2 bg-[#5F209B] text-white rounded-md text-sm hover:opacity-90 transition-opacity font-medium disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
             >
               <Activity className={`w-4 h-4 ${isApplying ? 'animate-spin' : ''}`} />
               {isApplying ? 'Applying fixes...' : 'Apply fixes'}

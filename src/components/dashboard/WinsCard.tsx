@@ -21,7 +21,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-4 border">
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-48 mb-3"></div>
           <div className="space-y-2">
@@ -41,8 +41,8 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg p-3 border">
-      <div className="flex items-center justify-between mb-2">
+    <div className="bg-white rounded-lg p-4 border shadow-sm">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="h3">Where you're winning</h3>
         {wins.length > 0 && (
           <div className="flex items-center gap-1 text-green-600">
@@ -61,15 +61,15 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
             No wins yet
           </p>
           <button
-            onClick={onRefresh}
-            className="px-4 py-2 bg-[#5F209B] text-white rounded-md text-sm hover:opacity-90 transition-opacity"
+            onClick={() => navigate('/analytics')}
+            className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
           >
             Run health check
           </button>
         </div>
       ) : (
         <>
-          <div className="space-y-2 mb-3">
+          <div className="space-y-3 mb-4">
             {wins.slice(0, 8).map((win, index) => (
               <div key={win.id} className="group">
                 <div className="flex items-start justify-between">
@@ -118,7 +118,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
           </div>
           
           {wins.length > 8 && (
-            <div className="text-xs text-gray-500 text-center mb-2">
+            <div className="text-xs text-gray-500 text-center mb-3">
               +{wins.length - 8} more wins
             </div>
           )}
@@ -127,7 +127,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
 
       <button 
         onClick={() => navigate('/analytics?tab=results')}
-        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
       >
         View all wins →
       </button>

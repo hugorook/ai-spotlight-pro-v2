@@ -202,33 +202,16 @@ export default function TodayDashboard() {
   }
 
   const handleRunHealthCheck = async () => {
-    if (!data.project) return
-
     try {
-      const response = await fetch('/api/health-check/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: data.project.id })
-      })
-
-      const result = await response.json()
-      if (!response.ok) throw new Error(result.error)
-
+      // Navigate to analytics page to run real health check
+      navigate('/analytics')
+      
       toast({
-        title: 'Success',
-        description: 'Health check started'
+        title: 'Redirected to Analytics',
+        description: 'Run your health check from the Analytics Hub'
       })
-
-      // Refresh wins data after a delay
-      setTimeout(() => {
-        loadDashboardData()
-      }, 2000)
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to run health check',
-        variant: 'destructive'
-      })
+      console.error('Navigation error:', error)
     }
   }
 

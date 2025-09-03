@@ -52,7 +52,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-4 border">
+      <div className="bg-white rounded-lg p-4 border shadow-sm">
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-64 mb-4"></div>
           {[1, 2, 3].map(i => (
@@ -68,11 +68,11 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
   }
 
   return (
-    <div className="bg-white rounded-lg p-3 border">
+    <div className="bg-white rounded-lg p-4 border shadow-sm">
       <h3 className="h3 mb-2">Your Top 3 for the next 30 days</h3>
-      <p className="text-sm text-gray-600 mb-3">Non-automatable, high-leverage actions</p>
+      <p className="text-sm text-gray-600 mb-4">Non-automatable, high-leverage actions</p>
       
-      <div className="space-y-3 mb-3">
+      <div className="space-y-3 mb-4">
         {actions.slice(0, 3).map((action, index) => (
           <div key={action.id || index} className="border-l-2 border-gray-200 pl-4 relative">
             {/* Priority indicator dot */}
@@ -102,7 +102,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onActionClick?.(action)}
-                className="px-3 py-1.5 bg-[#5F209B] text-white text-xs font-medium rounded hover:opacity-90 transition-opacity flex items-center gap-1"
+                className="px-3 py-1.5 bg-[#5F209B] text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1"
               >
                 Do it
                 <ArrowRight className="w-3 h-3" />
@@ -129,11 +129,11 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
       </div>
 
       {actions.length === 0 && !isLoading && (
-        <div className="text-center py-4">
+        <div className="text-center py-6">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <ArrowRight className="w-6 h-6 text-gray-400" />
           </div>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-gray-600 mb-4">
             No actions ready. Run a health check first.
           </p>
         </div>
@@ -141,7 +141,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
 
       <button 
         onClick={() => navigate('/analytics?tab=results')}
-        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
       >
         View details →
       </button>
