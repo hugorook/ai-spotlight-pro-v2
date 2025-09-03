@@ -435,19 +435,19 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Results Section */}
+        {/* Results Section - Always show, it handles its own tab switching */}
         <ResultsSection
-          healthCheckTab={activeTab}
-          testResults={testResults}
+          isVisible={true}
+          activeTab={activeTab}
+          results={testResults}
           healthScore={healthScore}
           company={company}
           websiteAnalysis={websiteAnalysis}
           authorityAnalysis={authorityAnalysis}
           industryBenchmark={industryBenchmark}
           trendingOpportunities={trendingOpportunities}
-          autoStrategies={autoStrategies}
+          strategies={autoStrategies}
           onTabChange={setActiveTab}
-          isRunningHealthCheck={isRunningHealthCheck}
         />
       </div>
     </AppShell>
