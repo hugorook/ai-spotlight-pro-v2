@@ -5,6 +5,7 @@ import AppShell from '@/components/layout/AppShell'
 import { AutopilotCard } from '@/components/dashboard/AutopilotCard'
 import { WinsCard } from '@/components/dashboard/WinsCard'
 import { TopActionsCard } from '@/components/dashboard/TopActionsCard'
+import { ImprovementsCard } from '@/components/dashboard/ImprovementsCard'
 import { useToast } from '@/components/ui/use-toast'
 import { useNavigate } from 'react-router-dom'
 
