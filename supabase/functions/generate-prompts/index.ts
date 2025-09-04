@@ -18,6 +18,7 @@ interface GeneratePromptsRequest {
   companySizes?: string[];
   locations?: string[];
   uniqueCombinations?: string[];
+  requestedCount?: number;
 }
 
 interface GeneratedPrompt {
@@ -184,7 +185,7 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Create 12 REALISTIC search prompts that actual customers would search for when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate on easy-wins. NO company name mentions.
+TASK: Create ${companyInfo.requestedCount || 10} REALISTIC search prompts that actual customers would search for when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate on easy-wins. NO company name mentions.
 
 CRITICAL: Balance REALISTIC human searches with enough SPECIFICITY to favor established players.
 
@@ -293,7 +294,7 @@ Or: What would a food manufacturer search for when they need sugar AND risk mana
 
 ❌ BANNED: "How to", "What are", "Best practices", "Benefits of", "Why"
 
-JSON FORMAT (EXACTLY 12 prompts):
+JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
 {
   "prompts": [
     {
@@ -436,8 +437,9 @@ The easy-wins should be REALISTIC SEARCHES that naturally favor established mark
       }
     }
 
-    // Cap to 12 for more variety and higher success rate
-    validatedPrompts = validatedPrompts.slice(0, 12);
+    // Cap to requested count (default 10) for more variety and higher success rate
+    const requestedCount = companyInfo.requestedCount || 10;
+    validatedPrompts = validatedPrompts.slice(0, requestedCount);
     console.log(`Returning ${validatedPrompts.length} validated prompts`);
     return validatedPrompts;
 

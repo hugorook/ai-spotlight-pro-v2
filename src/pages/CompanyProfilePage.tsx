@@ -158,6 +158,56 @@ const CompanyProfilePage = () => {
     }
   };
 
+  const generatePromptsWithAnalysis = async (enhancedData: any) => {
+    try {
+      console.log('Generating 10 new prompts with fresh website analysis...');
+      
+      // Always use current geographic focus from form data
+      const geographicFocus = formData.geography || 'Global';
+      
+      const { data, error } = await supabase.functions.invoke('generate-prompts', {
+        body: {
+          companyName: formData.companyName,
+          industry: formData.industry,
+          description: formData.description,
+          targetCustomers: formData.targetCustomers,
+          keyDifferentiators: formData.differentiators,
+          websiteUrl: formData.website,
+          geographicFocus: geographicFocus,
+          requestedCount: 10, // Request exactly 10 prompts
+          ...enhancedData,
+          // Override any cached locations with current geographic focus
+          locations: enhancedData.locations ? [geographicFocus, ...enhancedData.locations].slice(0, 3) : [geographicFocus]
+        }
+      });
+
+      if (error) {
+        console.error('Error generating prompts:', error);
+        toast({ 
+          title: 'Prompt Generation Warning', 
+          description: 'Analysis complete but failed to generate new test prompts. You can generate them manually from the Prompts page.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const generatedPrompts = (data?.prompts || []).map((p: any) => ({ ...p, isEditing: false }));
+      
+      // Save to localStorage (we'll use company name as key since company might not be saved yet)
+      const companyKey = company?.id || `temp_${formData.companyName.replace(/\s+/g, '_').toLowerCase()}`;
+      localStorage.setItem(`prompts_${companyKey}`, JSON.stringify(generatedPrompts));
+      
+      console.log(`Generated ${generatedPrompts.length} new prompts with website analysis`);
+    } catch (error) {
+      console.error('Error generating prompts:', error);
+      toast({ 
+        title: 'Prompt Generation Warning', 
+        description: 'Analysis complete but failed to generate new test prompts. You can generate them manually from the Prompts page.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const generatePromptsForCompany = async () => {
     if (!company) return;
     
@@ -187,6 +237,7 @@ const CompanyProfilePage = () => {
           keyDifferentiators: company.key_differentiators,
           websiteUrl: company.website_url,
           geographicFocus: geographicFocus,
+          requestedCount: 10, // Always generate 10 prompts
           ...enhancedData,
           // Override any cached locations with current geographic focus
           locations: enhancedData.locations ? [geographicFocus, ...enhancedData.locations].slice(0, 3) : [geographicFocus]
@@ -281,9 +332,12 @@ const CompanyProfilePage = () => {
         };
         localStorage.setItem('website_analysis_enhanced', JSON.stringify(enhancedData));
         
+        // Automatically generate updated prompts with the new analysis
+        await generatePromptsWithAnalysis(enhancedData);
+        
         toast({ 
-          title: 'Enhanced Analysis Complete', 
-          description: 'Website analyzed using AI knowledge + website content! This enhanced analysis combines AI\'s existing knowledge about your company with current website information to create more targeted prompts.' 
+          title: 'Analysis Complete', 
+          description: 'Website analyzed and 10 new test prompts generated automatically!' 
         });
       }
     } catch (error) {
