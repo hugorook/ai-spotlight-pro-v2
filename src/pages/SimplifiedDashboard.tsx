@@ -89,22 +89,22 @@ export default function TodayDashboard() {
         throw new Error('Could not create or load project')
       }
 
-      // Load wins, actions, and recent changes in parallel
-      const [winsResponse, actionsResponse, changelogResponse] = await Promise.all([
-        fetch(`/api/wins?projectId=${project.id}&limit=8`),
-        fetch('/api/recommendations/top', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ projectId: project.id, limit: 3 })
+      // Load wins, actions, and recent changes in parallel using Supabase edge functions
+      const [winsResult, actionsResult, changelogResult] = await Promise.all([
+        supabase.functions.invoke('get-wins', {
+          body: { projectId: project.id, limit: 8 }
         }),
-        fetch(`/api/changelog?projectId=${project.id}&limit=10`)
+        supabase.functions.invoke('get-recommendations', {
+          body: { projectId: project.id, limit: 3 }
+        }),
+        supabase.functions.invoke('get-changelog', {
+          body: { projectId: project.id, limit: 10 }
+        })
       ])
 
-      const [wins, actionsData, changelog] = await Promise.all([
-        winsResponse.json(),
-        actionsResponse.json(),
-        changelogResponse.json()
-      ])
+      const wins = winsResult.data?.wins || []
+      const actionsData = { recommendations: actionsResult.data?.recommendations || [] }
+      const changelog = { changelog: changelogResult.data?.changelog || [] }
 
       // Calculate recent changes (last 7 days)
       const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
@@ -144,16 +144,12 @@ export default function TodayDashboard() {
     try {
       setIsApplying(true)
       
-      const response = await fetch('/api/changes/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: data.project.id })
+      const { data: result, error } = await supabase.functions.invoke('apply-changes', {
+        body: { projectId: data.project.id }
       })
 
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to apply fixes')
+      if (error) {
+        throw new Error(error.message || 'Failed to apply fixes')
       }
 
       toast({
@@ -179,17 +175,14 @@ export default function TodayDashboard() {
     if (!data.project) return
 
     try {
-      const response = await fetch('/api/autopilot/toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { data: result, error } = await supabase.functions.invoke('toggle-autopilot', {
+        body: {
           projectId: data.project.id,
           enabled: !data.project.autopilot_enabled
-        })
+        }
       })
 
-      const result = await response.json()
-      if (!response.ok) throw new Error(result.error)
+      if (error) throw new Error(error.message || 'Failed to toggle autopilot')
 
       toast({
         title: 'Success',

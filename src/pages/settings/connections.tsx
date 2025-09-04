@@ -72,17 +72,14 @@ export default function ConnectionsSettings() {
 
     setIsUpdating(true)
     try {
-      const response = await fetch('/api/autopilot/toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { data: result, error } = await supabase.functions.invoke('toggle-autopilot', {
+        body: {
           projectId: project.id,
           enabled: !project.autopilot_enabled
-        })
+        }
       })
 
-      const result = await response.json()
-      if (!response.ok) throw new Error(result.error)
+      if (error) throw new Error(error.message || 'Failed to toggle autopilot')
 
       setProject({
         ...project,
