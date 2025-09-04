@@ -2,34 +2,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Brain, 
-  TrendingUp, 
-  Shield, 
-  ArrowRight, 
+import {
+  ArrowRight,
   Search,
-  TestTube,
   FileText,
-  BarChart3,
-  Zap,
+  TrendingUp,
   Target,
   Bot,
   Check,
-  Users,
-  Globe,
-  Star,
-  ChevronDown,
-  Lightbulb,
-  Award,
-  TrendingDownIcon
+  Sparkles
 } from "lucide-react";
-import heroImage from "@/assets/hero-ai-visibility.jpg";
-import GhostAnimation from "@/components/GhostAnimation";
-import FlashlightEffect from "@/components/FlashlightEffect";
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [flashlightActive, setFlashlightActive] = useState(true);
+  const [query, setQuery] = useState("");
 
   const handleGetStarted = () => {
     window.location.href = '/auth';
@@ -100,52 +86,45 @@ const LandingPage = () => {
     }
   ];
 
+  const handleSearch = () => {
+    if (!query) return;
+    // For now route to auth or a test page; replace with real search later
+    window.location.href = "/auth";
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Flashlight Effect */}
-      <FlashlightEffect 
-        isActive={flashlightActive} 
-        onToggle={setFlashlightActive} 
-      />
-      
+    <div className="min-h-screen bg-[#E9E3D6] text-[#1A1A1A]">
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#E9E3D6]/80 backdrop-blur-md border-b border-black/5">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
-                <svg 
-                  className="w-8 h-8 text-[#5F209B]" 
-                  viewBox="0 0 24 24" 
-                  fill="currentColor"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+                <span className="text-lg">Dexter</span>
               </div>
-              <span className="h3">Lex</span>
             </div>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#how" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
+              <a href="#how" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
                 How it Works
               </a>
-              <a href="#traffic" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
+              <a href="#traffic" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
                 Traffic
               </a>
-              <a href="#pricing" className="text-muted-foreground hover:text-[#5F209B] px-3 py-2 rounded-md transition-none">
+              <a href="#pricing" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
                 Pricing
               </a>
             </nav>
 
             {/* CTA Buttons */}
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={handleLogin}>
+              <Button variant="ghost" className="text-black/80 hover:bg-black/5" onClick={handleLogin}>
                 Login
               </Button>
               <Button 
-                className="bg-[#5F209B] text-white hover:bg-[#4A1A7D] transition-none"
+                className="bg-black text-white hover:bg-black/90 transition-none rounded-full px-5"
                 onClick={handleGetStarted}
               >
                 Cheat the Internet
@@ -156,54 +135,36 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Ghost Animation Overlay - Hero section only */}
-        <div className="absolute inset-0 pointer-events-none z-50">
-          <GhostAnimation />
-        </div>
-        
-        <div className="container mx-auto relative z-10">
-          {/* Centered Hero Content */}
-          <div className="text-center max-w-5xl mx-auto">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="h1">
-                  Cheat the Internet.
-                </h1>
-                
-                <div className="space-y-4">
-                  <h2 className="h2">
-                    Meet Lex. The Generative SEO tool.
-                  </h2>
-                  
-                  <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
-                    AI tools are funneling huge volumes of super high intent traffic — and the big brands aren't competing.
-                  </p>
-                  
-                  <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
-                    Lex is your shovel in the AI search gold rush. It helps you teach AI tools to recommend you. 
-                    Show up early. Own your category. Become the default choice.
-                  </p>
-                </div>
-              </div>
+      <section className="pt-28 pb-20 px-4">
+        <div className="container mx-auto">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight">
+              Cheat the internet. <span className="inline-flex items-center align-middle px-2"><Bot className="w-8 h-8" /></span> With Dexter.
+            </h1>
+            <p className="mt-6 text-base md:text-lg text-black/70">
+              AI tools are funneling huge volumes of super high intent traffic. Most brands aren’t competing.
+            </p>
+            <p className="mt-2 text-base md:text-lg text-black/70">
+              Lex is your shovel in the AI search gold rush. It helps you teach AI tools to recommend you.
+              Show up early. Own your category. Become the default choice.
+            </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  className="group bg-[#5F209B] text-white hover:bg-[#4A1A7D] transition-none text-lg px-8 py-4" 
-                  onClick={handleGetStarted}
+            {/* Search */}
+            <div className="mt-8 flex justify-center">
+              <div className="relative w-full max-w-xl">
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search or paste your website url"
+                  className="w-full h-12 rounded-full bg-white text-black/80 placeholder-black/40 pl-5 pr-14 shadow-[0_6px_30px_rgba(0,0,0,0.08)] border border-black/10"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#9CE94B] flex items-center justify-center shadow-md hover:brightness-95"
+                  aria-label="Search"
                 >
-                  Start Cheating
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform ml-2" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-[#5F209B] text-[#5F209B] hover:bg-[#5F209B] hover:text-white transition-none text-lg px-8 py-4"
-                >
-                  See How (3 min demo)
-                </Button>
+                  <Sparkles className="w-4 h-4 text-black" />
+                </button>
               </div>
             </div>
           </div>
@@ -211,35 +172,35 @@ const LandingPage = () => {
       </section>
 
       {/* What is Generative SEO Section */}
-      <section className="py-20 px-4 bg-[#E7F0F6]">
+      <section className="py-20 px-4">
         <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="h2 mb-8 text-center">
+          <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.12)] p-10 md:p-14">
+            <h2 className="text-center font-serif text-2xl md:text-3xl mb-8">
               "What the **** is Generative SEO?"
             </h2>
-            
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+
+            <div className="space-y-6 text-lg text-black/70 leading-relaxed">
               <p>
                 People use AI tools to search, ChatGPT alone has over 180M monthly users.
               </p>
               <p>
-                People trust AI recommendations, so the traffic is way more valuable. You're not an option, 
+                People trust AI recommendations, so the traffic is way more valuable. You're not an option,
                 you're a recommendation. Fewer impressions — way higher intent.
               </p>
               <p>
-                First movers win, and win big. Companies in SaaS and consumer products have already become 
+                First movers win, and win big. Companies in SaaS and consumer products have already become
                 the "default" answer to certain prompts. Once a model learns you as the go-to example, it tends to stick.
               </p>
             </div>
-            
+
             {/* AI Search Stats */}
             <div className="grid md:grid-cols-4 gap-6 mt-12">
               {aiSearchStats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-[#5F209B] mb-2">
+                  <div className="text-3xl md:text-4xl font-bold text-black mb-2">
                     {stat.metric}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-black/60">
                     {stat.label}
                   </div>
                 </div>
