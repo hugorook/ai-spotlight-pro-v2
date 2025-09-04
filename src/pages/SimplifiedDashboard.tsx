@@ -21,6 +21,7 @@ interface DashboardData {
   project: Project | null
   wins: any[]
   actions: any[]
+  improvements: any[]
   recentChanges: number
   lastRunAt?: string
   recentFixes: any[]
@@ -35,6 +36,7 @@ export default function TodayDashboard() {
     project: null,
     wins: [],
     actions: [],
+    improvements: [],
     recentChanges: 0,
     recentFixes: []
   })
@@ -252,6 +254,7 @@ export default function TodayDashboard() {
       // Process prompts one by one with real AI testing
       const results: any[] = []
       const wins: any[] = []
+      const improvements: any[] = []
       
       for (let i = 0; i < prompts.length; i++) {
         const currentPrompt = prompts[i]
@@ -294,6 +297,15 @@ export default function TodayDashboard() {
               rank: testResult.position,
               url: `https://${companyData.website_url || 'example.com'}`,
               lastSeen: new Date().toISOString()
+            })
+          } else if (!testResult.mentioned) {
+            // If not mentioned, add to improvements
+            improvements.push({
+              id: `improve-${i}`,
+              prompt: testResult.prompt,
+              reason: testResult.context || 'Company not mentioned in AI response',
+              priority: i < 5 ? 'High' : i < 10 ? 'Medium' : 'Low',
+              lastChecked: new Date().toISOString()
             })
           }
 
@@ -344,7 +356,8 @@ export default function TodayDashboard() {
       setData(prev => ({
         ...prev,
         wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
-        actions
+        actions,
+        improvements: improvements.slice(0, 8) // Show top 8 improvements
       }))
 
       const mentionCount = results.filter(r => r.mentioned).length
@@ -393,7 +406,7 @@ export default function TodayDashboard() {
 
   return (
     <AppShell>
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Compact Header - no center alignment */}
         <div className="mb-6">
           <h1 className="h1 mb-1">Dashboard</h1>
@@ -424,9 +437,9 @@ export default function TodayDashboard() {
           </div>
         )}
 
-        {/* Mobile: Single column, Desktop: Autopilot full-width top, Wins + Top 3 in 2-col grid */}
-        <div className="space-y-4">
-          {/* Autopilot Card - Full width */}
+        {/* Single Column Layout - Stacked Flow */}
+        <div className="max-w-2xl mx-auto space-y-4">
+          {/* 1. Autopilot Card */}
           <AutopilotCard
             isEnabled={data.project?.autopilot_enabled || false}
             scriptConnected={data.project?.site_script_status === 'connected'}
@@ -438,20 +451,26 @@ export default function TodayDashboard() {
             onToggleAutopilot={handleToggleAutopilot}
           />
 
-          {/* Wins + Top 3 Grid - 2 columns on md+ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <WinsCard
-              wins={data.wins}
-              isLoading={isLoading || isRunningHealthCheck}
-              onRefresh={handleRunHealthCheck}
-            />
+          {/* 2. Where You're Winning */}
+          <WinsCard
+            wins={data.wins}
+            isLoading={isLoading || isRunningHealthCheck}
+            onRefresh={handleRunHealthCheck}
+          />
 
-            <TopActionsCard
-              actions={data.actions}
-              isLoading={isLoading || isRunningHealthCheck}
-              onActionClick={handleActionClick}
-            />
-          </div>
+          {/* 3. Your Top 3 */}
+          <TopActionsCard
+            actions={data.actions}
+            isLoading={isLoading || isRunningHealthCheck}
+            onActionClick={handleActionClick}
+          />
+
+          {/* 4. Key Areas to Improve */}
+          <ImprovementsCard
+            improvements={data.improvements}
+            isLoading={isLoading || isRunningHealthCheck}
+            onRefresh={handleRunHealthCheck}
+          />
 
           {/* Run Health Check Button */}
           {!isRunningHealthCheck && (
