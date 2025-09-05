@@ -72,13 +72,13 @@ function AccordionSteps({
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   return (
-    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12">
+    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12 min-h-[720px] md:min-h-[860px]">
       {steps.map((step, index) => {
         const expanded = activeIndex === index;
         return (
           <div
             key={step.title}
-            className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] h-[220px] md:h-[260px]"
+            className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
             onMouseEnter={() => setActiveIndex(index)}
             onFocus={() => setActiveIndex(index)}
             onClick={() => setActiveIndex(index)}
@@ -92,7 +92,11 @@ function AccordionSteps({
               </div>
             </div>
 
-            <div className={`transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm md:text-base border-t border-[#efeee9] pt-10 pb-8 ${expanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 pointer-events-none'}`}>
+            <div
+              className={`${
+                expanded ? 'max-h-[320px] md:max-h-[380px] opacity-100 pt-10 pb-8' : 'max-h-0 opacity-0 pt-0 pb-0'
+              } transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm md:text-base border-t border-[#efeee9]`}
+            >
               <p className="leading-relaxed">
                 {step.description}
               </p>
