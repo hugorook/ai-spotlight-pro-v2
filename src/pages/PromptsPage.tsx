@@ -121,23 +121,30 @@ const PromptsPage = () => {
     setAnalyzing(true);
     
     try {
+      console.log('Invoking analyze-website-for-fields with URL:', formData.website);
       const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
         body: { url: formData.website }
       });
 
+      console.log('Edge function response:', { data, error });
+
       if (error) {
+        console.error('Edge function error:', error);
         throw error;
       }
 
-      if (data) {
+      if (data && data.fields) {
+        const fields = data.fields;
         const updatedFormData = {
           ...formData,
-          company_name: data.companyName || formData.company_name,
-          industry: data.industry || formData.industry,
-          description: data.description || formData.description,
-          target_customers: data.targetCustomers || formData.target_customers,
-          key_differentiators: data.keyDifferentiators || formData.key_differentiators,
-          geographic_focus: data.geographicFocus || formData.geographic_focus
+          company_name: fields.companyName || formData.company_name,
+          industry: fields.industry || formData.industry,
+          description: fields.description || formData.description,
+          target_customers: fields.targetCustomers || formData.target_customers,
+          key_differentiators: fields.keyDifferentiators || formData.key_differentiators,
+          geographic_focus: Array.isArray(fields.geographicFocus) 
+            ? fields.geographicFocus 
+            : (fields.geographicFocus ? [fields.geographicFocus] : formData.geographic_focus)
         };
         
         setFormData(updatedFormData);
@@ -154,9 +161,10 @@ const PromptsPage = () => {
       }
     } catch (error) {
       console.error('Error analyzing website:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({ 
         title: 'Analysis Failed', 
-        description: 'Could not analyze website. Please fill in the information manually.', 
+        description: `Could not analyze website: ${errorMessage}. Please fill in the information manually.`, 
         variant: 'destructive' 
       });
     } finally {
@@ -219,6 +227,7 @@ const PromptsPage = () => {
       }
 
       // Generate prompts
+      console.log('Invoking generate-prompts with data:', dataToUse);
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: dataToUse.company_name,
@@ -232,7 +241,12 @@ const PromptsPage = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Generate prompts response:', { data, error });
+
+      if (error) {
+        console.error('Generate prompts error:', error);
+        throw error;
+      }
 
       const generatedPrompts = (data?.prompts || []).map((p: any, index: number) => ({
         id: `prompt-${index + 1}`,
@@ -266,9 +280,10 @@ const PromptsPage = () => {
 
     } catch (error) {
       console.error('Error generating prompts:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({ 
         title: 'Generation Failed', 
-        description: 'Failed to generate prompts. Please try again.', 
+        description: `Failed to generate prompts: ${errorMessage}. Please try again.`, 
         variant: 'destructive' 
       });
     } finally {
