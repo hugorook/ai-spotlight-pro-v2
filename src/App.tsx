@@ -8,7 +8,6 @@ import CleanAuthPage from "./pages/CleanAuthPage";
 import SimplifiedDashboard from "./pages/SimplifiedDashboard";
 import CleanGeoPage from "./pages/CleanGeoPage";
 import PromptsPage from "./pages/PromptsPage";
-import CompanyProfilePage from "./pages/CompanyProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import ConnectionsSettings from "./pages/settings/connections";
 import Analytics from "./pages/analytics";
@@ -46,13 +45,7 @@ const App = () => (
                 </ErrorBoundary>
               </ProtectedRoute>
             } />
-            <Route path="/content" element={
-              <ProtectedRoute>
-                <ErrorBoundary>
-                  <CompanyProfilePage />
-                </ErrorBoundary>
-              </ProtectedRoute>
-            } />
+            <Route path="/content" element={<Navigate to="/prompts" replace />} />
             <Route path="/settings" element={
               <ProtectedRoute>
                 <ErrorBoundary>

@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppShell from '@/components/layout/AppShell';
 import { useToast } from '@/components/ui/use-toast';
-import { Wand2, Save, RefreshCw, MessageSquare, Edit2, Check, X, Plus } from 'lucide-react';
+import { Wand2, Save, RefreshCw, Globe, Edit2, Check, X, Loader2 } from 'lucide-react';
 
 interface Prompt {
   id: string;
@@ -21,15 +21,31 @@ interface Company {
   target_customers?: string;
   key_differentiators?: string;
   website_url?: string;
+  geographic_focus?: string[];
 }
 
 const PromptsPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   
+  // Company form state
   const [company, setCompany] = useState<Company | null>(null);
+  const [formData, setFormData] = useState({
+    website: '',
+    company_name: '',
+    industry: '',
+    description: '',
+    target_customers: '',
+    key_differentiators: '',
+    geographic_focus: ['Global']
+  });
+  
+  // Prompts state
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  
+  // UI state
   const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -52,14 +68,21 @@ const PromptsPage = () => {
 
       if (companyError && companyError.code !== 'PGRST116') {
         console.error('Error loading company:', companyError);
-        toast({ title: 'Error', description: 'Failed to load company information', variant: 'destructive' });
-        return;
       }
 
-      setCompany(companyData);
-
       if (companyData) {
-        // Try to load existing prompts from database first, then localStorage
+        setCompany(companyData);
+        setFormData({
+          website: companyData.website_url || '',
+          company_name: companyData.company_name || '',
+          industry: companyData.industry || '',
+          description: companyData.description || '',
+          target_customers: companyData.target_customers || '',
+          key_differentiators: companyData.key_differentiators || '',
+          geographic_focus: companyData.geographic_focus || ['Global']
+        });
+
+        // Load prompts from database first, then localStorage
         const { data: dbPrompts } = await supabase
           .from('prompts')
           .select('*')
@@ -67,7 +90,6 @@ const PromptsPage = () => {
           .order('created_at', { ascending: true });
 
         if (dbPrompts && dbPrompts.length > 0) {
-          // Convert database prompts to UI format
           const convertedPrompts = dbPrompts.map((p: any, index: number) => ({
             id: `prompt-${index + 1}`,
             text: p.text,
@@ -76,25 +98,6 @@ const PromptsPage = () => {
             isEditing: false
           }));
           setPrompts(convertedPrompts);
-          
-          // Also cache in localStorage for offline access
-          localStorage.setItem(`prompts_${companyData.id}`, JSON.stringify(convertedPrompts));
-        } else {
-          // Fallback to localStorage if no database prompts
-          const savedPrompts = localStorage.getItem(`prompts_${companyData.id}`);
-          if (savedPrompts) {
-            try {
-              const parsed = JSON.parse(savedPrompts);
-              setPrompts(parsed.map((p: any) => ({ ...p, isEditing: false })));
-            } catch (e) {
-              console.error('Error parsing saved prompts:', e);
-            }
-          }
-        }
-
-        // If no saved prompts at all, generate them
-        if ((!dbPrompts || dbPrompts.length === 0) && !localStorage.getItem(`prompts_${companyData.id}`)) {
-          await generateInitialPrompts(companyData);
         }
       }
     } catch (error) {
@@ -105,78 +108,171 @@ const PromptsPage = () => {
     }
   };
 
-  const generateInitialPrompts = async (companyData: Company) => {
+  const analyzeWebsite = async () => {
+    if (!formData.website.trim()) {
+      toast({ 
+        title: 'Website Required', 
+        description: 'Please enter a website URL first.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setAnalyzing(true);
+    
     try {
-      setGenerating(true);
-      
-      // Load enhanced analysis data if available and recent, but prioritize current company profile
-      let enhancedData = {};
-      try {
-        const stored = localStorage.getItem('website_analysis_enhanced');
-        if (stored) {
-          const parsedData = JSON.parse(stored);
-          // Check if analysis is for current company and is recent (less than 1 hour old)
-          const isRecent = parsedData.timestamp && (Date.now() - parsedData.timestamp < 3600000);
-          const isCurrentCompany = parsedData.companyAnalyzed === companyData.company_name;
-          
-          if (isRecent && isCurrentCompany) {
-            enhancedData = parsedData;
-            console.log('Using fresh enhanced analysis data with AI knowledge integration');
-          } else {
-            console.log('Enhanced analysis data is stale or for different company, will use basic extraction');
-            localStorage.removeItem('website_analysis_enhanced');
-          }
-        }
-      } catch (e) {
-        console.log('No enhanced analysis data available');
-      }
-      
-      // Always use current geographic focus from company profile, not cached data
-      const geographicFocus = (companyData.geographic_focus && companyData.geographic_focus[0]) || 'Global';
-      
-      const { data, error } = await supabase.functions.invoke('generate-prompts', {
-        body: {
-          companyName: companyData.company_name,
-          industry: companyData.industry,
-          description: companyData.description,
-          targetCustomers: companyData.target_customers,
-          keyDifferentiators: companyData.key_differentiators,
-          websiteUrl: companyData.website_url,
-          geographicFocus: geographicFocus,
-          ...enhancedData,
-          // Override any cached locations with current geographic focus
-          locations: enhancedData.locations ? [geographicFocus, ...enhancedData.locations].slice(0, 3) : [geographicFocus]
-        }
+      const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
+        body: { url: formData.website }
       });
 
       if (error) {
-        console.error('Error generating prompts:', error);
-        toast({ title: 'Error', description: 'Failed to generate prompts', variant: 'destructive' });
-        return;
+        throw error;
       }
 
-      const generatedPrompts = (data?.prompts || []).map((p: any) => ({ ...p, isEditing: false }));
+      if (data) {
+        setFormData(prev => ({
+          ...prev,
+          company_name: data.companyName || prev.company_name,
+          industry: data.industry || prev.industry,
+          description: data.description || prev.description,
+          target_customers: data.targetCustomers || prev.target_customers,
+          key_differentiators: data.keyDifferentiators || prev.key_differentiators,
+          geographic_focus: data.geographicFocus || prev.geographic_focus
+        }));
+
+        toast({ 
+          title: 'Website Analyzed', 
+          description: 'Company information has been auto-filled from your website.' 
+        });
+      }
+    } catch (error) {
+      console.error('Error analyzing website:', error);
+      toast({ 
+        title: 'Analysis Failed', 
+        description: 'Could not analyze website. Please fill in the information manually.', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const generatePrompts = async () => {
+    if (!formData.company_name || !formData.industry) {
+      toast({ 
+        title: 'Required Fields', 
+        description: 'Company name and industry are required to generate prompts.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setGenerating(true);
+    
+    try {
+      // First save/update company info
+      let companyId = company?.id;
+      
+      if (!company) {
+        // Create new company
+        const { data: newCompany, error: createError } = await supabase
+          .from('companies')
+          .insert({
+            user_id: user?.id,
+            company_name: formData.company_name,
+            industry: formData.industry,
+            description: formData.description,
+            target_customers: formData.target_customers,
+            key_differentiators: formData.key_differentiators,
+            website_url: formData.website,
+            geographic_focus: formData.geographic_focus
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        setCompany(newCompany);
+        companyId = newCompany.id;
+      } else {
+        // Update existing company
+        const { error: updateError } = await supabase
+          .from('companies')
+          .update({
+            company_name: formData.company_name,
+            industry: formData.industry,
+            description: formData.description,
+            target_customers: formData.target_customers,
+            key_differentiators: formData.key_differentiators,
+            website_url: formData.website,
+            geographic_focus: formData.geographic_focus
+          })
+          .eq('id', company.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Generate prompts
+      const { data, error } = await supabase.functions.invoke('generate-prompts', {
+        body: {
+          companyName: formData.company_name,
+          industry: formData.industry,
+          description: formData.description,
+          targetCustomers: formData.target_customers,
+          keyDifferentiators: formData.key_differentiators,
+          websiteUrl: formData.website,
+          geographicFocus: formData.geographic_focus[0] || 'Global',
+          requestedCount: 10
+        }
+      });
+
+      if (error) throw error;
+
+      const generatedPrompts = (data?.prompts || []).map((p: any, index: number) => ({
+        id: `prompt-${index + 1}`,
+        text: p.text,
+        category: p.category || 'moderate',
+        intent: p.intent || 'User is looking for company recommendations',
+        isEditing: false
+      }));
+
+      // Save to database
+      const promptsToSave = generatedPrompts.map((prompt: any) => ({
+        company_id: companyId,
+        text: prompt.text,
+        tags: [prompt.category]
+      }));
+      
+      // Clear existing prompts
+      await supabase.from('prompts').delete().eq('company_id', companyId);
+      
+      // Insert new prompts
+      const { error: insertError } = await supabase.from('prompts').insert(promptsToSave);
+      
+      if (insertError) throw insertError;
+
       setPrompts(generatedPrompts);
       
-      // Save to localStorage
-      localStorage.setItem(`prompts_${companyData.id}`, JSON.stringify(generatedPrompts));
-      
-      const hasEnhancedData = Object.keys(enhancedData).length > 0;
       toast({ 
-        title: 'Success', 
-        description: `Generated ${generatedPrompts.length} ${hasEnhancedData ? 'AI-enhanced' : 'standard'} search prompts${hasEnhancedData ? ' using AI knowledge + company analysis' : ''}` 
+        title: 'Prompts Generated', 
+        description: `Generated ${generatedPrompts.length} new test prompts successfully.` 
       });
+
     } catch (error) {
       console.error('Error generating prompts:', error);
-      toast({ title: 'Error', description: 'Failed to generate prompts', variant: 'destructive' });
+      toast({ 
+        title: 'Generation Failed', 
+        description: 'Failed to generate prompts. Please try again.', 
+        variant: 'destructive' 
+      });
     } finally {
       setGenerating(false);
     }
   };
 
-  const regeneratePrompts = async () => {
-    if (!company) return;
-    await generateInitialPrompts(company);
+  const updatePrompt = (id: string, field: string, value: string) => {
+    setPrompts(prev => prev.map(p => 
+      p.id === id ? { ...p, [field]: value } : p
+    ));
   };
 
   const toggleEdit = (id: string) => {
@@ -185,66 +281,32 @@ const PromptsPage = () => {
     ));
   };
 
-  const updatePrompt = (id: string, field: keyof Prompt, value: string) => {
-    setPrompts(prev => prev.map(p => 
-      p.id === id ? { ...p, [field]: value } : p
-    ));
-  };
-
   const savePrompts = async () => {
     if (!company) return;
     
+    setSaving(true);
+    
     try {
-      setSaving(true);
-      
-      // Save to database first
       const dbPrompts = prompts.map(p => ({
         company_id: company.id,
         text: p.text,
         tags: [p.category]
       }));
       
-      // Clear existing prompts for this company
       await supabase.from('prompts').delete().eq('company_id', company.id);
-      
-      // Insert updated prompts
       const { error: insertError } = await supabase.from('prompts').insert(dbPrompts);
       
-      if (insertError) {
-        console.error('Error saving prompts to database:', insertError);
-        toast({ title: 'Error', description: 'Failed to save prompts to database', variant: 'destructive' });
-        return;
-      }
+      if (insertError) throw insertError;
       
-      // Also save to localStorage for immediate access
-      const promptsToSave = prompts.map(p => ({ ...p, isEditing: false }));
-      localStorage.setItem(`prompts_${company.id}`, JSON.stringify(promptsToSave));
+      setPrompts(prev => prev.map(p => ({ ...p, isEditing: false })));
       
-      // Update state to exit edit mode
-      setPrompts(promptsToSave);
-      
-      toast({ title: 'Success', description: 'Prompts saved to database successfully' });
+      toast({ title: 'Success', description: 'Prompts saved successfully' });
     } catch (error) {
       console.error('Error saving prompts:', error);
       toast({ title: 'Error', description: 'Failed to save prompts', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
-  };
-
-  const addNewPrompt = () => {
-    const newPrompt: Prompt = {
-      id: `prompt-${Date.now()}`,
-      text: '',
-      category: 'moderate',
-      intent: '',
-      isEditing: true
-    };
-    setPrompts(prev => [...prev, newPrompt]);
-  };
-
-  const removePrompt = (id: string) => {
-    setPrompts(prev => prev.filter(p => p.id !== id));
   };
 
   const getCategoryColor = (category: string) => {
@@ -261,21 +323,7 @@ const PromptsPage = () => {
     return (
       <AppShell>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-pulse text-muted-foreground">Loading prompts...</div>
-        </div>
-      </AppShell>
-    );
-  }
-
-  if (!company) {
-    return (
-      <AppShell>
-        <div className="text-center py-12">
-          <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="h2 mb-2">No Company Profile Found</h2>
-          <p className="body mb-4">
-            Please set up your company profile first to generate test prompts.
-          </p>
+          <div className="animate-pulse text-muted-foreground">Loading...</div>
         </div>
       </AppShell>
     );
@@ -283,140 +331,205 @@ const PromptsPage = () => {
 
   return (
     <AppShell>
-      <div className="space-y-4">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="h1">Test Prompts</h1>
-            <p className="body">
-              Manage the search queries used for AI health checks
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
+        <div className="mb-6">
+          <h1 className="h1 mb-2">Test Prompts</h1>
+          <p className="body text-gray-600">Generate and manage your AI test prompts</p>
+        </div>
+
+        {/* URL Input Box */}
+        <div className="bg-white rounded-lg border shadow-sm p-6 mb-6">
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <input
+                type="url"
+                value={formData.website}
+                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                placeholder="Enter your website URL (e.g., https://example.com)"
+                className="w-full px-4 py-3 border rounded-lg text-lg"
+              />
+            </div>
             <button
-              onClick={regeneratePrompts}
-              disabled={generating}
-              className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-[#5F209B] hover:text-white transition-none"
+              onClick={analyzeWebsite}
+              disabled={analyzing || !formData.website}
+              className="px-6 py-3 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
             >
-              <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
-              {generating ? 'Generating...' : 'Regenerate'}
-            </button>
-            <button
-              onClick={savePrompts}
-              disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-[#5F209B] text-white rounded-lg hover:opacity-90 transition-none"
-            >
-              <Save className="w-4 h-4" />
-              {saving ? 'Saving...' : 'Save Changes'}
+              {analyzing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Globe className="w-5 h-5" />
+                  Auto-Fill
+                </>
+              )}
             </button>
           </div>
         </div>
 
-        {/* Company Info */}
-        <div className="glass p-2 rounded-lg">
-          <h3 className="h4 mb-2">Company: {company.company_name}</h3>
-          <p className="body text-xs">
-            Industry: {company.industry} | Target: {company.target_customers || 'Not specified'}
-          </p>
-        </div>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Side - Company Info */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="h3">Company Information</h2>
+              <button
+                onClick={generatePrompts}
+                disabled={generating}
+                className="px-4 py-2 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4" />
+                    Generate Prompts
+                  </>
+                )}
+              </button>
+            </div>
 
-        {/* Prompts List */}
-        <div className="space-y-2">
-          {prompts.map((prompt, index) => (
-            <div key={prompt.id} className="glass px-2 py-1.5 rounded-md">
-              <div className="flex items-center justify-between">
-                <div className="flex gap-4 flex-1 items-center">
-                  {/* Left side: Number and Tag */}
-                  <div className="flex items-center gap-2 min-w-[100px]">
-                    <span className="body text-sm font-medium">#{index + 1}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(prompt.category)}`}>
-                      {prompt.category}
-                    </span>
-                  </div>
-                  
-                  {/* Right side: Prompt content */}
-                  {!prompt.isEditing && (
-                    <div className="flex-1">
-                      <p className="body font-medium">"{prompt.text}"</p>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {prompt.isEditing ? (
-                    <>
-                      <button
-                        onClick={() => toggleEdit(prompt.id)}
-                        className="p-1 text-green-600 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
-                      >
-                        <Check className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => removePrompt(prompt.id)}
-                        className="p-1 text-red-600 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => toggleEdit(prompt.id)}
-                      className="p-1 hover:bg-[#5F209B] hover:text-white rounded transition-none flex items-center justify-center"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Company Name *</label>
+                <input
+                  type="text"
+                  value={formData.company_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, company_name: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Your company name"
+                />
               </div>
 
-              {prompt.isEditing && (
-                <div className="space-y-2">
-                  <div>
-                    <label className="block text-xs font-medium body mb-1">Search Query</label>
-                    <textarea
-                      value={prompt.text}
-                      onChange={(e) => updatePrompt(prompt.id, 'text', e.target.value)}
-                      className="w-full p-2 bg-white text-black rounded border text-sm"
-                      rows={2}
-                      placeholder="What would users actually search for?"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-foreground mb-1">Category</label>
-                    <select
-                      value={prompt.category}
-                      onChange={(e) => updatePrompt(prompt.id, 'category', e.target.value)}
-                      className="w-full p-2 bg-white text-black rounded border text-sm"
-                    >
-                      <option value="easy-win">Easy Win</option>
-                      <option value="moderate">Moderate</option>
-                      <option value="challenging">Challenging</option>
-                      <option value="trending">Trending</option>
-                    </select>
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Industry *</label>
+                <input
+                  type="text"
+                  value={formData.industry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="e.g., Software Development, Healthcare, Finance"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Brief description of what your company does"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Target Customers</label>
+                <textarea
+                  value={formData.target_customers}
+                  onChange={(e) => setFormData(prev => ({ ...prev, target_customers: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={2}
+                  placeholder="Who are your ideal customers?"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Key Differentiators</label>
+                <textarea
+                  value={formData.key_differentiators}
+                  onChange={(e) => setFormData(prev => ({ ...prev, key_differentiators: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={2}
+                  placeholder="What makes you different from competitors?"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - Generated Prompts */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="h3">Generated Prompts ({prompts.length}/10)</h2>
+              {prompts.length > 0 && (
+                <button
+                  onClick={savePrompts}
+                  disabled={saving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save All
+                    </>
+                  )}
+                </button>
               )}
             </div>
-          ))}
 
-          {/* Add New Prompt Button */}
-          <button
-            onClick={addNewPrompt}
-            className="w-full p-4 glass rounded-lg border-2 border-dashed border-black/20 hover:border-black/40 hover:bg-[#5F209B] hover:text-white transition-none flex items-center justify-center gap-2 body"
-          >
-            <Plus className="w-4 h-4" />
-            Add New Prompt
-          </button>
-        </div>
+            {prompts.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No prompts generated yet</p>
+                <p className="text-sm">Fill in company info and click "Generate Prompts"</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {prompts.map((prompt, index) => (
+                  <div key={prompt.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="text-sm font-medium text-gray-500">#{index + 1}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(prompt.category)}`}>
+                          {prompt.category}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => toggleEdit(prompt.id)}
+                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
-        {/* Info */}
-        <div className="glass p-2 rounded-lg">
-          <h4 className="h4 mb-2">How This Works</h4>
-          <ul className="body text-xs space-y-1">
-            <li>These prompts are used by the automated health check to test your AI visibility</li>
-            <li>Focus on realistic searches your potential customers would actually make</li>
-            <li>Edit prompts to better match your target audience and use cases</li>
-            <li>Prompts are automatically generated when you save company information</li>
-          </ul>
+                    {prompt.isEditing ? (
+                      <div className="space-y-3">
+                        <textarea
+                          value={prompt.text}
+                          onChange={(e) => updatePrompt(prompt.id, 'text', e.target.value)}
+                          className="w-full p-2 border rounded text-sm"
+                          rows={3}
+                        />
+                        <select
+                          value={prompt.category}
+                          onChange={(e) => updatePrompt(prompt.id, 'category', e.target.value)}
+                          className="w-full p-2 border rounded text-sm"
+                        >
+                          <option value="easy-win">Easy Win</option>
+                          <option value="moderate">Moderate</option>
+                          <option value="challenging">Challenging</option>
+                          <option value="trending">Trending</option>
+                        </select>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-700 leading-relaxed">{prompt.text}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </AppShell>

@@ -44,13 +44,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     },
     { 
       path: "/prompts", 
-      label: "Test Prompts", 
+      label: "Prompts", 
       icon: <MessageSquare className="w-5 h-5" />
-    },
-    { 
-      path: "/content", 
-      label: "Company Profile", 
-      icon: <User className="w-5 h-5" />
     },
     { 
       path: "/settings", 
