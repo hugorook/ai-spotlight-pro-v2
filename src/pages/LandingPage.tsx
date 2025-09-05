@@ -179,7 +179,7 @@ const LandingPage = () => {
         {/* Fixed Left Vertical Nav */}
         <aside className="hidden lg:block fixed top-6 left-6 z-50">
           <div className="w-40 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm">
-            <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823]">Dexter</div>
+            <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
             <nav className="px-2 pb-2 space-y-1">
               {navigationItems.map((item, index) => (
                 <a
