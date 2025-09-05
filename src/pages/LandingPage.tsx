@@ -72,7 +72,7 @@ function AccordionSteps({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   return (
-    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-4 mb-12">
+    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12">
       {steps.map((step, index) => {
         const ExpandedIcon = step.icon;
         const expanded = activeIndex === index;
@@ -82,24 +82,24 @@ function AccordionSteps({
             className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
             onClick={() => setActiveIndex(expanded ? null : index)}
           >
-            <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center justify-between px-6 py-5">
               <div className="flex items-center gap-4">
-                <div className="bg-[#ddff89] w-9 h-9 rounded-xl flex items-center justify-center">
-                  <ExpandedIcon className="w-5 h-5 text-[#282823]" />
+                <div className="bg-[#ddff89] w-12 h-12 rounded-xl flex items-center justify-center shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
+                  <ExpandedIcon className="w-6 h-6 text-[#282823]" />
                 </div>
-                <h3 className="font-corben text-[#282823] text-lg md:text-xl" style={{fontWeight: 400}}>
+                <h3 className="font-corben text-[#282823] text-xl md:text-2xl" style={{fontWeight: 400}}>
                   {step.title}
                 </h3>
               </div>
-              <div className="h-9 w-9 rounded-full bg-[#d6ff71] flex items-center justify-center">
-                <Search className="w-4 h-4 text-black" />
+              <div className="h-12 w-12 rounded-full bg-[#d6ff71] flex items-center justify-center shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
+                <Search className="w-5 h-5 text-black" />
               </div>
             </div>
 
             <div
               className={`${
                 expanded ? 'max-h-64 md:max-h-72 opacity-100 py-5' : 'max-h-0 opacity-0 py-0'
-              } group-hover:max-h-64 md:group-hover:max-h-72 group-hover:opacity-100 transition-all duration-400 ease-in-out px-5 text-[#3d3d38] text-sm border-t border-[#efeee9]`}
+              } group-hover:max-h-64 md:group-hover:max-h-72 group-hover:opacity-100 transition-all duration-500 ease-in-out px-6 pr-6 pl-[88px] text-[#3d3d38] text-sm border-t border-[#efeee9]`}
             >
               <p className="mt-3 leading-relaxed">
                 {step.description}
