@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { HealthCheckProvider } from "@/contexts/HealthCheckContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
@@ -21,6 +22,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <HealthCheckProvider>
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -84,6 +86,7 @@ const App = () => (
           </Routes>
           <Toaster />
         </BrowserRouter>
+      </HealthCheckProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

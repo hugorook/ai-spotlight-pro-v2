@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
 import { AutopilotCard } from '@/components/dashboard/AutopilotCard'
@@ -32,6 +33,17 @@ export default function TodayDashboard() {
   const { user } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const { 
+    isRunning: isRunningHealthCheck,
+    progress: healthCheckProgress,
+    currentPrompt: currentTestPrompt,
+    results: healthCheckResults,
+    visibilityScore,
+    mentionRate,
+    averagePosition,
+    runHealthCheck,
+    loadSavedResults
+  } = useHealthCheck()
   
   const [data, setData] = useState<DashboardData>({
     project: null,
@@ -43,9 +55,6 @@ export default function TodayDashboard() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isApplying, setIsApplying] = useState(false)
-  const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false)
-  const [healthCheckProgress, setHealthCheckProgress] = useState({ current: 0, total: 0 })
-  const [currentTestPrompt, setCurrentTestPrompt] = useState('')
 
   // Load dashboard data
   useEffect(() => {
@@ -53,6 +62,13 @@ export default function TodayDashboard() {
       loadDashboardData()
     }
   }, [user])
+
+  // Update dashboard data when health check results change
+  useEffect(() => {
+    if (healthCheckResults.length > 0) {
+      updateDashboardWithHealthCheckResults()
+    }
+  }, [healthCheckResults])
 
   const loadDashboardData = async () => {
     try {
@@ -200,141 +216,56 @@ export default function TodayDashboard() {
     }
   }
 
-  const handleRunHealthCheck = async () => {
-    if (!user) return
-
-    setIsRunningHealthCheck(true)
-    
+  const updateDashboardWithHealthCheckResults = async () => {
     try {
-      // Get company data from companies table
-      const { data: companies, error: companyError } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('user_id', user.id)
-        .limit(1)
-
-      if (companyError || !companies || companies.length === 0) {
-        toast({
-          title: 'Error',
-          description: 'Company profile not found. Please set up your company profile first.',
-          variant: 'destructive'
-        })
-        return
-      }
-
-      const companyData = companies[0]
-
-      // Generate prompts based on company data
-      const prompts = [
-        `What are the best companies in ${companyData.industry}?`,
-        `Who are the top players in ${companyData.industry}?`,
-        `Recommend solutions for ${companyData.target_customers}`,
-        `Best ${companyData.industry} providers`,
-        `${companyData.industry} market leaders`,
-        `How to choose ${companyData.industry} software`,
-        `${companyData.industry} comparison`,
-        `Top ${companyData.industry} vendors`,
-        `${companyData.industry} reviews`,
-        `Best practices for ${companyData.industry}`,
-        `${companyData.industry} implementation guide`,
-        `${companyData.industry} cost comparison`,
-        `${companyData.industry} features to look for`,
-        `${companyData.industry} trends 2024`,
-        `${companyData.industry} case studies`
-      ]
-
-      setHealthCheckProgress({ current: 0, total: prompts.length })
-
-      // Process prompts one by one with real AI testing
-      const results: any[] = []
+      // Convert health check results to dashboard format
       const wins: any[] = []
       const improvements: any[] = []
       
-      for (let i = 0; i < prompts.length; i++) {
-        const currentPrompt = prompts[i]
-        setCurrentTestPrompt(`Testing: ${currentPrompt}`)
-        setHealthCheckProgress({ current: i + 1, total: prompts.length })
-        
-        try {
-          // Make real API call to test AI models
-          const { data: result, error: testError } = await supabase.functions.invoke('test-ai-models', {
-            body: {
-              prompt: currentPrompt,
-              companyName: companyData.company_name,
-              industry: companyData.industry,
-              description: companyData.description,
-              differentiators: companyData.key_differentiators
-            }
+      // Get company data for URLs
+      const { data: companies } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('user_id', user?.id)
+        .limit(1)
+      
+      const companyData = companies?.[0]
+
+      healthCheckResults.forEach((result, i) => {
+        // If mentioned, add to wins
+        if (result.company_mentioned && result.mention_position) {
+          wins.push({
+            id: `win-${i}`,
+            prompt: result.prompt_text,
+            rank: result.mention_position,
+            url: `https://${companyData?.website_url || 'example.com'}`,
+            lastSeen: result.test_date
           })
-
-          if (testError) {
-            console.error('Error testing prompt:', testError)
-            continue
-          }
-
-          const testResult = {
-            prompt: currentPrompt,
-            mentioned: result.mentioned || false,
-            position: result.position || 0,
-            sentiment: result.sentiment || 'neutral',
-            context: result.context || 'No mention found',
-            response: result.response || 'No response available'
-          }
-          
-          results.push(testResult)
-
-          // If mentioned, add to wins
-          if (testResult.mentioned && testResult.position > 0) {
-            wins.push({
-              id: `win-${i}`,
-              prompt: testResult.prompt,
-              rank: testResult.position,
-              url: `https://${companyData.website_url || 'example.com'}`,
-              lastSeen: new Date().toISOString()
-            })
-          } else if (!testResult.mentioned) {
-            // If not mentioned, add to improvements
-            improvements.push({
-              id: `improve-${i}`,
-              prompt: testResult.prompt,
-              reason: testResult.context || 'Company not mentioned in AI response',
-              priority: i < 5 ? 'High' : i < 10 ? 'Medium' : 'Low',
-              lastChecked: new Date().toISOString()
-            })
-          }
-
-          // Store result in ai_tests table
-          await supabase.from('ai_tests').insert({
-            company_id: companyData.id,
-            prompt_text: currentPrompt,
-            ai_model: 'gpt-4o-mini',
-            company_mentioned: testResult.mentioned,
-            mention_position: testResult.position > 0 ? testResult.position : null,
-            sentiment: testResult.sentiment,
-            mention_context: testResult.context,
-            competitors_mentioned: [],
-            response_text: testResult.response,
-            test_date: new Date().toISOString()
+        } else if (!result.company_mentioned) {
+          // If not mentioned, add to improvements
+          improvements.push({
+            id: `improve-${i}`,
+            prompt: result.prompt_text,
+            reason: result.mention_context || 'Company not mentioned in AI response',
+            priority: i < 5 ? 'High' : i < 10 ? 'Medium' : 'Low',
+            lastChecked: result.test_date
           })
-          
-        } catch (error) {
-          console.error('Error processing prompt:', currentPrompt, error)
         }
-      }
+      })
 
-      // Generate top 3 actions from failed prompts using AI
-      const failedPrompts = results.filter(r => !r.mentioned)
+      // Generate actions from failed prompts
+      const failedResults = healthCheckResults.filter(r => !r.company_mentioned)
       const actions: any[] = []
 
-      if (failedPrompts.length > 0) {
+      if (failedResults.length > 0) {
         // Create actionable recommendations from failed prompts
-        const topFailures = failedPrompts.slice(0, 6) // Use top 6 failures to create 3 actions
+        const topFailures = failedResults.slice(0, 6) // Use top 6 failures to create 3 actions
         
         for (let i = 0; i < Math.min(3, Math.ceil(topFailures.length / 2)); i++) {
           const relevantPrompts = topFailures.slice(i * 2, (i + 1) * 2)
           actions.push({
             id: `action-${i}`,
-            title: `Create content targeting "${relevantPrompts[0]?.prompt.split(' ').slice(0, 4).join(' ')}..." queries`,
+            title: `Create content targeting "${relevantPrompts[0]?.prompt_text.split(' ').slice(0, 4).join(' ')}..." queries`,
             rationale: `You're not appearing for ${relevantPrompts.length} related queries. Create targeted content to capture this audience.`,
             impact: i === 0 ? 'High' : i === 1 ? 'Medium' : 'Low',
             effort: 'Medium',
@@ -346,7 +277,7 @@ export default function TodayDashboard() {
         }
       }
 
-      // Update dashboard data with real results
+      // Update dashboard data with health check results
       setData(prev => ({
         ...prev,
         wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
@@ -354,25 +285,25 @@ export default function TodayDashboard() {
         improvements: improvements.slice(0, 8) // Show top 8 improvements
       }))
 
-      const mentionCount = results.filter(r => r.mentioned).length
-      const successRate = Math.round((mentionCount / results.length) * 100)
-      
+    } catch (error) {
+      console.error('Error updating dashboard with health check results:', error)
+    }
+  }
+
+  const handleRunHealthCheck = async () => {
+    try {
+      await runHealthCheck()
       toast({
         title: 'Health Check Complete',
-        description: `Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% visibility rate)`
+        description: `Found ${mentionRate}% visibility rate with score of ${visibilityScore}`
       })
-      
     } catch (error) {
       console.error('Error running health check:', error)
       toast({
-        title: 'Error',
+        title: 'Error', 
         description: 'Failed to run health check. Please try again.',
         variant: 'destructive'
       })
-    } finally {
-      setIsRunningHealthCheck(false)
-      setCurrentTestPrompt('')
-      setHealthCheckProgress({ current: 0, total: 0 })
     }
   }
 
@@ -424,7 +355,7 @@ export default function TodayDashboard() {
               <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                 <div 
                   className="bg-[#5F209B] h-2 rounded-full transition-all duration-300" 
-                  style={{ width: `${(healthCheckProgress.current / healthCheckProgress.total) * 100}%` }}
+                  style={{ width: `${healthCheckProgress}%` }}
                 ></div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
@@ -13,24 +14,24 @@ import type { Tables } from '@/types/supabase'
 
 type Company = Tables<'companies'>
 
-interface TestResult {
-  prompt: string
-  mentioned: boolean
-  position: number
-  sentiment: 'positive' | 'neutral' | 'negative'
-  context: string
-}
 
 export default function HealthCheckAnalytics() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
+  const {
+    isRunning,
+    progress,
+    currentPrompt,
+    results: healthCheckResults,
+    visibilityScore,
+    mentionRate,
+    averagePosition,
+    runHealthCheck,
+    error: healthCheckError
+  } = useHealthCheck()
   
   const [company, setCompany] = useState<Company | null>(null)
-  const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [isRunning, setIsRunning] = useState(false)
-  const [currentPrompt, setCurrentPrompt] = useState('')
-  const [progress, setProgress] = useState({ current: 0, total: 0 })
   const [loading, setLoading] = useState(true)
 
   const loadData = useCallback(async () => {
@@ -45,31 +46,11 @@ export default function HealthCheckAnalytics() {
 
       const company = companies?.[0] || null
       setCompany(company)
-
-      // Load existing test results
-      if (company) {
-        const { data: aiTests } = await supabase
-          .from('ai_tests')
-          .select('*')
-          .eq('company_id', company.id)
-          .order('test_date', { ascending: false })
-
-        if (aiTests) {
-          const results = aiTests.map((test) => ({
-            prompt: test.prompt_id || 'Custom prompt',
-            mentioned: test.company_mentioned,
-            position: test.mention_position || 0,
-            sentiment: (test.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-            context: test.mention_context || ''
-          }))
-          setTestResults(results)
-        }
-      }
     } catch (error) {
       console.error('Error loading data:', error)
       toast({
         title: 'Error',
-        description: 'Failed to load health check data',
+        description: 'Failed to load company data',
         variant: 'destructive'
       })
     } finally {
@@ -83,7 +64,7 @@ export default function HealthCheckAnalytics() {
     }
   }, [user, loadData])
 
-  const runHealthCheck = async () => {
+  const handleRunHealthCheck = async () => {
     if (!company) {
       toast({
         title: 'Error',
@@ -93,101 +74,12 @@ export default function HealthCheckAnalytics() {
       return
     }
 
-    setIsRunning(true)
-    setProgress({ current: 0, total: 25 })
-    
     try {
-      // Generate 25 relevant prompts
-      const prompts = [
-        `What are the best ${company.industry} companies?`,
-        `Who are the top players in ${company.industry}?`,
-        `Recommend ${company.industry} solutions for ${company.target_customers}`,
-        `Best ${company.industry} providers`,
-        `${company.industry} market leaders`,
-        `How to choose ${company.industry} software`,
-        `${company.industry} comparison`,
-        `Top ${company.industry} vendors`,
-        `${company.industry} reviews`,
-        `Best practices for ${company.industry}`,
-        `${company.industry} implementation guide`,
-        `${company.industry} cost comparison`,
-        `${company.industry} features to look for`,
-        `${company.industry} trends 2024`,
-        `${company.industry} case studies`,
-        `${company.industry} success stories`,
-        `${company.industry} ROI analysis`,
-        `${company.industry} integration options`,
-        `${company.industry} security considerations`,
-        `${company.industry} scalability`,
-        `${company.industry} alternatives`,
-        `${company.industry} pricing models`,
-        `${company.industry} deployment options`,
-        `${company.industry} support and training`,
-        `${company.industry} future outlook`
-      ]
-
-      const results: TestResult[] = []
-      
-      for (let i = 0; i < prompts.length; i++) {
-        const currentTestPrompt = prompts[i]
-        setCurrentPrompt(`Testing: "${currentTestPrompt}"`)
-        setProgress({ current: i + 1, total: prompts.length })
-        
-        try {
-          const { data: result, error } = await supabase.functions.invoke('test-ai-models', {
-            body: {
-              prompt: currentTestPrompt,
-              companyName: company.company_name,
-              industry: company.industry,
-              description: company.description,
-              differentiators: company.key_differentiators
-            }
-          })
-
-          if (error) {
-            console.error('Prompt error:', error)
-            continue
-          }
-
-          if (result) {
-            const testResult: TestResult = {
-              prompt: currentTestPrompt,
-              mentioned: result.mentioned || false,
-              position: result.position || 0,
-              sentiment: (result.sentiment || 'neutral') as 'positive' | 'neutral' | 'negative',
-              context: result.context || result.response || ''
-            }
-            
-            results.push(testResult)
-            
-            const currentMentions = results.filter(r => r.mentioned).length
-            setCurrentPrompt(`Found ${currentMentions} mentions so far...`)
-            
-            await new Promise(resolve => setTimeout(resolve, 500))
-          }
-          
-        } catch (promptError) {
-          console.error('Error processing prompt:', promptError)
-        }
-      }
-
-      if (results.length === 0) {
-        toast({
-          title: 'Error',
-          description: 'Health check failed - no results returned',
-          variant: 'destructive'
-        })
-        return
-      }
-
-      setTestResults(results)
-      
-      const mentionCount = results.filter(r => r.mentioned).length
-      const successRate = Math.round((mentionCount / results.length) * 100)
+      await runHealthCheck()
       
       toast({
         title: 'Success',
-        description: `Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate)`
+        description: `Health check completed! Found ${mentionRate}% mention rate with score of ${visibilityScore}`
       })
       
     } catch (error) {
@@ -197,9 +89,6 @@ export default function HealthCheckAnalytics() {
         description: 'Failed to run health check. Please try again.',
         variant: 'destructive'
       })
-    } finally {
-      setIsRunning(false)
-      setCurrentPrompt('')
     }
   }
 
@@ -233,9 +122,7 @@ export default function HealthCheckAnalytics() {
     )
   }
 
-  const healthScore = testResults.length > 0 
-    ? Math.round((testResults.filter(r => r.mentioned).length / testResults.length) * 100)
-    : 0
+  const healthScore = visibilityScore || 0
 
   return (
     <AppShell>
@@ -273,7 +160,7 @@ export default function HealthCheckAnalytics() {
             {/* Run Health Check */}
             <div className="text-center space-y-4">
               <Button 
-                onClick={runHealthCheck} 
+                onClick={handleRunHealthCheck} 
                 disabled={isRunning}
                 size="lg"
                 className="w-full max-w-md h-12 text-lg"
@@ -294,11 +181,11 @@ export default function HealthCheckAnalytics() {
               {isRunning && (
                 <div className="space-y-3 max-w-md mx-auto">
                   <Progress 
-                    value={(progress.current / progress.total) * 100} 
+                    value={progress} 
                     className="h-2"
                   />
                   <p className="text-sm text-gray-600">
-                    Testing prompt {progress.current} of {progress.total}...
+                    Running health check... {progress}% complete
                   </p>
                   {currentPrompt && (
                     <div className="p-3 bg-gray-100 rounded-lg">
@@ -312,19 +199,19 @@ export default function HealthCheckAnalytics() {
             </div>
 
             {/* Results Display */}
-            {testResults.length > 0 && (
+            {healthCheckResults.length > 0 && (
               <div className="border-t pt-6 space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
                   <Card className="bg-gray-50">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold">{testResults.length}</div>
+                      <div className="text-2xl font-bold">{healthCheckResults.length}</div>
                       <div className="text-sm text-gray-600">Prompts Tested</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gray-50">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {Math.round((testResults.filter(r => r.mentioned).length / testResults.length) * 100)}%
+                        {mentionRate || 0}%
                       </div>
                       <div className="text-sm text-gray-600">Mention Rate</div>
                     </CardContent>
@@ -332,10 +219,7 @@ export default function HealthCheckAnalytics() {
                   <Card className="bg-gray-50">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold">
-                        {testResults
-                          .filter(r => r.mentioned && r.position > 0)
-                          .reduce((sum, r, _, arr) => sum + r.position / arr.length, 0)
-                          .toFixed(1) || '0'}
+                        {averagePosition || '0'}
                       </div>
                       <div className="text-sm text-gray-600">Avg Position</div>
                     </CardContent>
@@ -345,23 +229,23 @@ export default function HealthCheckAnalytics() {
                 <div className="space-y-3">
                   <h4 className="font-semibold">Detailed Results</h4>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {testResults.map((result, index) => (
+                    {healthCheckResults.map((result, index) => (
                       <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-white">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{result.prompt}</p>
-                          {result.context && (
-                            <p className="text-sm text-gray-600 mt-1 truncate">{result.context}</p>
+                          <p className="font-medium truncate">{result.prompt_text}</p>
+                          {result.mention_context && (
+                            <p className="text-sm text-gray-600 mt-1 truncate">{result.mention_context}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           <Badge 
-                            variant={result.mentioned ? "default" : "secondary"}
-                            className={result.mentioned ? "bg-green-600" : ""}
+                            variant={result.company_mentioned ? "default" : "secondary"}
+                            className={result.company_mentioned ? "bg-green-600" : ""}
                           >
-                            {result.mentioned ? `Position ${result.position}` : 'Not Mentioned'}
+                            {result.company_mentioned ? `Position ${result.mention_position || 'N/A'}` : 'Not Mentioned'}
                           </Badge>
                           <Badge variant="outline" className="capitalize">
-                            {result.sentiment}
+                            {result.sentiment || 'neutral'}
                           </Badge>
                         </div>
                       </div>
