@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // Custom hook for typewriter effect
-function useTypewriter(text: string, typingSpeed = 100, startDelay = 500) {
+function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onHalfway?: () => void) {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
@@ -30,21 +30,27 @@ function useTypewriter(text: string, typingSpeed = 100, startDelay = 500) {
     // Start typing after the initial delay
     timeout = setTimeout(() => {
       if (displayedText.length < text.length) {
-        setDisplayedText(text.substring(0, displayedText.length + 1));
+        const newLength = displayedText.length + 1;
+        setDisplayedText(text.substring(0, newLength));
+        
+        // Trigger callback when halfway through
+        if (onHalfway && newLength >= Math.floor(text.length / 2) && newLength === Math.floor(text.length / 2) + 1) {
+          onHalfway();
+        }
       } else {
         setIsTyping(false);
       }
     }, displayedText.length === 0 ? startDelay : typingSpeed);
     
     return () => clearTimeout(timeout);
-  }, [displayedText, text, typingSpeed, startDelay]);
+  }, [displayedText, text, typingSpeed, startDelay, onHalfway]);
 
   return { displayedText, isTyping };
 }
 
 // Typewriter text component
-function TypewriterText({ text, typingSpeed, startDelay }: { text: string; typingSpeed?: number; startDelay?: number }) {
-  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay);
+function TypewriterText({ text, typingSpeed, startDelay, onHalfway }: { text: string; typingSpeed?: number; startDelay?: number; onHalfway?: () => void }) {
+  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay, onHalfway);
   
   return (
     <span className="relative font-corben" style={{fontWeight: 400}}>
@@ -60,6 +66,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [footerSearchValue, setFooterSearchValue] = useState("");
+  const [showContent, setShowContent] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,7 +184,7 @@ const LandingPage = () => {
         </div>
 
         {/* Fixed Left Vertical Nav */}
-        <aside className="hidden lg:block fixed top-6 left-6 z-50">
+        <aside className={`hidden lg:block fixed top-6 left-6 z-50 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
           <div className="w-40 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm">
             <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
             <nav className="px-2 pb-2 space-y-1">
@@ -200,7 +207,7 @@ const LandingPage = () => {
         </aside>
 
         {/* Header */}
-        <header className="relative z-10 flex items-center justify-end py-6">
+        <header className={`relative z-10 flex items-center justify-end py-6 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
           {/* Left Navigation */}
           <nav className="hidden">
             <div className="flex items-center gap-2">
@@ -232,7 +239,7 @@ const LandingPage = () => {
 
         {/* Hero Section */}
         <section className="relative z-10 text-center py-20">
-          <div className="inline-flex items-center gap-3 mb-3">
+          <div className={`inline-flex items-center gap-3 mb-3 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
             <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
               <span className="font-corben text-[#282823] text-lg">Dexter</span>
             </div>
@@ -246,20 +253,21 @@ const LandingPage = () => {
               text="Cheat the internet." 
               typingSpeed={100}
               startDelay={500}
+              onHalfway={() => setShowContent(true)}
             />
           </h1>
 
-          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-0">
+          <p className={`text-[#3d3d38] text-lg max-w-3xl mx-auto mb-0 ${showContent ? 'animate-fadeInUp-delay-1' : 'opacity-0'}`}>
             AI is now funnelling huge volumes of super high intent traffic, but
             most brands aren't competing.
           </p>
 
-          <p className="font-semibold text-[#3d3d38] text-lg mb-12">
+          <p className={`font-semibold text-[#3d3d38] text-lg mb-12 ${showContent ? 'animate-fadeInUp-delay-2' : 'opacity-0'}`}>
             Dexter is your shovel in the AI search gold rush.
           </p>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto mb-20">
+          <form onSubmit={handleSearchSubmit} className={`max-w-2xl mx-auto mb-20 ${showContent ? 'animate-fadeInUp-delay-3' : 'opacity-0'}`}>
             <div className="relative">
               <div className="absolute inset-0 top-6 bg-[#a9a9a9] rounded-full blur-[50px] opacity-20" />
               <div className="relative bg-white rounded-3xl border border-[#28282357] p-3">
@@ -282,7 +290,7 @@ const LandingPage = () => {
           </form>
 
           {/* Future of Search Section (narrow white box) */}
-          <div className="bg-white rounded-[28px] px-8 py-10 md:px-14 md:py-14 mb-20 relative overflow-hidden max-w-5xl mx-auto">
+          <div className={`bg-white rounded-[28px] px-8 py-10 md:px-14 md:py-14 mb-20 relative overflow-hidden max-w-5xl mx-auto ${showContent ? 'animate-fadeInUp' : 'opacity-0 translate-y-20'}`}>
             <div className="text-center">
               <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
                 The future of search
@@ -341,7 +349,7 @@ const LandingPage = () => {
         </section>
 
         {/* How it Works Section */}
-        <section className="relative z-10 py-20">
+        <section className={`relative z-10 py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="text-center mb-12">
             <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
               How can I win?
@@ -391,7 +399,7 @@ const LandingPage = () => {
         </section>
 
         {/* Pricing Section */}
-        <section className="relative z-10 py-20">
+        <section className={`relative z-10 py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="text-center mb-12">
             <Badge className="bg-[#ddff89] text-[#282823] mb-6 text-sm px-4 py-2">
               Pricing
@@ -453,7 +461,7 @@ const LandingPage = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="relative z-10 text-center py-20">
+        <section className={`relative z-10 text-center py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <h2 className="font-corben text-[#282823] text-6xl mb-8" style={{fontWeight: 400}}>
             Cheat the internet.
           </h2>
@@ -487,7 +495,7 @@ const LandingPage = () => {
         </section>
 
         {/* Footer */}
-        <footer className="relative z-10 bg-white/80 backdrop-blur rounded-t-3xl py-12 px-8">
+        <footer className={`relative z-10 bg-white/80 backdrop-blur rounded-t-3xl py-12 px-8 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
               <div className="flex items-center gap-3 mb-4 md:mb-0">
