@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
 import ResultsSection from '@/components/ui/results-section'
@@ -55,14 +56,36 @@ export default function Analytics() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
+  const {
+    isRunning: isRunningHealthCheck,
+    progress: healthCheckProgress,
+    currentPrompt: currentTestPrompt,
+    results: healthCheckResults,
+    visibilityScore,
+    mentionRate,
+    averagePosition,
+    runHealthCheck: contextRunHealthCheck,
+    lastRunDate
+  } = useHealthCheck()
   
   const [company, setCompany] = useState<Company | null>(null)
   const [loading, setLoading] = useState(true)
-  const [healthScore, setHealthScore] = useState<number>(0)
-  const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false)
-  const [currentTestPrompt, setCurrentTestPrompt] = useState('')
-  const [testProgress, setTestProgress] = useState({ current: 0, total: 0 })
+  
+  // Convert health check results to TestResult format for UI
+  const testResults: TestResult[] = healthCheckResults.map(r => ({
+    prompt: r.prompt_text,
+    mentioned: r.company_mentioned,
+    position: r.mention_position || 0,
+    sentiment: r.sentiment || 'neutral',
+    context: r.mention_context || '',
+    response: r.response_text
+  }))
+  
+  const healthScore = visibilityScore || 0
+  const testProgress = {
+    current: Math.round((healthCheckProgress / 100) * 25),
+    total: 25
+  }
   const [contentOpportunities, setContentOpportunities] = useState<ContentOpportunity[]>([])
   const [autoStrategies, setAutoStrategies] = useState<any[]>([])
   const [trendingOpportunities, setTrendingOpportunities] = useState<TrendingOpportunity[]>([])
@@ -95,24 +118,40 @@ export default function Analytics() {
     }
   }, [])
 
-  // Load persisted data on mount
+  // Load analytics data from most recent health check
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem('geo_last_run')
-      if (raw) {
-        const parsed: PersistedLastRun = JSON.parse(raw)
-        setTestResults(parsed.results || [])
-        if (parsed.results && parsed.results.length > 0) {
-          setShowResultsSection(true)
-          calculateHealthScore(parsed.results)
+      // Analytics data should come from health check context, not localStorage
+      // Only load if we have health check results
+      if (healthCheckResults.length > 0) {
+        setShowResultsSection(true)
+        
+        // Generate content opportunities from health check results
+        if (company) {
+          generateContentOpportunities(testResults, company)
         }
-        if (parsed.type === 'health') {
-          setAutoStrategies(parsed.strategies || [])
-          setWebsiteAnalysis(parsed.websiteAnalysis || null)
+        
+        // Load analytics data that was generated during health check
+        // TODO: These should come from the health check context once implemented
+        const websiteData = localStorage.getItem('website_analysis')
+        if (websiteData) setWebsiteAnalysis(JSON.parse(websiteData))
+        
+        const authorityData = localStorage.getItem('authority_analysis')
+        if (authorityData) setAuthorityAnalysis(JSON.parse(authorityData))
+        
+        const benchmarkData = localStorage.getItem('benchmark_analysis')
+        if (benchmarkData) setIndustryBenchmark(JSON.parse(benchmarkData))
+        
+        const trendingData = localStorage.getItem('trending_analysis')
+        if (trendingData) {
+          const parsed = JSON.parse(trendingData)
+          setTrendingOpportunities(parsed.opportunities || [])
         }
       }
-    } catch {}
-  }, [])
+    } catch (error) {
+      console.error('Error loading analytics data:', error)
+    }
+  }, [healthCheckResults, company, testResults])
 
   const loadCompanyData = useCallback(async () => {
     if (!user) return
@@ -158,21 +197,6 @@ export default function Analytics() {
     }
   }, [user, loadCompanyData])
 
-  const calculateHealthScore = (results: TestResult[]) => {
-    if (results.length === 0) {
-      setHealthScore(0)
-      return
-    }
-    
-    const mentionRate = results.filter(r => r.mentioned).length / results.length
-    const avgPosition = results
-      .filter(r => r.mentioned && r.position > 0)
-      .reduce((sum, r) => sum + r.position, 0) / results.filter(r => r.mentioned && r.position > 0).length || 10
-    
-    const positionScore = Math.max(0, (10 - avgPosition) / 10)
-    const score = Math.round((mentionRate * 0.7 + positionScore * 0.3) * 100)
-    setHealthScore(score)
-  }
 
   const generateContentOpportunities = (results: TestResult[], companyData: Company) => {
     const missedPrompts = results.filter(r => !r.mentioned)
@@ -202,169 +226,12 @@ export default function Analytics() {
   }
 
   const runHealthCheck = async () => {
-    if (!company) {
-      toast({
-        title: 'Error',
-        description: 'Company profile required to run health check',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    setIsRunningHealthCheck(true)
-    
     try {
-      // Get company data from companies table
-      const { data: companies, error: companyError } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('user_id', user?.id)
-        .limit(1)
-
-      if (companyError || !companies || companies.length === 0) {
-        toast({
-          title: 'Error',
-          description: 'Company profile not found. Please set up your company profile first.',
-          variant: 'destructive'
-        })
-        return
-      }
-
-      const companyData = companies[0]
-
-      // Generate 25 relevant prompts based on company data
-      const prompts = [
-        `What are the best companies in ${companyData.industry}?`,
-        `Who are the top players in ${companyData.industry}?`,
-        `Recommend solutions for ${companyData.target_customers}`,
-        `Best ${companyData.industry} providers`,
-        `${companyData.industry} market leaders`,
-        `How to choose ${companyData.industry} software`,
-        `${companyData.industry} comparison`,
-        `Top ${companyData.industry} vendors`,
-        `${companyData.industry} reviews`,
-        `Best practices for ${companyData.industry}`,
-        `${companyData.industry} implementation guide`,
-        `${companyData.industry} cost comparison`,
-        `${companyData.industry} features to look for`,
-        `${companyData.industry} trends 2024`,
-        `${companyData.industry} case studies`,
-        `${companyData.industry} success stories`,
-        `${companyData.industry} ROI analysis`,
-        `${companyData.industry} integration options`,
-        `${companyData.industry} security considerations`,
-        `${companyData.industry} scalability`,
-        `${companyData.industry} alternatives`,
-        `${companyData.industry} pricing models`,
-        `${companyData.industry} deployment options`,
-        `${companyData.industry} support and training`,
-        `${companyData.industry} future outlook`
-      ]
-
-      setTestProgress({ current: 0, total: prompts.length })
-
-      // Process prompts one by one with real AI testing
-      const results: TestResult[] = []
-      
-      for (let i = 0; i < prompts.length; i++) {
-        const currentPrompt = prompts[i]
-        setCurrentTestPrompt(`Testing: "${currentPrompt}"`)
-        setTestProgress({ current: i + 1, total: prompts.length })
-        
-        try {
-          // Make real API call to test AI models
-          const { data: result, error: testError } = await supabase.functions.invoke('test-ai-models', {
-            body: {
-              prompt: currentPrompt,
-              companyName: companyData.company_name,
-              industry: companyData.industry,
-              description: companyData.description,
-              differentiators: companyData.key_differentiators
-            }
-          })
-
-          if (testError) {
-            console.error('Error testing prompt:', testError)
-            continue
-          }
-
-          const testResult: TestResult = {
-            prompt: currentPrompt,
-            mentioned: result.mentioned || false,
-            position: result.position || 0,
-            sentiment: result.sentiment || 'neutral',
-            context: result.context || 'No mention found',
-            response: result.response || 'No response available'
-          }
-          
-          results.push(testResult)
-
-          // Store result in ai_tests table
-          await supabase.from('ai_tests').insert({
-            company_id: companyData.id,
-            prompt_text: currentPrompt,
-            ai_model: 'gpt-4o-mini',
-            company_mentioned: testResult.mentioned,
-            mention_position: testResult.position > 0 ? testResult.position : null,
-            sentiment: testResult.sentiment,
-            mention_context: testResult.context,
-            competitors_mentioned: [],
-            response_text: testResult.response,
-            test_date: new Date().toISOString()
-          })
-          
-        } catch (error) {
-          console.error('Error processing prompt:', currentPrompt, error)
-          // Add failed test result
-          results.push({
-            prompt: currentPrompt,
-            mentioned: false,
-            position: 0,
-            sentiment: 'neutral',
-            context: 'Test failed - please try again',
-            response: 'Error occurred during testing'
-          })
-        }
-        
-        const currentMentions = results.filter(r => r.mentioned).length
-        setCurrentTestPrompt(`Found ${currentMentions} mentions so far...`)
-      }
-
-      if (results.length === 0) {
-        toast({
-          title: 'Error',
-          description: 'Health check failed - no results were returned',
-          variant: 'destructive'
-        })
-        return
-      }
-
-      setTestResults(results)
-      setShowResultsSection(true)
-      calculateHealthScore(results)
-      generateContentOpportunities(results, companyData)
-      
-      // Persist results
-      const persistData: PersistedLastRun = {
-        type: 'health',
-        results,
-        strategies: autoStrategies,
-        timestamp: Date.now(),
-        websiteAnalysis
-      }
-      window.localStorage.setItem('geo_last_run', JSON.stringify(persistData))
-      
-      const mentionCount = results.filter(r => r.mentioned).length
-      const successRate = Math.round((mentionCount / results.length) * 100)
-      
+      await contextRunHealthCheck()
       toast({
-        title: 'Success',
-        description: `Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate)`
+        title: 'Health Check Complete',
+        description: `Found ${mentionRate}% mention rate with visibility score of ${visibilityScore}`
       })
-
-      // Reload historical tests after completing new test
-      await loadCompanyData()
-      
     } catch (error) {
       console.error('Error running health check:', error)
       toast({
@@ -372,9 +239,6 @@ export default function Analytics() {
         description: 'Failed to run health check. Please try again.',
         variant: 'destructive'
       })
-    } finally {
-      setIsRunningHealthCheck(false)
-      setCurrentTestPrompt('')
     }
   }
 
