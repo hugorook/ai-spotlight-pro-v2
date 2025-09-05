@@ -34,9 +34,11 @@ function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onComp
         setDisplayedText(text.substring(0, newLength));
       } else {
         setIsTyping(false);
-        // Trigger callback when typing is complete
+        // Trigger callback when typing is complete, with a small delay
         if (onComplete) {
-          onComplete();
+          setTimeout(() => {
+            onComplete();
+          }, 500); // Half second delay after typing completes
         }
       }
     }, displayedText.length === 0 ? startDelay : typingSpeed);
