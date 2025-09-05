@@ -47,7 +47,7 @@ function TypewriterText({ text, typingSpeed, startDelay }: { text: string; typin
   const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay);
   
   return (
-    <span className="relative">
+    <span className="relative font-corben" style={{fontWeight: 400}}>
       {displayedText}
       <span 
         className={`inline-block w-[0.1em] h-[1.2em] bg-[#282823] align-middle ml-1 ${isTyping ? 'animate-blink' : 'opacity-0'}`}
