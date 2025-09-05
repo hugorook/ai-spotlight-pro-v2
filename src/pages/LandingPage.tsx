@@ -191,7 +191,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-6">
+          <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-6" style={{fontWeight: 400}}>
             Cheat the internet.
           </h1>
 
@@ -233,7 +233,7 @@ const LandingPage = () => {
               The future of search
             </Badge>
             
-            <h2 className="font-corben text-[#282823] text-5xl mb-8">
+            <h2 className="font-corben text-[#282823] text-5xl mb-8" style={{fontWeight: 400}}>
               'What the ****<br />
               is Generative SEO?'
             </h2>
@@ -259,7 +259,7 @@ const LandingPage = () => {
 
           {/* Statistics */}
           <div className="bg-white/80 backdrop-blur rounded-3xl p-8 mb-20">
-            <h3 className="font-corben text-[#282823] text-2xl mb-8">
+            <h3 className="font-corben text-[#282823] text-2xl mb-8" style={{fontWeight: 400}}>
               Your customers are already here
             </h3>
             
@@ -297,7 +297,7 @@ const LandingPage = () => {
               How can I win?
             </Badge>
             
-            <h2 className="font-corben text-[#282823] text-5xl mb-8">
+            <h2 className="font-corben text-[#282823] text-5xl mb-8" style={{fontWeight: 400}}>
               Win the Generative SEO race
             </h2>
 
@@ -318,7 +318,7 @@ const LandingPage = () => {
                   <div className="bg-[#ddff89] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
                     <step.icon className="w-6 h-6 text-[#282823]" />
                   </div>
-                  <h3 className="font-corben text-[#282823] text-xl mb-3">
+                  <h3 className="font-corben text-[#282823] text-xl mb-3" style={{fontWeight: 400}}>
                     {step.title}
                   </h3>
                   <p className="text-[#3d3d38] text-sm">
@@ -347,7 +347,7 @@ const LandingPage = () => {
               Pricing
             </Badge>
             
-            <h2 className="font-corben text-[#1a1a1a] text-5xl">
+            <h2 className="font-corben text-[#1a1a1a] text-5xl" style={{fontWeight: 400}}>
               Show up early.<br />
               Own your category.
             </h2>
@@ -404,7 +404,7 @@ const LandingPage = () => {
 
         {/* CTA Section */}
         <section className="relative z-10 text-center py-20">
-          <h2 className="font-corben text-[#282823] text-6xl mb-8">
+          <h2 className="font-corben text-[#282823] text-6xl mb-8" style={{fontWeight: 400}}>
             Cheat the internet.
           </h2>
 
