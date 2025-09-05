@@ -281,66 +281,62 @@ const LandingPage = () => {
             </div>
           </form>
 
-          {/* Future of Search Section */}
-          <div className="bg-white rounded-3xl p-12 mb-20 relative overflow-hidden">
-            <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
-              The future of search
-            </Badge>
-            
-            <h2 className="font-corben text-[#282823] text-5xl mb-8" style={{fontWeight: 400}}>
-              'What the ****<br />
-              is Generative SEO?'
-            </h2>
+          {/* Future of Search Section (narrow white box) */}
+          <div className="bg-white rounded-[28px] px-8 py-10 md:px-14 md:py-14 mb-20 relative overflow-hidden max-w-5xl mx-auto">
+            <div className="text-center">
+              <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
+                The future of search
+              </Badge>
 
-            <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-8">
-              People use AI tools to search, ChatGPT alone has over 180M monthly users.
-            </p>
+              <h2 className="font-corben text-[#282823] text-4xl md:text-5xl mb-6" style={{fontWeight: 400}}>
+                'What the **** is Generative SEO?'
+              </h2>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-              <p className="text-[#3d3d38] text-lg">
-                People trust AI recommendations, so the traffic is way more
-                valuable. You're not an option, you're a recommendation. Fewer
-                impressions — way higher intent.
-              </p>
-              <p className="text-[#3d3d38] text-lg">
-                First movers win, and win big. Companies in SaaS and consumer
-                products have already become the "default" answer to certain
-                prompts. Once a model learns you as the go-to example, it tends
-                to stick.
-              </p>
+              <div className="space-y-5 max-w-3xl mx-auto text-left md:text-center">
+                <p className="text-[#3d3d38] text-base md:text-lg">
+                  People use AI tools to search, ChatGPT alone has over 180M monthly users.
+                </p>
+                <p className="text-[#3d3d38] text-base md:text-lg">
+                  People trust AI recommendations, so the traffic is way more valuable. You're not an
+                  option, you're a recommendation. Fewer impressions — way higher intent.
+                </p>
+                <p className="text-[#3d3d38] text-base md:text-lg">
+                  First movers win, and win big. Companies in SaaS and consumer products have already
+                  become the "default" answer to certain prompts. Once a model learns you as the go-to
+                  example, it tends to stick.
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Statistics */}
-          <div className="bg-white/80 backdrop-blur rounded-3xl p-8 mb-20">
-            <h3 className="font-corben text-[#282823] text-2xl mb-8" style={{fontWeight: 400}}>
-              Your customers are already here
-            </h3>
-            
-            <div className="grid grid-cols-3 gap-8">
-              {statisticsData.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="font-corben text-[#282823] text-5xl mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-[#3d3d38] text-sm font-medium">
-                    {stat.description}
-                  </div>
+            {/* Inline Green Stats + CTA panel */}
+            <div className="mt-10 md:mt-12">
+              <div className="bg-[#ddff89] rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="order-2 md:order-1 grid grid-cols-3 gap-6 w-full md:w-auto">
+                  {statisticsData.map((stat) => (
+                    <div key={stat.description} className="text-center">
+                      <div className="font-corben text-[#282823] text-3xl md:text-4xl" style={{fontWeight: 400}}>
+                        {stat.value}
+                      </div>
+                      <div className="text-[#3d3d38] text-[11px] md:text-xs font-medium">
+                        {stat.description}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+                <div className="order-1 md:order-2 w-full md:w-auto flex flex-col items-center md:items-start">
+                  <p className="text-[#3d3d38] text-sm md:text-base mb-3 md:mb-2 font-medium">
+                    Your customers are already here
+                  </p>
+                  <Button
+                    onClick={() => navigate('/auth')}
+                    className="bg-[#282823] text-white font-corben rounded-2xl px-5 py-2"
+                  >
+                    Leverage this traffic
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
             </div>
-
-            <p className="text-[#3d3d38] font-medium mt-8">
-              Show up early. Own your category.
-            </p>
-
-            <Button
-              onClick={() => navigate('/auth')}
-              className="bg-[#282823] text-white font-corben rounded-2xl px-8 py-3 mt-6"
-            >
-              Leverage this traffic
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
           </div>
         </section>
 
