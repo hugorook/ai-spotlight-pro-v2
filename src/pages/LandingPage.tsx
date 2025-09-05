@@ -232,7 +232,7 @@ const LandingPage = () => {
 
         {/* Hero Section */}
         <section className="relative z-10 text-center py-20">
-          <div className="inline-flex items-center gap-3 mb-8">
+          <div className="inline-flex items-center gap-3 mb-3">
             <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
               <span className="font-corben text-[#282823] text-lg">Dexter</span>
             </div>
@@ -241,7 +241,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-6" style={{fontWeight: 400}}>
+          <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-2" style={{fontWeight: 400}}>
             <TypewriterText 
               text="Cheat the internet." 
               typingSpeed={100}
@@ -249,7 +249,7 @@ const LandingPage = () => {
             />
           </h1>
 
-          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-4">
+          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-1">
             AI is now funnelling huge volumes of super high intent traffic, but
             most brands aren't competing.
           </p>
