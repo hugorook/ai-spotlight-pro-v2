@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +18,43 @@ import {
   Target,
   LineChart
 } from "lucide-react";
+
+// Custom hook for typewriter effect
+function useTypewriter(text: string, typingSpeed = 100, startDelay = 500) {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    
+    // Start typing after the initial delay
+    timeout = setTimeout(() => {
+      if (displayedText.length < text.length) {
+        setDisplayedText(text.substring(0, displayedText.length + 1));
+      } else {
+        setIsTyping(false);
+      }
+    }, displayedText.length === 0 ? startDelay : typingSpeed);
+    
+    return () => clearTimeout(timeout);
+  }, [displayedText, text, typingSpeed, startDelay]);
+
+  return { displayedText, isTyping };
+}
+
+// Typewriter text component
+function TypewriterText({ text, typingSpeed, startDelay }: { text: string; typingSpeed?: number; startDelay?: number }) {
+  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay);
+  
+  return (
+    <span className="relative">
+      {displayedText}
+      <span 
+        className={`inline-block w-[0.1em] h-[1.2em] bg-[#282823] align-middle ml-1 ${isTyping ? 'animate-blink' : 'opacity-0'}`}
+      />
+    </span>
+  );
+}
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -205,7 +242,11 @@ const LandingPage = () => {
           </div>
 
           <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-6" style={{fontWeight: 400}}>
-            Cheat the internet.
+            <TypewriterText 
+              text="Cheat the internet." 
+              typingSpeed={100}
+              startDelay={500}
+            />
           </h1>
 
           <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-4">
