@@ -72,7 +72,7 @@ function AccordionSteps({
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   return (
-    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12 min-h-[720px] md:min-h-[860px]">
+    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-6 min-h-[560px] md:min-h-[620px]">
       {steps.map((step, index) => {
         const expanded = activeIndex === index;
         return (
@@ -418,7 +418,7 @@ const LandingPage = () => {
           {/* Hover-accordion list */}
           <AccordionSteps steps={processSteps} />
 
-          <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-6">
+          <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-2 md:bottom-4">
             <Button
               onClick={() => navigate('/auth')}
               className="bg-[#282823] text-white font-corben rounded-2xl px-8 py-3"
