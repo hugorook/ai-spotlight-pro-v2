@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppShell from '@/components/layout/AppShell';
 import { useToast } from '@/components/ui/use-toast';
-import { Wand2, Save, RefreshCw, Globe, Edit2, Check, X, Loader2 } from 'lucide-react';
+import { Wand2, Save, RefreshCw, Globe, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
 
 interface Prompt {
   id: string;
