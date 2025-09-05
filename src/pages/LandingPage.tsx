@@ -98,10 +98,12 @@ function AccordionSteps({
 
             <div
               className={`${
-                expanded ? 'max-h-32 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
-              } group-hover:max-h-32 group-hover:opacity-100 transition-all duration-300 ease-in-out px-5 text-[#3d3d38] text-sm`}
+                expanded ? 'max-h-64 md:max-h-72 opacity-100 py-5' : 'max-h-0 opacity-0 py-0'
+              } group-hover:max-h-64 md:group-hover:max-h-72 group-hover:opacity-100 transition-all duration-400 ease-in-out px-5 text-[#3d3d38] text-sm border-t border-[#efeee9]`}
             >
-              {step.description}
+              <p className="mt-3 leading-relaxed">
+                {step.description}
+              </p>
             </div>
           </div>
         );
