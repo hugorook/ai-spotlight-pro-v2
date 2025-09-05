@@ -74,7 +74,6 @@ function AccordionSteps({
   return (
     <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12">
       {steps.map((step, index) => {
-        const ExpandedIcon = step.icon;
         const expanded = activeIndex === index;
         return (
           <div
@@ -83,14 +82,9 @@ function AccordionSteps({
             onClick={() => setActiveIndex(expanded ? null : index)}
           >
             <div className="flex items-center justify-between px-6 py-5">
-              <div className="flex items-center gap-4">
-                <div className="bg-[#ddff89] w-12 h-12 rounded-xl flex items-center justify-center shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
-                  <ExpandedIcon className="w-6 h-6 text-[#282823]" />
-                </div>
-                <h3 className="font-corben text-[#282823] text-xl md:text-2xl" style={{fontWeight: 400}}>
-                  {step.title}
-                </h3>
-              </div>
+              <h3 className="font-corben text-[#282823] text-xl md:text-2xl" style={{fontWeight: 400}}>
+                {step.title}
+              </h3>
               <div className="h-12 w-12 rounded-full bg-[#d6ff71] flex items-center justify-center shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
                 <Search className="w-5 h-5 text-black" />
               </div>
@@ -98,10 +92,10 @@ function AccordionSteps({
 
             <div
               className={`${
-                expanded ? 'max-h-64 md:max-h-72 opacity-100 py-5' : 'max-h-0 opacity-0 py-0'
-              } group-hover:max-h-64 md:group-hover:max-h-72 group-hover:opacity-100 transition-all duration-500 ease-in-out px-6 pr-6 pl-[88px] text-[#3d3d38] text-sm border-t border-[#efeee9]`}
+                expanded ? 'max-h-72 md:max-h-80 opacity-100 py-6' : 'max-h-0 opacity-0 py-0'
+              } group-hover:max-h-72 md:group-hover:max-h-80 group-hover:opacity-100 transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm border-t border-[#efeee9]`}
             >
-              <p className="mt-3 leading-relaxed">
+              <p className="mt-2 mb-2 leading-relaxed">
                 {step.description}
               </p>
             </div>
