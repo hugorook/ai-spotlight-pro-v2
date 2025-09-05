@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
+import { 
   Search,
   ArrowRight,
   Rocket,
@@ -60,6 +60,53 @@ function TypewriterText({ text, typingSpeed, startDelay, onComplete }: { text: s
         className={`inline-block w-[0.1em] h-[1.2em] bg-[#282823] align-middle ml-1 ${isTyping ? 'animate-blink' : 'opacity-0'}`}
       />
     </span>
+  );
+}
+
+// Hover/tap accordion for steps
+function AccordionSteps({
+  steps,
+}: {
+  steps: { title: string; description: string; icon: React.ComponentType<{ className?: string }> }[];
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  return (
+    <div className="max-w-4xl md:max-w-5xl mx-auto space-y-4 mb-12">
+      {steps.map((step, index) => {
+        const ExpandedIcon = step.icon;
+        const expanded = activeIndex === index;
+        return (
+          <div
+            key={step.title}
+            className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+            onClick={() => setActiveIndex(expanded ? null : index)}
+          >
+            <div className="flex items-center justify-between px-5 py-4">
+              <div className="flex items-center gap-4">
+                <div className="bg-[#ddff89] w-9 h-9 rounded-xl flex items-center justify-center">
+                  <ExpandedIcon className="w-5 h-5 text-[#282823]" />
+                </div>
+                <h3 className="font-corben text-[#282823] text-lg md:text-xl" style={{fontWeight: 400}}>
+                  {step.title}
+                </h3>
+              </div>
+              <div className="h-9 w-9 rounded-full bg-[#d6ff71] flex items-center justify-center">
+                <Search className="w-4 h-4 text-black" />
+              </div>
+            </div>
+
+            <div
+              className={`${
+                expanded ? 'max-h-32 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
+              } group-hover:max-h-32 group-hover:opacity-100 transition-all duration-300 ease-in-out px-5 text-[#3d3d38] text-sm`}
+            >
+              {step.description}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -142,7 +189,7 @@ const LandingPage = () => {
       description: "Track competitors, publish content, measure results.",
       features: [
         "Everything in Starter",
-        "Competitor tracking & analysis",
+        "Competitor tracking & analysis", 
         "Content gap analysis",
         "Smart content recommendations",
         "Weekly reports & insights",
@@ -217,7 +264,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="flex items-center space-x-6" />
-          </nav>
+            </nav>
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
@@ -227,18 +274,18 @@ const LandingPage = () => {
               className="bg-white border-[#3b3b3738] text-[#282823] font-corben rounded-2xl px-6"
             >
               Log In
-            </Button>
-            <Button
+              </Button>
+              <Button 
               onClick={() => navigate('/auth')}
               className="bg-[#262622] text-white font-corben rounded-2xl px-6"
-            >
+              >
               Boost your brand
               <Rocket className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-        </header>
+              </Button>
+        </div>
+      </header>
 
-        {/* Hero Section */}
+      {/* Hero Section */}
         <section className="relative z-10 text-center py-20">
           <div className={`inline-flex items-center gap-3 mb-3 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
             <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
@@ -247,8 +294,8 @@ const LandingPage = () => {
             <p className="font-semibold text-[#3d3d38] text-lg">
               Win the Generative SEO race
             </p>
-          </div>
-
+        </div>
+        
           <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-2" style={{fontWeight: 400}}>
             <TypewriterText 
               text="Cheat the internet." 
@@ -256,8 +303,8 @@ const LandingPage = () => {
               startDelay={500}
               onComplete={() => setShowContent(true)}
             />
-          </h1>
-
+                </h1>
+                
           <p className={`text-[#3d3d38] text-lg max-w-3xl mx-auto mb-0 ${showContent ? 'animate-fadeInUp-delay-1' : 'opacity-0'}`}>
             AI is now funnelling huge volumes of super high intent traffic, but
             most brands aren't competing.
@@ -279,7 +326,7 @@ const LandingPage = () => {
                   placeholder="Search or paste your website url"
                   className="border-0 text-base placeholder:text-[#afaca7] pr-16"
                 />
-                <Button
+                <Button 
                   type="submit"
                   size="icon"
                   className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#d6ff71] hover:bg-[#c4ee60] rounded-full"
@@ -299,12 +346,12 @@ const LandingPage = () => {
 
               <h2 className="font-corben text-[#282823] text-4xl md:text-5xl mb-6" style={{fontWeight: 400}}>
                 'What the ****<br />is Generative SEO?'
-              </h2>
-
+            </h2>
+            
               <div className="space-y-5 max-w-3xl mx-auto text-left md:text-center">
                 <p className="text-[#3d3d38] text-base md:text-lg">
-                  People use AI tools to search, ChatGPT alone has over 180M monthly users.
-                </p>
+                People use AI tools to search, ChatGPT alone has over 180M monthly users.
+              </p>
                 <p className="text-[#3d3d38] text-base md:text-lg">
                   People trust AI recommendations, so the traffic is way more valuable. You're not an
                   option, you're a recommendation. Fewer impressions — way higher intent.
@@ -316,7 +363,7 @@ const LandingPage = () => {
                 </p>
               </div>
             </div>
-
+            
             {/* Inline Green Stats + CTA panel */}
             <div className="mt-10 md:mt-12">
               <div className="bg-[#ddff89] rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -325,12 +372,12 @@ const LandingPage = () => {
                     <div key={stat.description} className="text-center">
                       <div className="font-corben text-[#282823] text-3xl md:text-4xl" style={{fontWeight: 400}}>
                         {stat.value}
-                      </div>
+                  </div>
                       <div className="text-[#3d3d38] text-[11px] md:text-xs font-medium">
                         {stat.description}
-                      </div>
-                    </div>
-                  ))}
+                  </div>
+                </div>
+              ))}
                 </div>
                 <div className="order-1 md:order-2 w-full md:w-auto flex flex-col items-center md:items-start">
                   <p className="text-[#3d3d38] text-sm md:text-base mb-3 md:mb-2 font-medium">
@@ -345,9 +392,9 @@ const LandingPage = () => {
                   </Button>
                 </div>
               </div>
-            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* How it Works Section */}
         <section className={`relative z-10 py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
@@ -359,7 +406,7 @@ const LandingPage = () => {
             <h2 className="font-corben text-[#282823] text-5xl mb-8" style={{fontWeight: 400}}>
               Win the Generative SEO race
             </h2>
-
+            
             <p className="text-[#3d3d38] text-lg max-w-2xl mx-auto mb-4">
               Generative SEO is about teaching AI models to know you, trust you,
               and recommend you when customers ask.
@@ -370,23 +417,8 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
-            {processSteps.map((step, index) => (
-              <Card key={index} className="bg-white border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="bg-[#ddff89] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
-                    <step.icon className="w-6 h-6 text-[#282823]" />
-                  </div>
-                  <h3 className="font-corben text-[#282823] text-xl mb-3" style={{fontWeight: 400}}>
-                    {step.title}
-                  </h3>
-                  <p className="text-[#3d3d38] text-sm">
-                    {step.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* Hover-accordion list */}
+          <AccordionSteps steps={processSteps} />
 
           <div className="text-center">
             <Button
@@ -396,10 +428,10 @@ const LandingPage = () => {
               Get started
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Pricing Section */}
+      {/* Pricing Section */}
         <section className={`relative z-10 py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="text-center mb-12">
             <Badge className="bg-[#ddff89] text-[#282823] mb-6 text-sm px-4 py-2">
@@ -448,7 +480,7 @@ const LandingPage = () => {
                     {plan.description}
                   </p>
 
-                  <Button
+                  <Button 
                     onClick={() => navigate('/auth')}
                     className="w-full bg-[#282823] text-white font-corben rounded-2xl"
                   >
@@ -458,10 +490,10 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section */}
+      {/* CTA Section */}
         <section className={`relative z-10 text-center py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <h2 className="font-corben text-[#282823] text-6xl mb-8" style={{fontWeight: 400}}>
             Cheat the internet.
@@ -483,19 +515,19 @@ const LandingPage = () => {
                   placeholder="Search or paste your website url"
                   className="border-0 text-base placeholder:text-[#afaca7] pr-16"
                 />
-                <Button
+            <Button 
                   type="submit"
                   size="icon"
                   className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#d6ff71] hover:bg-[#c4ee60] rounded-full"
                 >
                   <Search className="w-4 h-4 text-black" />
-                </Button>
-              </div>
-            </div>
+            </Button>
+          </div>
+        </div>
           </form>
-        </section>
+      </section>
 
-        {/* Footer */}
+      {/* Footer */}
         <footer className={`relative z-10 bg-white/80 backdrop-blur rounded-t-3xl py-12 px-8 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -520,13 +552,13 @@ const LandingPage = () => {
                 </a>
               </nav>
             </div>
-
+            
             <p className="text-[#3d3d38] text-sm">
               © 2025 Dexter. All rights reserved.
             </p>
-          </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
+    </div>
     </main>
   );
 };
