@@ -8,7 +8,7 @@ import { Wand2, Save, RefreshCw, MessageSquare, Edit2, Check, X, Plus } from 'lu
 interface Prompt {
   id: string;
   text: string;
-  category: 'easy-win' | 'moderate' | 'challenging';
+  category: 'easy-win' | 'moderate' | 'challenging' | 'trending';
   intent: string;
   isEditing?: boolean;
 }
@@ -59,19 +59,41 @@ const PromptsPage = () => {
       setCompany(companyData);
 
       if (companyData) {
-        // Try to load existing prompts from localStorage first
-        const savedPrompts = localStorage.getItem(`prompts_${companyData.id}`);
-        if (savedPrompts) {
-          try {
-            const parsed = JSON.parse(savedPrompts);
-            setPrompts(parsed.map((p: any) => ({ ...p, isEditing: false })));
-          } catch (e) {
-            console.error('Error parsing saved prompts:', e);
+        // Try to load existing prompts from database first, then localStorage
+        const { data: dbPrompts } = await supabase
+          .from('prompts')
+          .select('*')
+          .eq('company_id', companyData.id)
+          .order('created_at', { ascending: true });
+
+        if (dbPrompts && dbPrompts.length > 0) {
+          // Convert database prompts to UI format
+          const convertedPrompts = dbPrompts.map((p: any, index: number) => ({
+            id: `prompt-${index + 1}`,
+            text: p.text,
+            category: p.tags?.[0] || 'moderate',
+            intent: 'User is looking for company recommendations',
+            isEditing: false
+          }));
+          setPrompts(convertedPrompts);
+          
+          // Also cache in localStorage for offline access
+          localStorage.setItem(`prompts_${companyData.id}`, JSON.stringify(convertedPrompts));
+        } else {
+          // Fallback to localStorage if no database prompts
+          const savedPrompts = localStorage.getItem(`prompts_${companyData.id}`);
+          if (savedPrompts) {
+            try {
+              const parsed = JSON.parse(savedPrompts);
+              setPrompts(parsed.map((p: any) => ({ ...p, isEditing: false })));
+            } catch (e) {
+              console.error('Error parsing saved prompts:', e);
+            }
           }
         }
 
-        // If no saved prompts, check if we should generate them
-        if (!savedPrompts || JSON.parse(savedPrompts).length === 0) {
+        // If no saved prompts at all, generate them
+        if ((!dbPrompts || dbPrompts.length === 0) && !localStorage.getItem(`prompts_${companyData.id}`)) {
           await generateInitialPrompts(companyData);
         }
       }
@@ -175,14 +197,33 @@ const PromptsPage = () => {
     try {
       setSaving(true);
       
-      // Save to localStorage
+      // Save to database first
+      const dbPrompts = prompts.map(p => ({
+        company_id: company.id,
+        text: p.text,
+        tags: [p.category]
+      }));
+      
+      // Clear existing prompts for this company
+      await supabase.from('prompts').delete().eq('company_id', company.id);
+      
+      // Insert updated prompts
+      const { error: insertError } = await supabase.from('prompts').insert(dbPrompts);
+      
+      if (insertError) {
+        console.error('Error saving prompts to database:', insertError);
+        toast({ title: 'Error', description: 'Failed to save prompts to database', variant: 'destructive' });
+        return;
+      }
+      
+      // Also save to localStorage for immediate access
       const promptsToSave = prompts.map(p => ({ ...p, isEditing: false }));
       localStorage.setItem(`prompts_${company.id}`, JSON.stringify(promptsToSave));
       
       // Update state to exit edit mode
       setPrompts(promptsToSave);
       
-      toast({ title: 'Success', description: 'Prompts saved successfully' });
+      toast({ title: 'Success', description: 'Prompts saved to database successfully' });
     } catch (error) {
       console.error('Error saving prompts:', error);
       toast({ title: 'Error', description: 'Failed to save prompts', variant: 'destructive' });
@@ -211,6 +252,7 @@ const PromptsPage = () => {
       case 'easy-win': return 'bg-green-100 text-green-700';
       case 'moderate': return 'bg-blue-100 text-blue-700';
       case 'challenging': return 'bg-red-100 text-red-700';
+      case 'trending': return 'bg-purple-100 text-purple-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -348,6 +390,7 @@ const PromptsPage = () => {
                       <option value="easy-win">Easy Win</option>
                       <option value="moderate">Moderate</option>
                       <option value="challenging">Challenging</option>
+                      <option value="trending">Trending</option>
                     </select>
                   </div>
                 </div>

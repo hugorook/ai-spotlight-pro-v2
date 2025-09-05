@@ -256,14 +256,36 @@ const CompanyProfilePage = () => {
 
       const generatedPrompts = (data?.prompts || []).map((p: any) => ({ ...p, isEditing: false }));
       
-      // Save to localStorage
-      localStorage.setItem(`prompts_${company.id}`, JSON.stringify(generatedPrompts));
+      // Save to Supabase database first
+      const promptsToSave = generatedPrompts.map((prompt: any) => ({
+        company_id: company.id,
+        text: prompt.text,
+        tags: [prompt.category || 'moderate']
+      }));
       
-      console.log(`Generated ${generatedPrompts.length} new prompts`);
-      toast({ 
-        title: 'Prompts Updated', 
-        description: `Generated ${generatedPrompts.length} new test prompts based on your updated company profile.`
-      });
+      // Clear existing prompts for this company
+      await supabase.from('prompts').delete().eq('company_id', company.id);
+      
+      // Insert new prompts
+      const { error: insertError } = await supabase.from('prompts').insert(promptsToSave);
+      
+      if (insertError) {
+        console.error('Error saving prompts to database:', insertError);
+        // Fallback to localStorage only
+        localStorage.setItem(`prompts_${company.id}`, JSON.stringify(generatedPrompts));
+        toast({ 
+          title: 'Prompts Generated', 
+          description: `Generated ${generatedPrompts.length} new test prompts (saved locally).`
+        });
+      } else {
+        // Also save to localStorage for immediate access
+        localStorage.setItem(`prompts_${company.id}`, JSON.stringify(generatedPrompts));
+        console.log(`Generated and saved ${generatedPrompts.length} new prompts to database`);
+        toast({ 
+          title: 'Prompts Updated', 
+          description: `Generated ${generatedPrompts.length} new test prompts and saved to database.`
+        });
+      }
     } catch (error) {
       console.error('Error generating prompts:', error);
       toast({ 

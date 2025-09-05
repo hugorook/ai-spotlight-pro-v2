@@ -24,7 +24,7 @@ interface GeneratePromptsRequest {
 interface GeneratedPrompt {
   id: string;
   text: string;
-  category: 'easy-win' | 'moderate' | 'challenging';
+  category: 'easy-win' | 'moderate' | 'challenging' | 'trending';
   intent: string;
 }
 
@@ -235,23 +235,31 @@ Examples of REALISTIC searches:
 - "Largest sugar trading houses globally" (not "established firms with market reputation")
 
 CATEGORIES (exact spelling) - REALISTIC but TARGETED:
-- "easy-win": Realistic searches that naturally favor major established players (4 prompts) - What procurement managers, analysts, or competitors would actually search
-- "moderate": Specific service/geographic searches but broader competition (4 prompts)  
-- "challenging": General industry category searches with lots of competition (4 prompts)
+- "easy-win": Very specific searches combining 2-3+ capabilities that naturally favor major established players (3 prompts) - What procurement managers would search for very specific solutions
+- "moderate": Service/geographic searches with moderate competition (3 prompts)  
+- "challenging": Broader industry category searches with lots of competition (2 prompts)
+- "trending": Current trending topics in the industry combined with company services (2 prompts)
 
-EXAMPLES of REALISTIC prompts that real people would search for:
+FOR EASY WINS - MAKE THESE GENUINELY EASY:
+Layer 3-4 specific capabilities + scale indicators + geography to create VERY NICHE searches that only 2-3 major companies would realistically serve:
 
-For Czarnikow (major sugar trading house) - REALISTIC but DETAILED searches targeting their USPs:
+Examples for major established players:
+- "Leading [industry] companies with [capability A] + [capability B] + [capability C] in [region/global]"  
+- "Major [service] firms offering [specific A] and [specific B] to [specific customer type]"
+- "Global [industry] leaders with [rare combination of services] for [specific market segment]"
 
-BETTER VERSION - More detailed and globally-focused:
-- "Leading sugar trading and supply chain companies offering mill financing and advisory services" (targets their financing USP with more detail)
-- "Major international sugar trading and supply chain firms with global mill relationships" (targets their worldwide presence, not just Brazil)
-- "Top global sugar trading and supply chain management companies with financing capabilities" (targets their global scale + multiple capabilities)
-- "International sugar and ethanol trading companies with integrated supply chain operations" (targets their integrated complex USP)
-- "Major sugar commodity trading houses with risk management and hedging services" (targets their risk services USP with more detail)
-- "Leading sugar trading companies providing working capital and structured finance to mills globally" (targets their mill financing worldwide)
-- "Global sugar trading and supply chain firms with physical storage and logistics capabilities" (targets their physical assets USP)
-- "International commodity trading companies with worldwide sugar-ethanol complex operations" (targets their integrated business USP with global scope)
+FOR TRENDING TOPICS:
+Include current industry trends like:
+- AI/automation in the industry
+- Sustainability/ESG requirements
+- Supply chain resilience 
+- Digital transformation
+- Regulatory compliance
+- Climate adaptation
+
+Examples:
+- "[Industry] companies with AI-powered [service] for [trend/regulation]"  
+- "Sustainable [industry] providers with [trending capability]"
 
 AVOID SIMPLE VERSIONS like:
 - "Sugar trading companies that provide mill financing" (too simple)
@@ -325,7 +333,7 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert at creating realistic search queries that maximize company mention rates. Create detailed, multi-layered search terms that naturally describe established major players. Use combinations like "Leading sugar trading and supply chain companies offering mill financing and advisory services" rather than simple terms like "sugar trading companies". INCLUDE customer-perspective prompts. For "easy-win" prompts, layer multiple capabilities, scale indicators, and geographic scope to create searches that naturally favor major established players. Adapt customer examples to the specific company industry. Every prompt must result in numbered company lists.'
+          content: 'You are an expert at creating realistic search queries that maximize company mention rates. For "easy-win" prompts: Layer 3-4 specific capabilities + scale indicators to create VERY NICHE searches that only 2-3 major companies can realistically serve - these must be genuinely easy wins (80%+ mention rate). For "trending" prompts: Include current industry trends like AI, sustainability, supply chain resilience, digital transformation. CRITICAL: Easy wins should combine so many specific capabilities that only major established players would appear. Every prompt must result in numbered company lists.'
         },
         { role: 'user', content: promptGenerationRequest },
       ],
@@ -353,11 +361,11 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
     const parsed = JSON.parse(responseText);
     let prompts = parsed.prompts || [];
 
-    // Normalize + validate (expect 12 prompts)
-    let validatedPrompts: GeneratedPrompt[] = prompts.slice(0, 24).map((prompt: any, index: number) => ({
+    // Normalize + validate (expect 10 prompts: 3+3+2+2)
+    let validatedPrompts: GeneratedPrompt[] = prompts.slice(0, 10).map((prompt: any, index: number) => ({
       id: prompt.id || `prompt-${index + 1}`,
       text: String(prompt.text || '').trim(),
-      category: ['easy-win', 'moderate', 'challenging'].includes(prompt.category)
+      category: ['easy-win', 'moderate', 'challenging', 'trending'].includes(prompt.category)
         ? prompt.category
         : 'moderate',
       intent: String(prompt.intent || 'User is looking for company recommendations')
@@ -369,7 +377,7 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
     if (validatedPrompts.length < 10) {
       console.log(`Only ${validatedPrompts.length} valid prompts; requesting strict rewrite...`);
-      const strictPrompt = `Create EXACTLY 12 search prompts for ${companyInfo.companyName} with 4 ULTRA-SPECIFIC "easy win" prompts designed for 50%+ mention rate. NO COMPANY NAME MENTIONS.
+      const strictPrompt = `Create EXACTLY 10 search prompts for ${companyInfo.companyName}: 3 easy-win, 3 moderate, 2 challenging, 2 trending. Easy wins must be ULTRA-SPECIFIC for 80%+ mention rate. NO COMPANY NAME MENTIONS.
 
 CRITICAL STRATEGY:
 
