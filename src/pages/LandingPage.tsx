@@ -163,7 +163,7 @@ const LandingPage = () => {
         </aside>
 
         {/* Header */}
-        <header className="relative z-10 flex items-center justify-between py-6">
+        <header className="relative z-10 flex items-center justify-end py-6">
           {/* Left Navigation */}
           <nav className="hidden">
             <div className="flex items-center gap-2">
