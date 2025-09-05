@@ -381,19 +381,23 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
 
 CRITICAL STRATEGY:
 
-4 EASY-WIN prompts (must be REALISTIC but TARGETED):
+3 EASY-WIN prompts (must be REALISTIC but TARGETED):
 - Realistic searches that procurement managers, analysts, or competitors would actually make
 - Focus on their key markets, scale indicators, or service combinations that favor major players
 - Target searches where established companies naturally rank high
 - Examples: "Major [service] companies globally", "[service] companies in [key geographic market]", "Largest [commodity] traders", "[service] firms with [key capability]"
 
-4 MODERATE prompts:
+3 MODERATE prompts:
 - Specific to their main services but broader market
 - Include geographic or capability specificity but not ultra-narrow
 
-4 CHALLENGING prompts:
+2 CHALLENGING prompts:
 - General industry category searches
 - Broader competitive landscape queries
+
+2 TRENDING prompts:
+- Current industry trends (AI, sustainability, digital transformation, etc.)
+- Combined with their core services
 
 For Czarnikow example - EASY-WIN realistic specificity:
 ❌ "Sugar trading companies" (too broad, hundreds of results)
@@ -430,7 +434,7 @@ The easy-wins should be REALISTIC SEARCHES that naturally favor established mark
           let strictPrompts: GeneratedPrompt[] = (strictParsed.prompts || []).map((p: any, i: number) => ({
             id: p.id || `prompt-${i + 1}`,
             text: String(p.text || '').trim(),
-            category: ['easy-win', 'moderate', 'challenging'].includes(p.category) ? p.category : 'moderate',
+            category: ['easy-win', 'moderate', 'challenging', 'trending'].includes(p.category) ? p.category : 'moderate',
             intent: String(p.intent || 'User is looking for company recommendations')
           }));
           strictPrompts = strictPrompts.filter(p => p.text && !isBanned(p.text) && isListQuery(p.text));

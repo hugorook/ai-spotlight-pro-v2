@@ -130,20 +130,27 @@ const PromptsPage = () => {
       }
 
       if (data) {
-        setFormData(prev => ({
-          ...prev,
-          company_name: data.companyName || prev.company_name,
-          industry: data.industry || prev.industry,
-          description: data.description || prev.description,
-          target_customers: data.targetCustomers || prev.target_customers,
-          key_differentiators: data.keyDifferentiators || prev.key_differentiators,
-          geographic_focus: data.geographicFocus || prev.geographic_focus
-        }));
+        const updatedFormData = {
+          ...formData,
+          company_name: data.companyName || formData.company_name,
+          industry: data.industry || formData.industry,
+          description: data.description || formData.description,
+          target_customers: data.targetCustomers || formData.target_customers,
+          key_differentiators: data.keyDifferentiators || formData.key_differentiators,
+          geographic_focus: data.geographicFocus || formData.geographic_focus
+        };
+        
+        setFormData(updatedFormData);
 
         toast({ 
           title: 'Website Analyzed', 
-          description: 'Company information has been auto-filled from your website.' 
+          description: 'Company information has been auto-filled. Generating prompts...' 
         });
+
+        // Automatically generate prompts after successful analysis
+        if (updatedFormData.company_name && updatedFormData.industry) {
+          await generatePromptsWithData(updatedFormData);
+        }
       }
     } catch (error) {
       console.error('Error analyzing website:', error);
@@ -157,8 +164,8 @@ const PromptsPage = () => {
     }
   };
 
-  const generatePrompts = async () => {
-    if (!formData.company_name || !formData.industry) {
+  const generatePromptsWithData = async (dataToUse: typeof formData) => {
+    if (!dataToUse.company_name || !dataToUse.industry) {
       toast({ 
         title: 'Required Fields', 
         description: 'Company name and industry are required to generate prompts.', 
@@ -179,13 +186,13 @@ const PromptsPage = () => {
           .from('companies')
           .insert({
             user_id: user?.id,
-            company_name: formData.company_name,
-            industry: formData.industry,
-            description: formData.description,
-            target_customers: formData.target_customers,
-            key_differentiators: formData.key_differentiators,
-            website_url: formData.website,
-            geographic_focus: formData.geographic_focus
+            company_name: dataToUse.company_name,
+            industry: dataToUse.industry,
+            description: dataToUse.description,
+            target_customers: dataToUse.target_customers,
+            key_differentiators: dataToUse.key_differentiators,
+            website_url: dataToUse.website,
+            geographic_focus: dataToUse.geographic_focus
           })
           .select()
           .single();
@@ -198,13 +205,13 @@ const PromptsPage = () => {
         const { error: updateError } = await supabase
           .from('companies')
           .update({
-            company_name: formData.company_name,
-            industry: formData.industry,
-            description: formData.description,
-            target_customers: formData.target_customers,
-            key_differentiators: formData.key_differentiators,
-            website_url: formData.website,
-            geographic_focus: formData.geographic_focus
+            company_name: dataToUse.company_name,
+            industry: dataToUse.industry,
+            description: dataToUse.description,
+            target_customers: dataToUse.target_customers,
+            key_differentiators: dataToUse.key_differentiators,
+            website_url: dataToUse.website,
+            geographic_focus: dataToUse.geographic_focus
           })
           .eq('id', company.id);
 
@@ -214,13 +221,13 @@ const PromptsPage = () => {
       // Generate prompts
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
-          companyName: formData.company_name,
-          industry: formData.industry,
-          description: formData.description,
-          targetCustomers: formData.target_customers,
-          keyDifferentiators: formData.key_differentiators,
-          websiteUrl: formData.website,
-          geographicFocus: formData.geographic_focus[0] || 'Global',
+          companyName: dataToUse.company_name,
+          industry: dataToUse.industry,
+          description: dataToUse.description,
+          targetCustomers: dataToUse.target_customers,
+          keyDifferentiators: dataToUse.key_differentiators,
+          websiteUrl: dataToUse.website,
+          geographicFocus: dataToUse.geographic_focus[0] || 'Global',
           requestedCount: 10
         }
       });
@@ -267,6 +274,10 @@ const PromptsPage = () => {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const generatePrompts = async () => {
+    await generatePromptsWithData(formData);
   };
 
   const updatePrompt = (id: string, field: string, value: string) => {
@@ -363,7 +374,7 @@ const PromptsPage = () => {
               ) : (
                 <>
                   <Globe className="w-5 h-5" />
-                  Auto-Fill
+                  Auto-Fill & Generate
                 </>
               )}
             </button>
