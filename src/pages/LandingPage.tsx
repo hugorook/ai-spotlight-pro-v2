@@ -78,7 +78,7 @@ function AccordionSteps({
         return (
           <div
             key={step.title}
-            className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+            className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] h-[220px] md:h-[260px]"
             onMouseEnter={() => setActiveIndex(index)}
             onFocus={() => setActiveIndex(index)}
             onClick={() => setActiveIndex(index)}
@@ -92,11 +92,7 @@ function AccordionSteps({
               </div>
             </div>
 
-            <div
-              className={`${
-                expanded ? 'max-h-[320px] md:max-h-[380px] opacity-100 pt-10 pb-8' : 'max-h-0 opacity-0 pt-0 pb-0'
-              } transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm md:text-base border-t border-[#efeee9]`}
-            >
+            <div className={`transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm md:text-base border-t border-[#efeee9] pt-10 pb-8 ${expanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 pointer-events-none'}`}>
               <p className="leading-relaxed">
                 {step.description}
               </p>
