@@ -129,8 +129,43 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
     }
   };
 
-  const generatePrompts = async (company: any) => {
+  const loadExistingPrompts = async (company: any) => {
     try {
+      // First, try to load existing prompts from localStorage (from PromptsPage/CompanyProfile)
+      const savedPrompts = localStorage.getItem(`prompts_${company.id}`);
+      if (savedPrompts) {
+        try {
+          const parsed = JSON.parse(savedPrompts);
+          if (parsed && parsed.length > 0) {
+            console.log(`Loaded ${parsed.length} existing prompts from localStorage`);
+            return parsed.map((p: any) => ({
+              text: p.text,
+              id: p.id,
+              category: p.category
+            }));
+          }
+        } catch (e) {
+          console.error('Error parsing saved prompts:', e);
+        }
+      }
+
+      // If no prompts in localStorage, check database prompts table
+      const { data: dbPrompts } = await supabase
+        .from('prompts')
+        .select('*')
+        .eq('company_id', company.id);
+
+      if (dbPrompts && dbPrompts.length > 0) {
+        console.log(`Loaded ${dbPrompts.length} existing prompts from database`);
+        return dbPrompts.map((p: any) => ({
+          text: p.text,
+          id: p.id,
+          category: 'moderate'
+        }));
+      }
+
+      // If still no prompts found, generate new ones as fallback
+      console.log('No existing prompts found, generating new ones...');
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: company.company_name,
@@ -139,16 +174,15 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           targetCustomers: company.target_customers,
           keyDifferentiators: company.key_differentiators,
           geographicFocus: (company.geographic_focus && company.geographic_focus[0]) || 'Global',
-          requestedCount: 25, // Generate 25 prompts for comprehensive health check
+          requestedCount: 25,
         }
       });
 
       if (error) throw error;
-
       return data?.prompts || [];
     } catch (error) {
-      console.error('Error generating prompts:', error);
-      throw new Error('Failed to generate test prompts');
+      console.error('Error loading prompts:', error);
+      throw new Error('Failed to load test prompts');
     }
   };
 
@@ -181,9 +215,9 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
       const company = companies[0];
 
-      // Generate test prompts
-      setState(prev => ({ ...prev, currentPrompt: 'Generating test prompts...' }));
-      const prompts = await generatePrompts(company);
+      // Load existing test prompts or generate new ones as fallback
+      setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
+      const prompts = await loadExistingPrompts(company);
       
       if (!prompts.length) {
         throw new Error('No prompts generated. Please try again.');

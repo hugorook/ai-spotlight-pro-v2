@@ -395,7 +395,7 @@ const LandingPage = () => {
       </section>
 
         {/* How it Works Section */}
-        <section className={`relative z-10 py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
+        <section className={`relative z-10 pt-20 pb-36 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div className="text-center mb-12">
             <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
               How can I win?
@@ -418,7 +418,7 @@ const LandingPage = () => {
           {/* Hover-accordion list */}
           <AccordionSteps steps={processSteps} />
 
-          <div className="text-center">
+          <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-8">
             <Button
               onClick={() => navigate('/auth')}
               className="bg-[#282823] text-white font-corben rounded-2xl px-8 py-3"
@@ -426,7 +426,7 @@ const LandingPage = () => {
               Get started
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-        </div>
+          </div>
       </section>
 
       {/* Pricing Section */}
