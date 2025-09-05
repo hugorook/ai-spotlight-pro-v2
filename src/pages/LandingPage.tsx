@@ -39,11 +39,11 @@ const LandingPage = () => {
   };
 
   const navigationItems = [
-    { label: "How it works", icon: Home },
-    { label: "Dashboard", icon: TrendingUp },
-    { label: "Analytics", icon: BarChart3 },
-    { label: "Prompts", icon: FileText },
-    { label: "Company", icon: Settings },
+    { label: "How it works", icon: Home, href: "#how" },
+    { label: "Dashboard", icon: TrendingUp, href: "/dashboard" },
+    { label: "Analytics", icon: BarChart3, href: "/analytics" },
+    { label: "Prompts", icon: FileText, href: "/prompts" },
+    { label: "Company", icon: Settings, href: "/content" },
   ];
 
   const statisticsData = [
@@ -139,26 +139,39 @@ const LandingPage = () => {
           <div className="w-full max-w-[1830px] h-full mx-auto bg-[#ffffff78] rounded-[50%] blur-[200px]" />
         </div>
 
+        {/* Fixed Left Vertical Nav */}
+        <aside className="hidden lg:block fixed top-6 left-6 z-50">
+          <div className="w-40 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm">
+            <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823]">Dexter</div>
+            <nav className="px-2 pb-2 space-y-1">
+              {navigationItems.map((item, index) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={`${
+                    index === 0
+                      ? 'bg-[#ddff89] text-[#282823]'
+                      : 'text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]'
+                  } flex items-center justify-between px-3 py-2 rounded-md transition-colors`}
+                >
+                  <span className="text-[13px] font-normal">{item.label}</span>
+                  <item.icon className="w-3.5 h-3.5" />
+                </a>
+              ))}
+            </nav>
+          </div>
+        </aside>
+
         {/* Header */}
         <header className="relative z-10 flex items-center justify-between py-6">
           {/* Left Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8 bg-white rounded-2xl border border-[#d9d9d9] px-6 py-4">
+          <nav className="hidden">
             <div className="flex items-center gap-2">
               <div className="bg-[#ddff89] px-3 py-1 rounded-lg">
                 <span className="font-corben text-[#282823] text-xl">Dexter</span>
               </div>
             </div>
-            <div className="flex items-center space-x-6">
-              {navigationItems.map((item, index) => (
-                <button
-                  key={index}
-                  className="flex items-center gap-2 text-[#282823] hover:opacity-70 transition-opacity"
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span className="font-corben text-sm">{item.label}</span>
-                </button>
-              ))}
-            </div>
+            <div className="flex items-center space-x-6" />
           </nav>
 
           {/* Right Actions */}
