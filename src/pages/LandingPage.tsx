@@ -298,7 +298,7 @@ const LandingPage = () => {
               </Badge>
 
               <h2 className="font-corben text-[#282823] text-4xl md:text-5xl mb-6" style={{fontWeight: 400}}>
-                'What the **** is Generative SEO?'
+                'What the ****<br />is Generative SEO?'
               </h2>
 
               <div className="space-y-5 max-w-3xl mx-auto text-left md:text-center">
