@@ -249,7 +249,7 @@ const LandingPage = () => {
             />
           </h1>
 
-          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-1">
+          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-0">
             AI is now funnelling huge volumes of super high intent traffic, but
             most brands aren't competing.
           </p>
