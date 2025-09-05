@@ -145,22 +145,22 @@ const LandingPage = () => {
   const processSteps = [
     {
       title: "Check your visibility",
-      description: "Get real-time visibility into how AI models see your brand across all major platforms.",
+      description: "What would an AI model say about your brand? Dexter runs a real-time audit across major platforms, from search engines to chatbots, and shows you exactly how you appear, where you’re strong, and where the blind spots are.",
       icon: Eye,
     },
     {
       title: "Analyse the gaps",
-      description: "Identify where your competitors are winning and where you're missing out.",
+      description: "It’s not just about being visible, it’s about outperforming competitors. Dexter reveals the prompts your rivals own, the spaces you’re missing, and the areas where you can quickly win ground.",
       icon: Target,
     },
     {
       title: "Let Dexter guide you",
-      description: "Get actionable recommendations to improve your AI visibility.",
+      description: "Most SEO tools drown you in data. Dexter cuts through the noise with clear, practical steps: the few things worth doing today that will actually improve your AI visibility.",
       icon: Rocket,
     },
     {
       title: "Track your growth",
-      description: "Monitor your progress and watch your AI mentions grow over time.",
+      description: "Visibility builds over time. Dexter shows your share of mentions growing week by week, highlights which actions are working, and benchmarks you against competitors so you can prove the impact.",
       icon: LineChart,
     },
   ];
