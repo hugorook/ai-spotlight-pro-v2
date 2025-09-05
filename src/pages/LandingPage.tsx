@@ -196,7 +196,7 @@ const LandingPage = () => {
         "Content creation tools",
       ],
       buttonText: "Get Ahead",
-      backgroundColor: "bg-[#f5f5e8]",
+      backgroundColor: "bg-[#E7FF8A]",
       textColor: "text-[#282823]",
       popular: true,
     },
@@ -442,11 +442,11 @@ const LandingPage = () => {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
             {pricingPlans.map((plan, index) => (
               <Card
                 key={index}
-                className={`${plan.backgroundColor} border-0 relative overflow-hidden`}
+                className={`${plan.backgroundColor} border-0 relative overflow-hidden h-full flex flex-col`}
               >
                 {plan.popular && (
                   <Badge className="absolute top-6 right-6 bg-[#32322d] text-white">
@@ -454,16 +454,16 @@ const LandingPage = () => {
                   </Badge>
                 )}
                 
-                <CardContent className="p-8">
-                  <h3 className={`font-corben ${plan.textColor} text-5xl mb-4`}>
+                <CardContent className="p-8 flex flex-col flex-1 text-left">
+                  <h3 className={`font-corben ${plan.textColor} text-5xl mb-4`} style={{fontWeight: 400}}>
                     {plan.name}
                   </h3>
                   
-                  <div className={`font-corben ${plan.textColor} text-2xl mb-8`}>
+                  <div className={`font-corben ${plan.textColor} text-2xl mb-8`} style={{fontWeight: 400}}>
                     {plan.price}
                   </div>
 
-                  <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-start gap-3">
                         <Check className={`w-4 h-4 mt-1 flex-shrink-0 ${plan.featureTextColor || 'text-[#3d3d38]'}`} />
@@ -480,7 +480,7 @@ const LandingPage = () => {
 
                   <Button 
                     onClick={() => navigate('/auth')}
-                    className="w-full bg-[#282823] text-white font-corben rounded-2xl"
+                    className="mt-auto w-full bg-[#262622] text-white font-corben rounded-2xl"
                   >
                     {plan.buttonText}
                     <ArrowRight className="w-4 h-4 ml-2" />
