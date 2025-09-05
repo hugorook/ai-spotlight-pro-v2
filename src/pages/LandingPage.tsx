@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // Custom hook for typewriter effect
-function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onHalfway?: () => void) {
+function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onComplete?: () => void) {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
@@ -32,25 +32,24 @@ function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onHalf
       if (displayedText.length < text.length) {
         const newLength = displayedText.length + 1;
         setDisplayedText(text.substring(0, newLength));
-        
-        // Trigger callback when halfway through
-        if (onHalfway && newLength >= Math.floor(text.length / 2) && newLength === Math.floor(text.length / 2) + 1) {
-          onHalfway();
-        }
       } else {
         setIsTyping(false);
+        // Trigger callback when typing is complete
+        if (onComplete) {
+          onComplete();
+        }
       }
     }, displayedText.length === 0 ? startDelay : typingSpeed);
     
     return () => clearTimeout(timeout);
-  }, [displayedText, text, typingSpeed, startDelay, onHalfway]);
+  }, [displayedText, text, typingSpeed, startDelay, onComplete]);
 
   return { displayedText, isTyping };
 }
 
 // Typewriter text component
-function TypewriterText({ text, typingSpeed, startDelay, onHalfway }: { text: string; typingSpeed?: number; startDelay?: number; onHalfway?: () => void }) {
-  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay, onHalfway);
+function TypewriterText({ text, typingSpeed, startDelay, onComplete }: { text: string; typingSpeed?: number; startDelay?: number; onComplete?: () => void }) {
+  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay, onComplete);
   
   return (
     <span className="relative font-corben" style={{fontWeight: 400}}>
@@ -253,7 +252,7 @@ const LandingPage = () => {
               text="Cheat the internet." 
               typingSpeed={100}
               startDelay={500}
-              onHalfway={() => setShowContent(true)}
+              onComplete={() => setShowContent(true)}
             />
           </h1>
 
