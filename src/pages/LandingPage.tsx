@@ -275,10 +275,10 @@ const LandingPage = () => {
               </Button>
               <Button 
               onClick={() => navigate('/auth')}
-              className="bg-[#262622] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-6"
+              className="group !bg-[#262622] !text-white hover:!bg-white hover:!text-[#262622] transition-colors font-corben rounded-2xl px-6"
               >
               Boost your brand
-              <Rocket className="w-4 h-4 ml-2" />
+              <Rocket className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
               </Button>
         </div>
       </header>
@@ -383,10 +383,10 @@ const LandingPage = () => {
                   </p>
                   <Button
                     onClick={() => navigate('/auth')}
-                    className="bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-5 py-2"
+                    className="group bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-5 py-2"
                   >
                     Leverage this traffic
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
                   </Button>
                 </div>
               </div>
@@ -421,10 +421,10 @@ const LandingPage = () => {
           <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-2 md:bottom-4">
             <Button
               onClick={() => navigate('/auth')}
-              className="bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-8 py-3"
+              className="group bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-8 py-3"
             >
               Get started
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
             </Button>
           </div>
       </section>
@@ -480,10 +480,10 @@ const LandingPage = () => {
 
                   <Button 
                     onClick={() => navigate('/auth')}
-                    className="mt-auto w-full bg-[#262622] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl"
+                    className="group mt-auto w-full bg-[#262622] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl"
                   >
                     {plan.buttonText}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
                   </Button>
                 </CardContent>
               </Card>
