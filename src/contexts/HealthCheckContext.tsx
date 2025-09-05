@@ -129,6 +129,100 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
     }
   };
 
+  const generateAnalyticsData = async (company: any, testResults: TestResult[]) => {
+    try {
+      // Generate all analytics data in parallel to populate analytics hub sections
+      const analyticsPromises = [];
+
+      // 1. Website Analysis - analyze company website for AI optimization
+      if (company.website_url) {
+        analyticsPromises.push(
+          supabase.functions.invoke('analyze-website', {
+            body: {
+              websiteUrl: `https://${company.website_url}`,
+              companyName: company.company_name,
+              industry: company.industry
+            }
+          }).then(result => {
+            if (result.data) {
+              localStorage.setItem('website_analysis', JSON.stringify({
+                ...result.data,
+                fetchedAt: new Date().toISOString()
+              }));
+            }
+          }).catch(error => console.error('Website analysis failed:', error))
+        );
+      }
+
+      // 2. Authority Analysis - generate authority building opportunities
+      analyticsPromises.push(
+        supabase.functions.invoke('analyze-authority', {
+          body: {
+            companyName: company.company_name,
+            industry: company.industry,
+            testResults: testResults,
+            websiteUrl: company.website_url
+          }
+        }).then(result => {
+          if (result.data) {
+            localStorage.setItem('authority_analysis', JSON.stringify({
+              ...result.data,
+              generatedAt: new Date().toISOString()
+            }));
+          }
+        }).catch(error => console.error('Authority analysis failed:', error))
+      );
+
+      // 3. Benchmarking Analysis - compare against industry
+      analyticsPromises.push(
+        supabase.functions.invoke('analyze-benchmark', {
+          body: {
+            companyName: company.company_name,
+            industry: company.industry,
+            mentionRate: Math.round((testResults.filter(r => r.company_mentioned).length / testResults.length) * 100),
+            averagePosition: testResults.filter(r => r.company_mentioned && r.mention_position)
+              .reduce((sum, r, _, arr) => sum + (r.mention_position || 0) / arr.length, 0) || 0,
+            testResults: testResults
+          }
+        }).then(result => {
+          if (result.data) {
+            localStorage.setItem('benchmark_analysis', JSON.stringify({
+              ...result.data,
+              analyzedAt: new Date().toISOString()
+            }));
+          }
+        }).catch(error => console.error('Benchmark analysis failed:', error))
+      );
+
+      // 4. Trending Analysis - find trending opportunities
+      analyticsPromises.push(
+        supabase.functions.invoke('analyze-trending', {
+          body: {
+            industry: company.industry,
+            companyName: company.company_name,
+            failedPrompts: testResults.filter(r => !r.company_mentioned).map(r => r.prompt_text),
+            targetCustomers: company.target_customers
+          }
+        }).then(result => {
+          if (result.data) {
+            localStorage.setItem('trending_analysis', JSON.stringify({
+              ...result.data,
+              generatedAt: new Date().toISOString()
+            }));
+          }
+        }).catch(error => console.error('Trending analysis failed:', error))
+      );
+
+      // Execute all analytics generation in parallel
+      await Promise.allSettled(analyticsPromises);
+      console.log('Analytics data generation completed');
+
+    } catch (error) {
+      console.error('Error generating analytics data:', error);
+      // Don't throw error - analytics generation is supplementary to core health check
+    }
+  };
+
   const loadExistingPrompts = async (company: any) => {
     try {
       // First, try to load existing prompts from localStorage (from PromptsPage/CompanyProfile)
@@ -317,6 +411,10 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       
       const positionScore = averagePosition ? Math.max(0, (11 - averagePosition) / 10) : 0;
       const visibilityScore = Math.round((mentionRate * 0.7 + positionScore * 100 * 0.3));
+
+      // Generate analytics data to populate all analytics hub sections
+      setState(prev => ({ ...prev, currentPrompt: 'Generating analytics insights...' }));
+      await generateAnalyticsData(company, testResults);
 
       setState(prev => ({
         ...prev,
