@@ -1,76 +1,119 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
-  ArrowRight,
   Search,
-  FileText,
+  ArrowRight,
+  Rocket,
   TrendingUp,
-  Target,
-  Bot,
+  BarChart3,
+  FileText,
+  Settings,
+  Home,
   Check,
-  Sparkles
+  Eye,
+  Target,
+  LineChart
 } from "lucide-react";
 
 const LandingPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [footerSearchValue, setFooterSearchValue] = useState("");
 
-  const handleGetStarted = () => {
-    window.location.href = '/auth';
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate('/auth');
+    }
   };
 
-  const handleLogin = () => {
-    window.location.href = '/auth';
+  const handleFooterSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (footerSearchValue.trim()) {
+      navigate('/auth');
+    }
   };
 
-  const aiSearchStats = [
-    { metric: "180M+", label: "ChatGPT Monthly Users" },
-    { metric: "10x", label: "Higher Intent Traffic" },
-    { metric: "67%", label: "Trust AI Recommendations" },
-    { metric: "2024", label: "AI Search Gold Rush" }
+  const navigationItems = [
+    { label: "How it works", icon: Home },
+    { label: "Dashboard", icon: TrendingUp },
+    { label: "Analytics", icon: BarChart3 },
+    { label: "Prompts", icon: FileText },
+    { label: "Company", icon: Settings },
+  ];
+
+  const statisticsData = [
+    { value: "180M", description: "ChatGPT Monthly Users" },
+    { value: "10X", description: "Higher Intent Traffic" },
+    { value: "67%", description: "Trust AI Recommendations" },
+  ];
+
+  const processSteps = [
+    {
+      title: "Check your visibility",
+      description: "Get real-time visibility into how AI models see your brand across all major platforms.",
+      icon: Eye,
+    },
+    {
+      title: "Analyse the gaps",
+      description: "Identify where your competitors are winning and where you're missing out.",
+      icon: Target,
+    },
+    {
+      title: "Let Dexter guide you",
+      description: "Get actionable recommendations to improve your AI visibility.",
+      icon: Rocket,
+    },
+    {
+      title: "Track your growth",
+      description: "Monitor your progress and watch your AI mentions grow over time.",
+      icon: LineChart,
+    },
   ];
 
   const pricingPlans = [
     {
-      name: "Starter",
-      price: "$19.99",
-      period: "per month", 
+      name: "Prospect",
+      price: "$19.99 pm",
       description: "Test the waters. See if AI even knows you exist.",
       features: [
         "Basic AI visibility checks",
         "ChatGPT, Claude, Gemini testing",
         "Monthly reports",
         "Email support",
-        "Up to 50 prompts tested"
+        "Up to 50 prompts tested",
       ],
-      highlighted: false,
-      buttonText: "Start Testing"
+      buttonText: "Start Testing",
+      backgroundColor: "bg-white",
+      textColor: "text-[#282823]",
     },
     {
       name: "Pro",
-      price: "$50",
-      period: "per month",
-      description: "Get serious. Track competitors, publish smarter content, measure results.",
+      price: "$50 pm",
+      description: "Track competitors, publish content, measure results.",
       features: [
         "Everything in Starter",
-        "Competitor tracking & analysis", 
+        "Competitor tracking & analysis",
         "Content gap analysis",
         "Smart content recommendations",
         "Weekly reports & insights",
         "Up to 500 prompts tested",
         "Priority support",
-        "Content creation tools"
+        "Content creation tools",
       ],
-      highlighted: true,
-      buttonText: "Get Serious"
+      buttonText: "Get Ahead",
+      backgroundColor: "bg-[#f5f5e8]",
+      textColor: "text-[#282823]",
+      popular: true,
     },
     {
       name: "Enterprise",
       price: "Custom",
-      period: "pricing",
-      description: "Need integrations, dashboards, or a dedicated manager? Lex scales with you.",
+      description: "Need integrations, dashboards, or a dedicated manager?",
       features: [
         "Everything in Pro",
         "Unlimited prompts tested",
@@ -79,406 +122,353 @@ const LandingPage = () => {
         "Dedicated account manager",
         "Custom reporting",
         "SLA guarantee",
-        "Training & onboarding"
+        "Training & onboarding",
       ],
-      highlighted: false,
-      buttonText: "Let's Talk"
-    }
+      buttonText: "Let's Talk",
+      backgroundColor: "bg-[#282823]",
+      textColor: "text-[#ece7e1]",
+      featureTextColor: "text-white",
+    },
   ];
 
-  const handleSearch = () => {
-    if (!query) return;
-    // For now route to auth or a test page; replace with real search later
-    window.location.href = "/auth";
-  };
-
   return (
-    <div className="min-h-screen bg-[#E9E3D6] text-[#1A1A1A]">
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#E9E3D6]/80 backdrop-blur-md border-b border-black/5">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
-                <span className="text-lg">Dexter</span>
+    <main className="bg-[#ece7e0] min-h-screen">
+      <div className="max-w-[1920px] mx-auto px-6 relative">
+        {/* Background blur effect */}
+        <div className="absolute w-full h-[1200px] top-[17px] left-0">
+          <div className="w-full max-w-[1830px] h-full mx-auto bg-[#ffffff78] rounded-[50%] blur-[200px]" />
+        </div>
+
+        {/* Header */}
+        <header className="relative z-10 flex items-center justify-between py-6">
+          {/* Left Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8 bg-white rounded-2xl border border-[#d9d9d9] px-6 py-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-[#ddff89] px-3 py-1 rounded-lg">
+                <span className="font-corben text-[#282823] text-xl">Dexter</span>
               </div>
             </div>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              <a href="#how" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
-                How it Works
-              </a>
-              <a href="#traffic" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
-                Traffic
-              </a>
-              <a href="#pricing" className="text-black/60 hover:text-black px-3 py-2 rounded-md transition-none">
-                Pricing
-              </a>
-            </nav>
-
-            {/* CTA Buttons */}
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" className="text-black/80 hover:bg-black/5" onClick={handleLogin}>
-                Login
-              </Button>
-              <Button 
-                className="bg-black text-white hover:bg-black/90 transition-none rounded-full px-5"
-                onClick={handleGetStarted}
-              >
-                Cheat the Internet
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="pt-28 pb-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight">
-              Cheat the internet. <span className="inline-flex items-center align-middle px-2"><Bot className="w-8 h-8" /></span> With Dexter.
-            </h1>
-            <p className="mt-6 text-base md:text-lg text-black/70">
-              AI tools are funneling huge volumes of super high intent traffic. Most brands aren’t competing.
-            </p>
-            <p className="mt-2 text-base md:text-lg text-black/70">
-              Lex is your shovel in the AI search gold rush. It helps you teach AI tools to recommend you.
-              Show up early. Own your category. Become the default choice.
-            </p>
-
-            {/* Search */}
-            <div className="mt-8 flex justify-center">
-              <div className="relative w-full max-w-xl">
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search or paste your website url"
-                  className="w-full h-12 rounded-full bg-white text-black/80 placeholder-black/40 pl-5 pr-14 shadow-[0_6px_30px_rgba(0,0,0,0.08)] border border-black/10"
-                />
+            <div className="flex items-center space-x-6">
+              {navigationItems.map((item, index) => (
                 <button
-                  onClick={handleSearch}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#9CE94B] flex items-center justify-center shadow-md hover:brightness-95"
-                  aria-label="Search"
+                  key={index}
+                  className="flex items-center gap-2 text-[#282823] hover:opacity-70 transition-opacity"
                 >
-                  <Sparkles className="w-4 h-4 text-black" />
+                  <item.icon className="w-4 h-4" />
+                  <span className="font-corben text-sm">{item.label}</span>
                 </button>
+              ))}
+            </div>
+          </nav>
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/auth')}
+              className="bg-white border-[#3b3b3738] text-[#282823] font-corben rounded-2xl px-6"
+            >
+              Log In
+            </Button>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-[#262622] text-white font-corben rounded-2xl px-6"
+            >
+              Boost your brand
+              <Rocket className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="relative z-10 text-center py-20">
+          <div className="inline-flex items-center gap-3 mb-8">
+            <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
+              <span className="font-corben text-[#282823] text-lg">Dexter</span>
+            </div>
+            <p className="font-semibold text-[#3d3d38] text-lg">
+              Win the Generative SEO race
+            </p>
+          </div>
+
+          <h1 className="font-corben text-[#282823] text-6xl md:text-7xl leading-tight mb-6">
+            Cheat the internet.
+          </h1>
+
+          <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-4">
+            AI is now funnelling huge volumes of super high intent traffic, but
+            most brands aren't competing.
+          </p>
+
+          <p className="font-semibold text-[#3d3d38] text-lg mb-12">
+            Dexter is your shovel in the AI search gold rush.
+          </p>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto mb-20">
+            <div className="relative">
+              <div className="absolute inset-0 top-6 bg-[#a9a9a9] rounded-full blur-[50px] opacity-20" />
+              <div className="relative bg-white rounded-3xl border border-[#28282357] p-3">
+                <Input
+                  type="text"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  placeholder="Search or paste your website url"
+                  className="border-0 text-base placeholder:text-[#afaca7] pr-16"
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#d6ff71] hover:bg-[#c4ee60] rounded-full"
+                >
+                  <Search className="w-4 h-4 text-black" />
+                </Button>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </form>
 
-      {/* What is Generative SEO Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.12)] p-10 md:p-14">
-            <h2 className="text-center font-serif text-2xl md:text-3xl mb-8">
-              "What the **** is Generative SEO?"
+          {/* Future of Search Section */}
+          <div className="bg-white rounded-3xl p-12 mb-20 relative overflow-hidden">
+            <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
+              The future of search
+            </Badge>
+            
+            <h2 className="font-corben text-[#282823] text-5xl mb-8">
+              'What the ****<br />
+              is Generative SEO?'
             </h2>
 
-            <div className="space-y-6 text-lg text-black/70 leading-relaxed">
-              <p>
-                People use AI tools to search, ChatGPT alone has over 180M monthly users.
+            <p className="text-[#3d3d38] text-lg max-w-3xl mx-auto mb-8">
+              People use AI tools to search, ChatGPT alone has over 180M monthly users.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
+              <p className="text-[#3d3d38] text-lg">
+                People trust AI recommendations, so the traffic is way more
+                valuable. You're not an option, you're a recommendation. Fewer
+                impressions — way higher intent.
               </p>
-              <p>
-                People trust AI recommendations, so the traffic is way more valuable. You're not an option,
-                you're a recommendation. Fewer impressions — way higher intent.
-              </p>
-              <p>
-                First movers win, and win big. Companies in SaaS and consumer products have already become
-                the "default" answer to certain prompts. Once a model learns you as the go-to example, it tends to stick.
+              <p className="text-[#3d3d38] text-lg">
+                First movers win, and win big. Companies in SaaS and consumer
+                products have already become the "default" answer to certain
+                prompts. Once a model learns you as the go-to example, it tends
+                to stick.
               </p>
             </div>
+          </div>
 
-            {/* AI Search Stats */}
-            <div className="grid md:grid-cols-4 gap-6 mt-12">
-              {aiSearchStats.map((stat, index) => (
+          {/* Statistics */}
+          <div className="bg-white/80 backdrop-blur rounded-3xl p-8 mb-20">
+            <h3 className="font-corben text-[#282823] text-2xl mb-8">
+              Your customers are already here
+            </h3>
+            
+            <div className="grid grid-cols-3 gap-8">
+              {statisticsData.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-black mb-2">
-                    {stat.metric}
+                  <div className="font-corben text-[#282823] text-5xl mb-2">
+                    {stat.value}
                   </div>
-                  <div className="text-sm text-black/60">
-                    {stat.label}
+                  <div className="text-[#3d3d38] text-sm font-medium">
+                    {stat.description}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* How Lex Helps Section */}
-      <section id="how" className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="h2 mb-8 text-center">
-              How does Lex help me win?
-            </h2>
-            
-            <p className="text-lg text-muted-foreground leading-relaxed mb-12 text-center">
-              Generative SEO is about teaching AI models to know you, trust you, and recommend you when 
-              customers ask. Most marketers find it confusing. Lex makes it simple:
+            <p className="text-[#3d3d38] font-medium mt-8">
+              Show up early. Own your category.
             </p>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="p-8 bg-white border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
-                    <Search className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      Lex checks whether you're mentioned across ChatGPT, Claude, and Gemini.
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Get real-time visibility into how AI models see your brand across all major platforms.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-8 bg-white border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
-                    <Target className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      Analyses the gaps Where has ChatGPT missed recommending you and why.
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Understand exactly why AI models aren't recommending you and what's missing.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-8 bg-white border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
-                    <FileText className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      Guides you step by step so models start recommending customers to you.
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Get actionable recommendations and content strategies that actually work.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-8 bg-white border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-[#5F209B]/20 text-[#5F209B]">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      Tracks your growth as your brand gets recommended more often.
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Monitor your progress and see how your AI visibility improves over time.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Traffic Section */}
-      <section id="traffic" className="py-20 px-4 bg-[#E7F0F6]">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="h2 mb-8">
-              How Much Traffic Can I actually get?
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-[#282823] text-white font-corben rounded-2xl px-8 py-3 mt-6"
+            >
+              Leverage this traffic
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </section>
+
+        {/* How it Works Section */}
+        <section className="relative z-10 py-20">
+          <div className="text-center mb-12">
+            <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
+              How can I win?
+            </Badge>
+            
+            <h2 className="font-corben text-[#282823] text-5xl mb-8">
+              Win the Generative SEO race
             </h2>
-            
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 mb-8">
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-[#5F209B] mb-2">432%</div>
-                  <div className="text-sm text-muted-foreground">Growth in AI search queries</div>
-                  <div className="text-xs text-muted-foreground mt-1">vs. 2023</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-[#5F209B] mb-2">$2.3B</div>
-                  <div className="text-sm text-muted-foreground">Value of AI search traffic</div>
-                  <div className="text-xs text-muted-foreground mt-1">projected 2024</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-[#5F209B] mb-2">73%</div>
-                  <div className="text-sm text-muted-foreground">Of marketers unaware</div>
-                  <div className="text-xs text-muted-foreground mt-1">of this opportunity</div>
-                </div>
-              </div>
-            </div>
-            
-            <p className="text-lg text-muted-foreground">
-              [Stats on AI search market growth]
+
+            <p className="text-[#3d3d38] text-lg max-w-2xl mx-auto mb-4">
+              Generative SEO is about teaching AI models to know you, trust you,
+              and recommend you when customers ask.
+            </p>
+
+            <p className="font-semibold text-[#3d3d38] text-lg">
+              Most marketers find it confusing. Dexter makes it simple.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Promotion Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="h2 mb-8">
-              Will I get a promotion?
-            </h2>
-            
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                You're not chasing vanity numbers—you're positioning your brand to be the authority AI names by default. 
-                When that happens, you own the moment—and that's worth way more than millions of passive visits.
-              </p>
-              <p className="text-xl font-semibold text-[#5F209B]">
-                Also, Lex helps you with regular SEO and reporting too.. So yes.
-              </p>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+            {processSteps.map((step, index) => (
+              <Card key={index} className="bg-white border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="bg-[#ddff89] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                    <step.icon className="w-6 h-6 text-[#282823]" />
+                  </div>
+                  <h3 className="font-corben text-[#282823] text-xl mb-3">
+                    {step.title}
+                  </h3>
+                  <p className="text-[#3d3d38] text-sm">
+                    {step.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Why Nobody Knows Section */}
-      <section className="py-20 px-4 bg-[#E7F0F6]">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="h2 mb-8">
-              Why does nobody know about this?
-            </h2>
-            
-            <p className="text-2xl font-bold text-[#5F209B]">
-              Because they are dumb.
-            </p>
+          <div className="text-center">
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-[#282823] text-white font-corben rounded-2xl px-8 py-3"
+            >
+              Get started
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="h2 mb-6">
+        {/* Pricing Section */}
+        <section className="relative z-10 py-20">
+          <div className="text-center mb-12">
+            <Badge className="bg-[#ddff89] text-[#282823] mb-6 text-sm px-4 py-2">
               Pricing
+            </Badge>
+            
+            <h2 className="font-corben text-[#1a1a1a] text-5xl">
+              Show up early.<br />
+              Own your category.
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-4 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`relative p-8 flex flex-col ${plan.highlighted ? 'border-[#5F209B] shadow-xl bg-[#5F209B]/5' : 'bg-white border-gray-200'}`}>
-                {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#5F209B] text-white">
-                    Most Popular
+              <Card
+                key={index}
+                className={`${plan.backgroundColor} border-0 relative overflow-hidden`}
+              >
+                {plan.popular && (
+                  <Badge className="absolute top-6 right-6 bg-[#32322d] text-white">
+                    Most popular
                   </Badge>
                 )}
                 
-                <CardHeader className="p-0 mb-6">
-                  <CardTitle className="h3">{plan.name}</CardTitle>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                    <span className="text-muted-foreground">/{plan.period}</span>
+                <CardContent className="p-8">
+                  <h3 className={`font-corben ${plan.textColor} text-5xl mb-4`}>
+                    {plan.name}
+                  </h3>
+                  
+                  <div className={`font-corben ${plan.textColor} text-2xl mb-8`}>
+                    {plan.price}
                   </div>
-                  <CardDescription className="text-base mt-4 leading-relaxed">
-                    {plan.description}
-                  </CardDescription>
-                </CardHeader>
 
-                <CardContent className="p-0 flex flex-col flex-1">
-                  <ul className="space-y-3 mb-8 flex-1">
+                  <div className="space-y-4 mb-8">
                     {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center gap-3">
-                        <Check className="w-4 h-4 text-[#5F209B] flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
-                      </li>
+                      <div key={featureIndex} className="flex items-start gap-3">
+                        <Check className={`w-4 h-4 mt-1 flex-shrink-0 ${plan.featureTextColor || 'text-[#3d3d38]'}`} />
+                        <p className={`text-sm font-semibold ${plan.featureTextColor || 'text-[#3d3d38]'}`}>
+                          {feature}
+                        </p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
 
-                  <Button 
-                    className={`w-full transition-none mt-auto ${
-                      plan.highlighted 
-                        ? 'bg-[#5F209B] text-white hover:bg-[#4A1A7D]' 
-                        : 'bg-white text-[#5F209B] border-[#5F209B] border hover:bg-[#5F209B] hover:text-white'
-                    }`}
-                    onClick={handleGetStarted}
+                  <p className={`text-sm font-medium mb-6 ${plan.featureTextColor || plan.textColor}`}>
+                    {plan.description}
+                  </p>
+
+                  <Button
+                    onClick={() => navigate('/auth')}
+                    className="w-full bg-[#282823] text-white font-corben rounded-2xl"
                   >
                     {plan.buttonText}
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-[#5F209B]">
-        <div className="container mx-auto text-center">
-          <h2 className="h2 text-white mb-6">
-            Ready to Own Your Category?
+        {/* CTA Section */}
+        <section className="relative z-10 text-center py-20">
+          <h2 className="font-corben text-[#282823] text-6xl mb-8">
+            Cheat the internet.
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
-            Join the companies already teaching AI models to recommend them. 
-            The gold rush is happening now. Don't get left behind.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-white text-[#5F209B] hover:bg-gray-100 transition-none text-lg px-8 py-4"
-              onClick={handleGetStarted}
-            >
-              Start Cheating Today
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button 
-              size="lg" 
-              className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#5F209B] transition-none text-lg px-8 py-4"
-            >
-              See Demo
-            </Button>
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 bg-background border-t border-border">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
-                <svg 
-                  className="w-8 h-8 text-[#5F209B]" 
-                  viewBox="0 0 24 24" 
-                  fill="currentColor"
+          <p className="font-semibold text-[#3d3d38] text-lg mb-8">
+            Ready to Own Your Category? <span className="font-normal">Try for free</span>
+          </p>
+
+          {/* Footer Search Bar */}
+          <form onSubmit={handleFooterSearchSubmit} className="max-w-2xl mx-auto mb-20">
+            <div className="relative">
+              <div className="absolute inset-0 top-6 bg-[#a9a9a9] rounded-full blur-[50px] opacity-20" />
+              <div className="relative bg-white rounded-3xl border border-[#28282357] p-3">
+                <Input
+                  type="text"
+                  value={footerSearchValue}
+                  onChange={(e) => setFooterSearchValue(e.target.value)}
+                  placeholder="Search or paste your website url"
+                  className="border-0 text-base placeholder:text-[#afaca7] pr-16"
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#d6ff71] hover:bg-[#c4ee60] rounded-full"
                 >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+                  <Search className="w-4 h-4 text-black" />
+                </Button>
               </div>
-              <span className="h3">Lex</span>
             </div>
-            
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+          </form>
+        </section>
+
+        {/* Footer */}
+        <footer className="relative z-10 bg-white/80 backdrop-blur rounded-t-3xl py-12 px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
+                <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
+                  <span className="font-corben text-[#282823] text-lg">Dexter</span>
+                </div>
+                <p className="font-semibold text-[#3d3d38]">
+                  Win the Generative SEO race
+                </p>
+              </div>
+
+              <nav className="flex gap-8">
+                <a href="#" className="font-corben text-[#282823] hover:opacity-70 transition-opacity">
+                  Privacy Policy
+                </a>
+                <a href="#" className="font-corben text-[#282823] hover:opacity-70 transition-opacity">
+                  Terms
+                </a>
+                <a href="#" className="font-corben text-[#282823] hover:opacity-70 transition-opacity">
+                  Contact
+                </a>
+              </nav>
             </div>
+
+            <p className="text-[#3d3d38] text-sm">
+              © 2025 Dexter. All rights reserved.
+            </p>
           </div>
-          
-          <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2024 Lex. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </main>
   );
 };
 

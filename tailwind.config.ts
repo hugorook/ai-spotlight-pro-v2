@@ -22,6 +22,7 @@ export default {
 				sans: ["Inter", "ui-sans-serif", "system-ui"],
 				serif: ["Hedvig", "Georgia", "serif"],
 				mono: ["JetBrains Mono", "ui-monospace"],
+				corben: ["Corben", "serif"],
 			},
 			letterSpacing: {
 				tighter: '-0.02em',
