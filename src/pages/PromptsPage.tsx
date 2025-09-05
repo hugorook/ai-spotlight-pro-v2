@@ -93,7 +93,7 @@ const PromptsPage = () => {
           const convertedPrompts = dbPrompts.map((p: any, index: number) => ({
             id: `prompt-${index + 1}`,
             text: p.text,
-            category: p.tags?.[0] || 'moderate',
+            category: (p.tags && p.tags.length > 0) ? p.tags[0] : 'moderate',
             intent: 'User is looking for company recommendations',
             isEditing: false
           }));
@@ -300,8 +300,8 @@ const PromptsPage = () => {
       console.log('Saving prompts to database for company ID:', companyId);
       const promptsToSave = generatedPrompts.map((prompt: any) => ({
         company_id: companyId,
-        text: prompt.text,
-        tags: [prompt.category]
+        text: prompt.text
+        // Note: Removed tags for now due to schema issue
       }));
       
       // Clear existing prompts
@@ -366,8 +366,8 @@ const PromptsPage = () => {
     try {
       const dbPrompts = prompts.map(p => ({
         company_id: company.id,
-        text: p.text,
-        tags: [p.category]
+        text: p.text
+        // Note: Removed tags for now due to schema issue
       }));
       
       await supabase.from('prompts').delete().eq('company_id', company.id);
