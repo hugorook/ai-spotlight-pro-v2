@@ -600,7 +600,7 @@ const PromptsPage = () => {
                 <p className="text-sm">Fill in company info and click "Generate Prompts"</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="space-y-3">
                 {prompts.map((prompt, index) => (
                   <div key={prompt.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
