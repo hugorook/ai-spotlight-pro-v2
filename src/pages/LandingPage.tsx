@@ -69,7 +69,7 @@ function AccordionSteps({
 }: {
   steps: { title: string; description: string; icon: React.ComponentType<{ className?: string }> }[];
 }) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   return (
     <div className="max-w-4xl md:max-w-5xl mx-auto space-y-5 mb-12">
@@ -79,7 +79,9 @@ function AccordionSteps({
           <div
             key={step.title}
             className="group bg-white border border-[#e7e5df] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
-            onClick={() => setActiveIndex(expanded ? null : index)}
+            onMouseEnter={() => setActiveIndex(index)}
+            onFocus={() => setActiveIndex(index)}
+            onClick={() => setActiveIndex(index)}
           >
             <div className="flex items-center justify-between px-6 py-5">
               <h3 className="font-corben text-[#282823] text-xl md:text-2xl" style={{fontWeight: 400}}>
@@ -92,10 +94,10 @@ function AccordionSteps({
 
             <div
               className={`${
-                expanded ? 'max-h-72 md:max-h-80 opacity-100 py-6' : 'max-h-0 opacity-0 py-0'
-              } group-hover:max-h-72 md:group-hover:max-h-80 group-hover:opacity-100 transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm border-t border-[#efeee9]`}
+                expanded ? 'max-h-[320px] md:max-h-[380px] opacity-100 pt-10 pb-8' : 'max-h-0 opacity-0 pt-0 pb-0'
+              } transition-all duration-500 ease-in-out px-6 text-[#3d3d38] text-sm md:text-base border-t border-[#efeee9]`}
             >
-              <p className="mt-2 mb-2 leading-relaxed">
+              <p className="leading-relaxed">
                 {step.description}
               </p>
             </div>
