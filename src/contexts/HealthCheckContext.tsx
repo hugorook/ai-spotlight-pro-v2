@@ -77,35 +77,32 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
     if (!user) return;
 
     try {
-      // Get user's company
-      const { data: companies } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('user_id', user.id)
-        .limit(1);
-
-      if (!companies || companies.length === 0) return;
+      console.log('🔍 PERSISTENCE DEBUG: Loading saved results for user:', user.id);
       
-      const company = companies[0];
-
-      // Load MOST RECENT session's results only
+      // Load MOST RECENT completed session's results (works for both company and URL-only workflow)
       const { data: recentSession } = await supabase
         .from('health_check_sessions')
-        .select('id, completed_at, started_at')
+        .select('id, completed_at, mention_rate, average_position, health_score')
         .eq('user_id', user.id)
-        .order('completed_at', { ascending: false, nullsFirst: false })
-        .order('started_at', { ascending: false })
+        .not('completed_at', 'is', null) // Only get completed sessions
+        .order('completed_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
-      if (!recentSession) return;
+      console.log('🔍 PERSISTENCE DEBUG: Recent session:', recentSession);
+
+      if (!recentSession) {
+        console.log('🔍 PERSISTENCE DEBUG: No completed sessions found');
+        return;
+      }
 
       const { data: tests, error: testsError } = await supabase
         .from('ai_tests')
         .select('*')
-        .eq('company_id', company.id)
         .eq('health_check_session_id', recentSession.id)
         .order('test_date', { ascending: false });
+
+      console.log('🔍 PERSISTENCE DEBUG: Loaded tests:', { tests, error: testsError });
 
       if (testsError) {
         console.error('Error loading test results:', testsError);
@@ -113,26 +110,42 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       }
 
       if (tests && tests.length > 0) {
-        // Calculate metrics from the results
-        const mentionCount = tests.filter(test => test.company_mentioned).length;
-        const mentionRate = (mentionCount / tests.length) * 100;
+        console.log('🔍 PERSISTENCE DEBUG: Setting state with', tests.length, 'test results');
         
-        const mentionedTests = tests.filter(test => test.company_mentioned && test.mention_position);
-        const averagePosition = mentionedTests.length > 0 
-          ? mentionedTests.reduce((sum, test) => sum + (test.mention_position || 0), 0) / mentionedTests.length
-          : null;
+        // Use session metrics if available, otherwise calculate from tests
+        const sessionMetrics = {
+          mentionRate: recentSession.mention_rate ? Math.round(recentSession.mention_rate) : null,
+          averagePosition: recentSession.average_position,
+          visibilityScore: recentSession.health_score
+        };
         
-        const positionScore = averagePosition ? Math.max(0, (11 - averagePosition) / 10) : 0;
-        const visibilityScore = Math.round((mentionRate * 0.7 + positionScore * 100 * 0.3));
+        // Calculate metrics from tests if session doesn't have them
+        let calculatedMetrics = { mentionRate: 0, averagePosition: null, visibilityScore: 0 };
+        if (!sessionMetrics.mentionRate) {
+          const mentionCount = tests.filter(test => test.company_mentioned).length;
+          calculatedMetrics.mentionRate = Math.round((mentionCount / tests.length) * 100);
+          
+          const mentionedTests = tests.filter(test => test.company_mentioned && test.mention_position);
+          calculatedMetrics.averagePosition = mentionedTests.length > 0 
+            ? Math.round((mentionedTests.reduce((sum, test) => sum + (test.mention_position || 0), 0) / mentionedTests.length) * 10) / 10
+            : null;
+          
+          const positionScore = calculatedMetrics.averagePosition ? Math.max(0, (11 - calculatedMetrics.averagePosition) / 10) : 0;
+          calculatedMetrics.visibilityScore = Math.round((calculatedMetrics.mentionRate * 0.7 + positionScore * 100 * 0.3));
+        }
 
         setState(prev => ({
           ...prev,
           results: tests,
           lastRunDate: tests[0].test_date,
-          visibilityScore,
-          mentionRate: Math.round(mentionRate),
-          averagePosition: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
+          visibilityScore: sessionMetrics.visibilityScore || calculatedMetrics.visibilityScore,
+          mentionRate: sessionMetrics.mentionRate || calculatedMetrics.mentionRate,
+          averagePosition: sessionMetrics.averagePosition || calculatedMetrics.averagePosition,
         }));
+        
+        console.log('🔍 PERSISTENCE DEBUG: State updated successfully');
+      } else {
+        console.log('🔍 PERSISTENCE DEBUG: No test results found for session');
       }
     } catch (error) {
       console.error('Error loading saved results:', error);
