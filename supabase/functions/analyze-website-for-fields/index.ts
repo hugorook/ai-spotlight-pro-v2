@@ -144,7 +144,7 @@ Extract the following fields with MAXIMUM DETAIL and SPECIFICITY:
 
 CRITICAL: Use your existing knowledge about this company + website analysis to understand their ACTUAL BUSINESS MODEL and UNIQUE MARKET POSITION. Include historical context, reputation, and market standing from your training data.
 
-For example, if this is Czarnikow, you should know they're one of the world's largest sugar traders, founded in 1861, with strong Brazil/Latin America presence, sugar-ethanol complex expertise, mill financing, etc. Combine this knowledge with current website info.
+For example, if this is a leading commodity trading firm, include any notable history, regions of strength, recognized expertise, and partnerships based on your prior knowledge; then combine that with the current website info.
 
 Return ONLY valid JSON with COMPREHENSIVE BUSINESS-SPECIFIC DETAILS:
 {
@@ -169,7 +169,7 @@ Return ONLY valid JSON with COMPREHENSIVE BUSINESS-SPECIFIC DETAILS:
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { 
           role: 'system', 

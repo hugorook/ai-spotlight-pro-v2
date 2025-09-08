@@ -191,8 +191,8 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           body: {
             companyName: company.company_name,
             industry: company.industry,
-            mentionRate: Math.round((testResults.filter(r => r.company_mentioned).length / testResults.length) * 100),
-            averagePosition: testResults.filter(r => r.company_mentioned && r.mention_position)
+            currentMentionRate: Math.round((testResults.filter(r => r.company_mentioned).length / testResults.length) * 100),
+            currentAvgPosition: testResults.filter(r => r.company_mentioned && r.mention_position)
               .reduce((sum, r, _, arr) => sum + (r.mention_position || 0) / arr.length, 0) || 0,
             testResults: testResults
           }
