@@ -21,7 +21,7 @@ const TopNavBar = () => {
 
   const navItems: NavItem[] = [
     { 
-      path: "/geo", 
+      path: "/analytics", 
       label: "AI Health Check", 
       icon: <Brain className="w-4 h-4" />
     },

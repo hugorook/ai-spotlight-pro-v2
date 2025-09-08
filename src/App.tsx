@@ -6,7 +6,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
 import SimplifiedDashboard from "./pages/SimplifiedDashboard";
-import CleanGeoPage from "./pages/CleanGeoPage";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ConnectionsSettings from "./pages/settings/connections";

@@ -17,7 +17,7 @@ const Sidebar = () => {
 
   const navItems: NavItem[] = [
     { 
-      path: "/geo", 
+      path: "/analytics", 
       label: "AI Health Check", 
       subtitle: "Test your visibility",
       icon: <Activity className="w-5 h-5" />

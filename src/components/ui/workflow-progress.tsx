@@ -95,7 +95,7 @@ export const useWorkflowSteps = (
       description: 'Tell us about your company',
       icon: <Building2 className="w-6 h-6" />,
       status: hasCompanyProfile ? 'completed' : 'current',
-      action: hasCompanyProfile ? undefined : () => window.location.href = '/geo'
+      action: hasCompanyProfile ? undefined : () => window.location.href = '/analytics'
     },
     {
       id: 'health-check',
@@ -103,7 +103,7 @@ export const useWorkflowSteps = (
       description: 'Test your current AI visibility',
       icon: <Activity className="w-6 h-6" />,
       status: hasRunHealthCheck ? 'completed' : hasCompanyProfile ? 'current' : 'pending',
-      action: hasRunHealthCheck ? undefined : hasCompanyProfile ? () => window.location.href = '/geo' : undefined
+      action: hasRunHealthCheck ? undefined : hasCompanyProfile ? () => window.location.href = '/analytics' : undefined
     },
     {
       id: 'content',
