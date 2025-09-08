@@ -419,9 +419,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           },
           prompts_used: prompts.map((p: any) => p.text),
           total_prompts: prompts.length,
-          session_type: companies?.[0] ? 'company_profile' : 'url_analysis',
-          created_at: new Date().toISOString(),
-          started_at: new Date().toISOString()
+          session_type: companies?.[0] ? 'company_profile' : 'url_only'
         })
         .select('id')
         .single();
