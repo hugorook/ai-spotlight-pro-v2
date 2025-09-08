@@ -1337,9 +1337,13 @@ export default function CleanGeoPage() {
     }
 
     const { prompts, companyData } = healthCheckData;
-    
-    // Store cached company data for use throughout component
-    setCachedCompanyData(companyData);
+
+    // Store cached company data for use throughout component, ensuring websiteUrl is present
+    const enrichedCompanyData = {
+      ...companyData,
+      websiteUrl: companyData?.websiteUrl || healthCheckData.websiteUrl || ''
+    };
+    setCachedCompanyData(enrichedCompanyData);
 
     setIsRunningHealthCheck(true);
     setLastRunType('health');
@@ -1586,7 +1590,7 @@ export default function CleanGeoPage() {
       // Website Analysis
       try {
         console.log('🔄 Running website analysis...');
-        await getWebsiteAnalysis(companyData, healthCheckSessionId);
+        await getWebsiteAnalysis(enrichedCompanyData, healthCheckSessionId);
         analyticsResults.website = true;
         console.log('✅ Website analysis completed');
       } catch (error) {
@@ -1606,7 +1610,7 @@ export default function CleanGeoPage() {
       // Authority Analysis
       try {
         console.log('🔄 Running authority analysis...');
-        await loadAuthorityAnalysis(companyData, healthCheckSessionId);
+        await loadAuthorityAnalysis(enrichedCompanyData, healthCheckSessionId);
         analyticsResults.authority = true;
         console.log('✅ Authority analysis completed');
       } catch (error) {
@@ -1616,7 +1620,7 @@ export default function CleanGeoPage() {
       // Industry Benchmark
       try {
         console.log('🔄 Running industry benchmark...');
-        await loadIndustryBenchmark(companyData, healthCheckSessionId, results);
+        await loadIndustryBenchmark(enrichedCompanyData, healthCheckSessionId, results);
         analyticsResults.benchmark = true;
         console.log('✅ Industry benchmark completed');
       } catch (error) {
