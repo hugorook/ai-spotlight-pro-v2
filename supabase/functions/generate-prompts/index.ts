@@ -30,6 +30,10 @@ interface GeneratedPrompt {
 
 
 async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Promise<GeneratedPrompt[]> {
+  console.log('=== GENERATE PROMPTS DEBUG ===');
+  console.log('Input companyInfo:', companyInfo);
+  console.log('OPENAI_API_KEY available:', !!OPENAI_API_KEY);
+  
   if (!OPENAI_API_KEY) {
     console.error('OPENAI_API_KEY environment variable not set');
     throw new Error('OPENAI_API_KEY not configured. Please check environment variables.');
@@ -89,7 +93,15 @@ Return ONLY JSON format:
           companyInfo.description = parsed.description || '';
           companyInfo.targetCustomers = parsed.targetCustomers || '';
           companyInfo.keyDifferentiators = `${parsed.keyDifferentiators || ''} ${parsed.coreServices || ''} ${parsed.valueProposition || ''}`.trim();
-          console.log('Extracted detailed company info:', parsed);
+          console.log('Raw OpenAI analysis response:', analysisText);
+          console.log('Parsed company info:', parsed);
+          console.log('Updated companyInfo object:', {
+            companyName: companyInfo.companyName,
+            industry: companyInfo.industry,
+            description: companyInfo.description,
+            targetCustomers: companyInfo.targetCustomers,
+            keyDifferentiators: companyInfo.keyDifferentiators
+          });
         } catch (parseError) {
           console.warn('Failed to parse website analysis:', parseError);
           throw new Error('Could not analyze website. Please check the URL is valid and accessible.');
@@ -570,16 +582,19 @@ serve(async (req: Request) => {
     
     const prompts = await generateRealisticPrompts(body);
     
-    // Also return the company data that was extracted/analyzed
+    // Return the company data that was extracted/analyzed (after website analysis)
     const companyData = {
-      companyName: body.companyName,
-      industry: body.industry,
-      description: body.description,
-      targetCustomers: body.targetCustomers,
-      keyDifferentiators: body.keyDifferentiators,
+      companyName: body.companyName || 'Unknown Company',
+      industry: body.industry || 'Unknown Industry', 
+      description: body.description || '',
+      targetCustomers: body.targetCustomers || '',
+      keyDifferentiators: body.keyDifferentiators || '',
       websiteUrl: body.websiteUrl
     };
     
+    console.log('=== FINAL RETURN DATA DEBUG ===');
+    console.log('Body after generateRealisticPrompts:', body);
+    console.log('CompanyData being returned:', companyData);
     console.log('generate-prompts completed successfully');
     return new Response(JSON.stringify({ 
       prompts,
