@@ -265,13 +265,13 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
     }
   };
 
-  const loadExistingPrompts = async (company: any) => {
+  const loadExistingPrompts = async (userId: string) => {
     try {
       // 1) Prefer latest prompts generated from Prompts page (persistent and user-specific)
       const { data: latestGen, error: genErr } = await supabase
         .from('generated_prompts')
         .select('prompts, website_url, generated_at')
-        .eq('user_id', company.user_id)
+        .eq('user_id', userId)
         .order('generated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -281,7 +281,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       }
 
       if (latestGen && Array.isArray(latestGen.prompts) && latestGen.prompts.length > 0) {
-        console.log(`Loaded ${latestGen.prompts.length} prompts from generated_prompts`);
+        console.log(`✅ Loaded ${latestGen.prompts.length} prompts from generated_prompts`);
         // Normalize shape: accept { text } objects or plain strings
         return latestGen.prompts.map((p: any, idx: number) => ({
           text: typeof p === 'string' ? p : p.text || '',
@@ -291,10 +291,14 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       }
 
       // 2) Fallback to prompts table if user hasn’t generated prompts yet
+      console.log('❌ No prompts found in generated_prompts table');
+      throw new Error('No prompts found. Please generate prompts first from the Prompts page.');
+      
+      // REMOVED: Fallback logic
       const { data: dbPrompts } = await supabase
         .from('prompts')
         .select('id, text')
-        .eq('company_id', company.id);
+        .eq('user_id', userId); // REMOVED - URL-only workflow doesn't use company_id
 
       if (dbPrompts && dbPrompts.length > 0) {
         console.log(`Loaded ${dbPrompts.length} prompts from prompts table`);
@@ -328,7 +332,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       return generated;
     } catch (error) {
       console.error('Error loading prompts:', error);
-      throw new Error('Failed to load test prompts');
+      throw new Error('Failed to load test prompts. Please generate prompts first from the Prompts page.');
     }
   };
 
@@ -348,23 +352,41 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         currentPrompt: 'Initializing...'
       }));
 
-      // Get user's company
+      // Try to get user's company (for legacy support), but don't require it
       const { data: companies } = await supabase
         .from('companies')
         .select('*')
         .eq('user_id', user.id)
         .limit(1);
 
-      if (!companies || companies.length === 0) {
-        throw new Error('No company found. Please complete your company profile first.');
+      // For URL-only workflow, get company data from generated_prompts instead
+      const { data: latestGen } = await supabase
+        .from('generated_prompts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!companies?.length && !latestGen) {
+        throw new Error('No company data found. Please generate prompts first from the Prompts page.');
       }
 
-      const company = companies[0];
+      // Use company data from companies table if available, otherwise from generated_prompts
+      const company = companies?.[0] || {
+        id: 'generated-company',
+        user_id: user.id,
+        company_name: latestGen?.company_data?.companyName || 'Unknown Company',
+        industry: latestGen?.company_data?.industry || 'Unknown',
+        description: latestGen?.company_data?.description || '',
+        website_url: latestGen?.website_url || '',
+        key_differentiators: latestGen?.company_data?.keyDifferentiators || ''
+      };
 
       // Create a new health check session
       // Load existing test prompts or generate new ones as fallback
       setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
-      const prompts = await loadExistingPrompts(company);
+      const prompts = await loadExistingPrompts(user.id);
 
       // Create a new health check session AFTER loading prompts, so we can persist required fields
       const { data: sessionInsert, error: sessionError } = await supabase
