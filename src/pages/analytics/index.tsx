@@ -253,10 +253,10 @@ export default function Analytics() {
 
   const runHealthCheck = async () => {
     try {
-      await contextRunHealthCheck()
+      const result = await contextRunHealthCheck()
       toast({
         title: 'Health Check Complete',
-        description: `Found ${mentionRate}% mention rate with visibility score of ${visibilityScore}`
+        description: `Found ${result && 'mentionRate' in result ? result.mentionRate : mentionRate}% mention rate with visibility score of ${result && 'visibilityScore' in result ? result.visibilityScore : visibilityScore}`
       })
     } catch (error) {
       console.error('Error running health check:', error)

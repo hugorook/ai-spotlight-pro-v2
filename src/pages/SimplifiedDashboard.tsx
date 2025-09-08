@@ -292,10 +292,10 @@ export default function TodayDashboard() {
 
   const handleRunHealthCheck = async () => {
     try {
-      await runHealthCheck()
+      const result = await runHealthCheck()
       toast({
         title: 'Health Check Complete',
-        description: `Found ${mentionRate}% visibility rate with score of ${visibilityScore}`
+        description: `Found ${(result && 'mentionRate' in result ? result.mentionRate : mentionRate)}% visibility rate with score of ${(result && 'visibilityScore' in result ? result.visibilityScore : visibilityScore)}`
       })
     } catch (error) {
       console.error('Error running health check:', error)

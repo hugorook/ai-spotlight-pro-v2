@@ -30,7 +30,7 @@ export interface HealthCheckState {
 }
 
 interface HealthCheckContextType extends HealthCheckState {
-  runHealthCheck: () => Promise<void>;
+  runHealthCheck: () => Promise<{ mentionRate: number; visibilityScore: number | null } | void>;
   loadSavedResults: () => Promise<void>;
   clearResults: () => void;
   resetHealthCheck: () => void;
@@ -549,6 +549,8 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         mentionRate: Math.round(mentionRate),
         averagePosition: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
       }));
+
+      return { mentionRate: Math.round(mentionRate), visibilityScore };
 
     } catch (error: any) {
       console.error('Health check error:', error);
