@@ -134,12 +134,25 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       // Generate all analytics data in parallel to populate analytics hub sections
       const analyticsPromises = [];
 
-      // 1. Website Analysis - analyze company website for AI optimization
-      if (company.website_url) {
+      // Determine website URL: prefer company.website_url else latest generated_prompts.website_url
+      let websiteUrl = company.website_url || '';
+      if (!websiteUrl) {
+        const { data: latestGenerated } = await supabase
+          .from('generated_prompts')
+          .select('website_url')
+          .eq('user_id', company.user_id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        websiteUrl = latestGenerated?.website_url || '';
+      }
+
+      // 1. Website Analysis - analyze company website for AI optimization (Edge: analyze-website expects { url })
+      if (websiteUrl) {
         analyticsPromises.push(
           supabase.functions.invoke('analyze-website', {
             body: {
-              websiteUrl: `https://${company.website_url}`,
+              url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`,
               companyName: company.company_name,
               industry: company.industry
             }
@@ -154,14 +167,13 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         );
       }
 
-      // 2. Authority Analysis - generate authority building opportunities
+      // 2. Authority Analysis - generate authority building opportunities (Edge: analyze-competitive-authority)
       analyticsPromises.push(
-        supabase.functions.invoke('analyze-authority', {
+        supabase.functions.invoke('analyze-competitive-authority', {
           body: {
             companyName: company.company_name,
             industry: company.industry,
-            testResults: testResults,
-            websiteUrl: company.website_url
+            keyDifferentiators: company.key_differentiators
           }
         }).then(result => {
           if (result.data) {
@@ -173,9 +185,9 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         }).catch(error => console.error('Authority analysis failed:', error))
       );
 
-      // 3. Benchmarking Analysis - compare against industry
+      // 3. Benchmarking Analysis - compare against industry (Edge: industry-benchmarking)
       analyticsPromises.push(
-        supabase.functions.invoke('analyze-benchmark', {
+        supabase.functions.invoke('industry-benchmarking', {
           body: {
             companyName: company.company_name,
             industry: company.industry,
@@ -194,14 +206,17 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         }).catch(error => console.error('Benchmark analysis failed:', error))
       );
 
-      // 4. Trending Analysis - find trending opportunities
+      // 4. Trending Analysis - find trending opportunities (Edge: trending-opportunities expects { industry, companyName, services, keywords })
       analyticsPromises.push(
-        supabase.functions.invoke('analyze-trending', {
+        supabase.functions.invoke('trending-opportunities', {
           body: {
             industry: company.industry,
             companyName: company.company_name,
-            failedPrompts: testResults.filter(r => !r.company_mentioned).map(r => r.prompt_text),
-            targetCustomers: company.target_customers
+            services: (company.key_differentiators || '')
+              .split(',')
+              .map((s: string) => s.trim())
+              .filter(Boolean),
+            keywords: [company.industry, company.company_name]
           }
         }).then(result => {
           if (result.data) {
