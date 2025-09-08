@@ -60,6 +60,7 @@ const PromptsPage = () => {
       setLoading(true);
       
       // First, try to load most recent generated prompts from database
+      console.log('Attempting to load prompts from database for user:', user?.id);
       try {
         const { data: recentPrompts, error: promptsError } = await supabase
           .from('generated_prompts')
@@ -69,8 +70,10 @@ const PromptsPage = () => {
           .limit(1)
           .single();
           
+        console.log('Database query result:', { data: recentPrompts, error: promptsError });
+          
         if (!promptsError && recentPrompts) {
-          console.log('Loaded most recent prompts from database:', recentPrompts);
+          console.log('Successfully loaded prompts from database:', recentPrompts);
           
           // Set prompts from database
           const convertedPrompts = recentPrompts.prompts.map((p: any, index: number) => ({
@@ -242,29 +245,51 @@ const PromptsPage = () => {
       }
       
       // Save to database for cross-device persistence
-      try {
-        const { error: dbError } = await supabase
-          .from('generated_prompts')
-          .upsert({
-            user_id: user?.id,
-            website_url: formData.website,
-            company_data: companyData,
-            prompts: generatedPrompts,
-            prompt_count: generatedPrompts.length,
-            generation_method: 'url_analysis',
-            generated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,website_url',
-            ignoreDuplicates: false
-          });
+      if (!user?.id) {
+        console.warn('No user ID available, cannot save to database');
+      } else {
+        try {
+          console.log('Saving prompts to database for user:', user.id, 'website:', formData.website);
           
-        if (dbError) {
-          console.warn('Could not save prompts to database:', dbError);
-        } else {
-          console.log('Successfully saved prompts to database for cross-device access');
+          // First delete any existing prompts for this URL and user
+          const { error: deleteError } = await supabase
+            .from('generated_prompts')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('website_url', formData.website);
+          
+        if (deleteError) {
+          console.error('Error deleting existing prompts:', deleteError);
         }
-      } catch (dbError) {
-        console.warn('Database save failed:', dbError);
+        
+          // Now insert the new prompts
+          const { data: insertData, error: dbError } = await supabase
+            .from('generated_prompts')
+            .insert({
+              user_id: user.id,
+              website_url: formData.website,
+              company_data: companyData,
+              prompts: generatedPrompts,
+              prompt_count: generatedPrompts.length,
+              generation_method: 'url_analysis',
+              generated_at: new Date().toISOString()
+            })
+            .select();
+            
+          if (dbError) {
+            console.error('Could not save prompts to database:', dbError);
+            console.error('Database error details:', {
+              message: dbError.message,
+              details: dbError.details,
+              hint: dbError.hint,
+              code: dbError.code
+            });
+          } else {
+            console.log('Successfully saved prompts to database:', insertData);
+          }
+        } catch (dbError) {
+          console.error('Database save failed:', dbError);
+        }
       }
       
       toast({ 
