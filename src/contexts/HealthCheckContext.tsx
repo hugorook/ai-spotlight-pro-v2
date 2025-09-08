@@ -268,7 +268,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           targetCustomers: company.target_customers,
           keyDifferentiators: company.key_differentiators,
           geographicFocus: (company.geographic_focus && company.geographic_focus[0]) || 'Global',
-          requestedCount: 25,
+          requestedCount: 10,
         }
       });
 

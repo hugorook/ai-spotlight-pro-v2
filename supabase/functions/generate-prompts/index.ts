@@ -449,35 +449,16 @@ The easy-wins should be REALISTIC SEARCHES that naturally favor established mark
       }
     }
 
-    // Ensure exactly 10 prompts - pad with fallback prompts if needed
+    // Must have exactly the requested number of quality prompts
     const requestedCount = companyInfo.requestedCount || 10;
     
     if (validatedPrompts.length < requestedCount) {
-      console.log(`Only ${validatedPrompts.length} prompts, padding to ${requestedCount}`);
-      
-      // Create fallback prompts with different categories
-      const fallbackPrompts: GeneratedPrompt[] = [
-        { id: 'fallback-1', text: `Best ${companyInfo.industry} companies globally`, category: 'easy-win', intent: 'Find industry leaders' },
-        { id: 'fallback-2', text: `Top ${companyInfo.industry} firms worldwide`, category: 'easy-win', intent: 'Find top firms' },
-        { id: 'fallback-3', text: `Leading ${companyInfo.industry} providers`, category: 'moderate', intent: 'Find providers' },
-        { id: 'fallback-4', text: `Major ${companyInfo.industry} companies`, category: 'moderate', intent: 'Find major companies' },
-        { id: 'fallback-5', text: `${companyInfo.industry} companies with global reach`, category: 'challenging', intent: 'Find global companies' },
-        { id: 'fallback-6', text: `${companyInfo.industry} firms with AI capabilities`, category: 'trending', intent: 'Find AI-enabled firms' },
-        { id: 'fallback-7', text: `Sustainable ${companyInfo.industry} companies`, category: 'trending', intent: 'Find sustainable companies' },
-        { id: 'fallback-8', text: `${companyInfo.industry} service providers`, category: 'moderate', intent: 'Find service providers' },
-        { id: 'fallback-9', text: `International ${companyInfo.industry} specialists`, category: 'challenging', intent: 'Find specialists' },
-        { id: 'fallback-10', text: `${companyInfo.industry} companies for enterprises`, category: 'easy-win', intent: 'Find enterprise solutions' }
-      ];
-      
-      // Add fallback prompts until we have exactly the requested count
-      while (validatedPrompts.length < requestedCount && fallbackPrompts.length > 0) {
-        validatedPrompts.push(fallbackPrompts.shift()!);
-      }
+      throw new Error(`Only generated ${validatedPrompts.length} valid prompts, need ${requestedCount}. The AI-generated prompts were either banned or not list-style queries.`);
     }
     
-    // Ensure exactly the requested count
+    // Return exactly the requested count
     validatedPrompts = validatedPrompts.slice(0, requestedCount);
-    console.log(`Returning exactly ${validatedPrompts.length} validated prompts`);
+    console.log(`Returning exactly ${validatedPrompts.length} company-specific prompts`);
     return validatedPrompts;
 
   } catch (parseError) {

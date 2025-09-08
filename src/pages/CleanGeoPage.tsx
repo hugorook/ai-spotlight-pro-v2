@@ -1257,92 +1257,60 @@ export default function CleanGeoPage() {
         description: company.description
       });
 
-      // Ensure we have realistic prompts: try local cache -> edge function -> fallback
-      const getRealisticPrompts = async (): Promise<string[]> => {
-        const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms/i.test(t) || /which\s+.*companies/i.test(t);
-        const isBanned = (t: string) => /^(how\s*to|what\b|what\s+are\b|best\s*practices|benefits\b|why\b|how\s+can\s+i\b)/i.test(t);
-        const ensureMin = (arr: string[], min = 10) => {
-          const out = [...arr];
-          const industry = company.industry || 'services';
-          const audience = company.target_customers || 'SMBs';
-          const region = (company.geographic_focus && company.geographic_focus[0]) || 'your region';
-          const seed: string[] = [
-            `Best ${industry} providers for ${audience}`,
-            `Top 10 ${industry} vendors in ${region}`,
-            `Leading ${industry} consultants for ${audience}`,
-            `Which companies offer ${industry} solutions for ${audience}?`,
-            `Top ${industry} agencies for ${audience}`,
-            `Best-rated ${industry} firms in ${region}`,
-            `Top ${industry} platforms for ${audience}`,
-            `Most recommended ${industry} companies for ${audience}`,
-            `Leading companies that provide ${industry} services`,
-            `Top ${industry} solution providers for ${audience}`,
-          ];
-          for (const s of seed) {
-            if (out.length >= min) break;
-            if (!out.some(x => x.toLowerCase() === s.toLowerCase())) out.push(s);
-          }
-          return out.slice(0, min);
-        };
+      // Generate 10 specific prompts for this company
+      const getCompanyPrompts = async (): Promise<string[]> => {
         try {
+          // Try cached prompts first
           const saved = localStorage.getItem(`prompts_${company.id}`);
           if (saved) {
             const parsed = JSON.parse(saved);
-            let texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-            texts = texts.filter(t => !isBanned(t) && isListQuery(t));
-            if (texts.length >= 6) {
+            const texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+            if (texts.length >= 10) {
               console.log(`Using ${texts.length} cached prompts`);
-              return ensureMin(texts);
+              return texts.slice(0, 10);
             }
           }
         } catch {}
 
-        try {
-          const { data, error } = await supabase.functions.invoke('generate-prompts', {
-            body: {
-              companyName: company.company_name,
-              industry: company.industry,
-              description: company.description,
-              targetCustomers: company.target_customers,
-              keyDifferentiators: company.key_differentiators,
-              websiteUrl: company.website_url,
-            }
-          });
-          if (error) throw error;
-          let generated = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-          generated = generated.filter(t => !isBanned(t) && isListQuery(t));
-          if (generated.length > 0) {
-            try { localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); } catch {}
-            console.log(`Generated ${generated.length} prompts via website analysis`);
-            return ensureMin(generated);
-          } else {
-            toast({ title: 'No realistic prompts returned', description: 'Website analyzer did not yield list-style queries. Using fallback.', variant: 'destructive' });
+        // Generate new prompts using AI
+        const { data, error } = await supabase.functions.invoke('generate-prompts', {
+          body: {
+            companyName: company.company_name,
+            industry: company.industry,
+            description: company.description,
+            targetCustomers: company.target_customers,
+            keyDifferentiators: company.key_differentiators,
+            websiteUrl: company.website_url,
+            requestedCount: 10
           }
-        } catch (e: any) {
-          console.warn('generate-prompts failed, using fallback', e);
-          toast({ title: 'Prompt generation failed', description: e?.message || 'Falling back to basics.', variant: 'destructive' });
+        });
+        
+        if (error) {
+          console.error('Failed to generate prompts:', error);
+          throw new Error(`Prompt generation failed: ${error.message}`);
         }
 
-        return ensureMin([
-          `Best ${company.industry} providers for ${company.target_customers || 'SMBs'}`,
-          `Top ${company.industry} companies`,
-          `Leading ${company.industry} consultants`,
-          `Which companies offer ${company.industry} solutions for ${company.target_customers || 'SMBs'}?`,
-          `Top ${company.industry} platforms`,
-          `Best ${company.industry} services in ${company.geographic_focus?.[0] || 'your region'}`,
-          `Most recommended ${company.industry} vendors`,
-          `${company.industry} case studies`,
-          `Top-rated ${company.industry} providers for ${company.description?.split(' ')?.slice(0,3)?.join(' ') || 'common needs'}`,
-          `Leading companies that provide ${company.key_differentiators || company.industry}`
-        ]);
+        const prompts = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
+        
+        if (prompts.length < 10) {
+          throw new Error(`Only generated ${prompts.length} prompts, need 10`);
+        }
+
+        // Cache the prompts
+        try { 
+          localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); 
+        } catch {}
+
+        console.log(`Generated ${prompts.length} company-specific prompts`);
+        return prompts.slice(0, 10);
       };
 
-      const prompts = await getRealisticPrompts();
+      const prompts = await getCompanyPrompts();
 
       setTestProgress({ current: 0, total: prompts.length });
 
-      console.log('Using prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
-      toast({ title: `Testing ${prompts.length} prompts`, description: 'We try list-style company queries first.' });
+      console.log('Using company-specific prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
+      toast({ title: `Testing ${prompts.length} company-specific prompts`, description: 'AI-generated prompts tailored to your business.' });
 
       const results: TestResult[] = [];
       const errors: string[] = [];
