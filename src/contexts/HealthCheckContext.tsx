@@ -508,6 +508,30 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         }));
       }
 
+      // Second-pass local detection to reduce false negatives (name/domain scan)
+      try {
+        const normalizedName = (brandName || '').toLowerCase();
+        const nameStripped = normalizedName.replace(/[^a-z0-9\s]/gi, '').trim();
+        let host: string | undefined;
+        if (websiteUrlForDetection) {
+          try {
+            const url = new URL(websiteUrlForDetection.startsWith('http') ? websiteUrlForDetection : `https://${websiteUrlForDetection}`);
+            host = url.hostname.replace(/^www\./, '').toLowerCase();
+          } catch {}
+        }
+        for (const r of testResults) {
+          if (!r.company_mentioned && r.response_text) {
+            const resp = r.response_text.toLowerCase();
+            const hitName = resp.includes(normalizedName) || (!!nameStripped && resp.includes(nameStripped));
+            const hitDomain = host ? resp.includes(host) : false;
+            if (hitName || hitDomain) {
+              r.company_mentioned = true;
+              r.mention_position = r.mention_position || 1;
+            }
+          }
+        }
+      } catch {}
+
       // Calculate final metrics
       const mentionCount = testResults.filter(test => test.company_mentioned).length;
       const mentionRate = (mentionCount / testResults.length) * 100;
