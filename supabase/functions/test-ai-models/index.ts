@@ -56,7 +56,7 @@ async function analyzeResponse(input: {
   
   const sys =
     'You are analyzing an AI response to determine if a target company is mentioned. '
-    + 'Consider exact names, common misspellings, plural/singular, website/brand references, and unambiguous descriptions. '
+    + 'Count as a mention if: the exact brand name appears, a common misspelling/variant appears, OR the company website/domain appears (with or without www./http). '
     + 'Determine: 1) mentioned (boolean), 2) position (1-10 where 1 = first mentioned, 0 = not mentioned), 3) sentiment, 4) context.'
     + " Return STRICT JSON: { \"mentioned\": boolean, \"position\": number, \"sentiment\": 'positive'|'neutral'|'negative', \"context\": string }.";
     

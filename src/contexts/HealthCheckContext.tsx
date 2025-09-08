@@ -398,10 +398,12 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       let brandIndustry = company.industry as string | undefined;
       let brandDescription = company.description as string | undefined;
       let brandDifferentiators = (company as any).key_differentiators as string | undefined;
+      // Also capture website URL to pass into mention detection
+      let websiteUrlForDetection: string | undefined = (company as any).website_url || undefined;
       try {
         const { data: latestGen } = await supabase
           .from('generated_prompts')
-          .select('company_data')
+          .select('company_data, website_url')
           .eq('user_id', user.id)
           .order('generated_at', { ascending: false })
           .limit(1)
@@ -412,6 +414,9 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           brandIndustry = cd.industry || brandIndustry;
           brandDescription = cd.description || brandDescription;
           brandDifferentiators = cd.keyDifferentiators || brandDifferentiators;
+        }
+        if (!websiteUrlForDetection && latestGen?.website_url) {
+          websiteUrlForDetection = latestGen.website_url;
         }
       } catch {}
       
@@ -444,7 +449,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
                 industry: brandIndustry || '',
                 description: brandDescription || '',
                 differentiators: brandDifferentiators || '',
-                websiteUrl: websiteUrl
+                websiteUrl: websiteUrlForDetection || ''
               }
             });
 
