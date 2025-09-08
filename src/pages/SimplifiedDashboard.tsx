@@ -85,11 +85,22 @@ export default function TodayDashboard() {
 
       // Create default project if none exists
       if (!project && user) {
+        // Try to get website URL from latest generated prompts
+        const { data: latestGenerated } = await supabase
+          .from('generated_prompts')
+          .select('website_url, company_data')
+          .eq('user_id', user.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const websiteUrl = latestGenerated?.website_url || 'https://example.com'
+        
         const { data: newProject, error } = await supabase
           .from('projects')
           .insert({
             user_id: user.id,
-            site_url: 'https://example.com', // TODO: Get from user input
+            site_url: websiteUrl,
             cms_provider: 'manual',
             site_script_status: 'missing',
             autopilot_enabled: false
@@ -222,14 +233,23 @@ export default function TodayDashboard() {
       const wins: any[] = []
       const improvements: any[] = []
       
-      // Get company data for URLs
+      // Get company data for URLs from generated_prompts (URL-only workflow) or companies (legacy)
       const { data: companies } = await supabase
         .from('companies')
         .select('*')
         .eq('user_id', user?.id)
         .limit(1)
       
+      const { data: latestGenerated } = await supabase
+        .from('generated_prompts')
+        .select('website_url, company_data')
+        .eq('user_id', user?.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      
       const companyData = companies?.[0]
+      const websiteUrl = latestGenerated?.website_url || companyData?.website_url || 'example.com'
 
       healthCheckResults.forEach((result, i) => {
         // If mentioned, add to wins
@@ -238,7 +258,7 @@ export default function TodayDashboard() {
             id: `win-${i}`,
             prompt: result.prompt_text,
             rank: result.mention_position,
-            url: `https://${companyData?.website_url || 'example.com'}`,
+            url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`,
             lastSeen: result.test_date
           })
         } else if (!result.company_mentioned) {
