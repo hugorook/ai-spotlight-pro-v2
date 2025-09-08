@@ -5,8 +5,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
 interface GeneratePromptsRequest {
-  companyName: string;
-  industry: string;
+  companyName?: string;
+  industry?: string;
   description?: string;
   targetCustomers?: string;
   keyDifferentiators?: string;
@@ -35,7 +35,71 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     throw new Error('OPENAI_API_KEY not configured. Please check environment variables.');
   }
 
-  console.log('Generating prompts from saved company fields only...');
+  // If only URL is provided, analyze the website first
+  if (companyInfo.websiteUrl && !companyInfo.companyName) {
+    console.log('Analyzing website to extract company information...');
+    
+    try {
+      const websiteAnalysisPrompt = `Analyze this website URL: ${companyInfo.websiteUrl}
+
+Visit this website and extract the following information:
+1. Company name
+2. Industry/sector
+3. Brief description of what they do
+4. Target customers/market
+5. Key differentiators/unique value proposition
+
+Return ONLY JSON format:
+{
+  "companyName": "Company Name",
+  "industry": "Industry",
+  "description": "What they do",
+  "targetCustomers": "Who they serve",
+  "keyDifferentiators": "What makes them unique"
+}`;
+
+      const analysisRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are an expert at analyzing websites and extracting company information. Use your knowledge of companies and analyze the URL provided to extract accurate company details.' },
+            { role: 'user', content: websiteAnalysisPrompt },
+          ],
+          temperature: 0.1,
+          response_format: { type: 'json_object' },
+        }),
+      });
+
+      if (analysisRes.ok) {
+        const analysisData = await analysisRes.json();
+        const analysisText = analysisData?.choices?.[0]?.message?.content ?? '{}';
+        try {
+          const parsed = JSON.parse(analysisText);
+          companyInfo.companyName = parsed.companyName || 'Unknown Company';
+          companyInfo.industry = parsed.industry || 'Technology';
+          companyInfo.description = parsed.description || '';
+          companyInfo.targetCustomers = parsed.targetCustomers || '';
+          companyInfo.keyDifferentiators = parsed.keyDifferentiators || '';
+          console.log('Extracted company info:', parsed);
+        } catch (parseError) {
+          console.warn('Failed to parse website analysis:', parseError);
+          throw new Error('Could not analyze website. Please check the URL is valid and accessible.');
+        }
+      } else {
+        throw new Error('Failed to analyze website. Please check the URL is valid.');
+      }
+    } catch (error) {
+      console.error('Website analysis failed:', error);
+      throw new Error('Could not analyze website. Please provide company details manually.');
+    }
+  }
+
+  console.log('Generating prompts with company info:', {
+    name: companyInfo.companyName,
+    industry: companyInfo.industry
+  });
 
   // Step A: Extract capabilities using AI knowledge + company data for ultra-specific prompts
   const extractPrompt = `Using your knowledge about ${companyInfo.companyName} from your training data PLUS the company information below, extract specific terms for creating targeted search prompts.
@@ -484,8 +548,8 @@ serve(async (req: Request) => {
       industry: body.industry 
     });
     
-    if (!body.companyName || !body.industry) {
-      throw new Error('Missing required fields: companyName and industry');
+    if (!body.companyName && !body.industry && !body.websiteUrl) {
+      throw new Error('Missing required fields: either (companyName and industry) or websiteUrl');
     }
     
     const prompts = await generateRealisticPrompts(body);

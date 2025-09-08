@@ -129,7 +129,7 @@ const PromptsPage = () => {
     }
   };
 
-  const analyzeWebsite = async () => {
+  const generatePromptsFromURL = async () => {
     if (!formData.website.trim()) {
       toast({ 
         title: 'Website Required', 
@@ -139,82 +139,61 @@ const PromptsPage = () => {
       return;
     }
 
-    setAnalyzing(true);
+    setGenerating(true);
     
     try {
-      console.log('Invoking analyze-website-for-fields with URL:', formData.website);
-      const { data, error } = await supabase.functions.invoke('analyze-website-for-fields', {
-        body: { url: formData.website }
+      console.log('Generating prompts directly from URL:', formData.website);
+      const { data, error } = await supabase.functions.invoke('generate-prompts', {
+        body: { 
+          websiteUrl: formData.website,
+          requestedCount: 10
+        }
       });
 
-      console.log('Edge function response:', { data, error });
+      console.log('Generate prompts response:', { data, error });
 
       if (error) {
         console.error('Edge function error:', error);
-        throw error;
+        throw new Error(`Prompt generation failed: ${error.message || JSON.stringify(error)}`);
       }
 
-      if (data && data.fields) {
-        const fields = data.fields;
-        const updatedFormData = {
-          ...formData,
-          company_name: fields.companyName || formData.company_name,
-          industry: fields.industry || formData.industry,
-          description: fields.description || formData.description,
-          target_customers: fields.targetCustomers || formData.target_customers,
-          key_differentiators: fields.keyDifferentiators || formData.key_differentiators,
-          geographic_focus: Array.isArray(fields.geographicFocus) 
-            ? fields.geographicFocus 
-            : (fields.geographicFocus ? [fields.geographicFocus] : formData.geographic_focus)
-        };
-        
-        setFormData(updatedFormData);
-
-        toast({ 
-          title: 'Website Analyzed', 
-          description: 'Company information has been auto-filled. Generating prompts...' 
-        });
-
-        // Automatically generate prompts after successful analysis
-        console.log('Checking if we can generate prompts:', {
-          company_name: updatedFormData.company_name,
-          industry: updatedFormData.industry,
-          hasCompanyName: !!updatedFormData.company_name,
-          hasIndustry: !!updatedFormData.industry
-        });
-        
-        if (updatedFormData.company_name && updatedFormData.industry) {
-          console.log('Calling generatePromptsWithData...');
-          try {
-            await generatePromptsWithData(updatedFormData);
-            console.log('generatePromptsWithData completed successfully');
-          } catch (promptError) {
-            console.error('generatePromptsWithData failed:', promptError);
-            toast({
-              title: 'Prompt Generation Failed',
-              description: `Could not generate prompts: ${promptError.message}`,
-              variant: 'destructive'
-            });
-          }
-        } else {
-          console.log('Cannot generate prompts - missing required fields');
-          toast({
-            title: 'Cannot Generate Prompts',
-            description: 'Company name and industry are required to generate prompts.',
-            variant: 'destructive'
-          });
-        }
+      if (!data?.prompts || data.prompts.length === 0) {
+        throw new Error('No prompts were generated from the website analysis');
       }
+
+      const generatedPrompts = data.prompts.map((p: any, index: number) => ({
+        id: `prompt-${index + 1}`,
+        text: p.text,
+        category: p.category || 'moderate',
+        intent: p.intent || 'User is looking for company recommendations',
+        isEditing: false
+      }));
+
+      setPrompts(generatedPrompts);
+      
+      // Save to localStorage
+      try {
+        const urlHash = btoa(formData.website).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+        localStorage.setItem(`prompts_${urlHash}`, JSON.stringify(generatedPrompts));
+      } catch (e) {
+        console.warn('Could not save to localStorage:', e);
+      }
+      
+      toast({ 
+        title: 'Prompts Generated', 
+        description: `Generated ${generatedPrompts.length} test prompts from your website.` 
+      });
+
     } catch (error) {
-      console.error('Error analyzing website:', error);
+      console.error('Error generating prompts from URL:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({ 
-        title: 'Analysis Failed', 
-        description: `Could not analyze website: ${errorMessage}. Please fill in the information manually.`, 
+        title: 'Generation Failed', 
+        description: `Could not generate prompts: ${errorMessage}`, 
         variant: 'destructive' 
       });
     } finally {
-      setAnalyzing(false);
+      setGenerating(false);
     }
   };
 
@@ -466,110 +445,27 @@ const PromptsPage = () => {
               />
             </div>
             <button
-              onClick={analyzeWebsite}
-              disabled={analyzing || !formData.website}
+              onClick={generatePromptsFromURL}
+              disabled={generating || !formData.website}
               className="px-6 py-3 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
             >
-              {analyzing ? (
+              {generating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Analyzing...
+                  Generating...
                 </>
               ) : (
                 <>
-                  <Globe className="w-5 h-5" />
-                  Auto-Fill & Generate
+                  <Wand2 className="w-5 h-5" />
+                  Generate Prompts
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Side - Company Info */}
-          <div className="bg-white rounded-lg border shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="h3">Company Information</h2>
-              <button
-                onClick={generatePrompts}
-                disabled={generating}
-                className="px-4 py-2 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="w-4 h-4" />
-                    Generate Prompts
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Company Name *</label>
-                <input
-                  type="text"
-                  value={formData.company_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company_name: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="Your company name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Industry *</label>
-                <input
-                  type="text"
-                  value={formData.industry}
-                  onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="e.g., Software Development, Healthcare, Finance"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={3}
-                  placeholder="Brief description of what your company does"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Target Customers</label>
-                <textarea
-                  value={formData.target_customers}
-                  onChange={(e) => setFormData(prev => ({ ...prev, target_customers: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={2}
-                  placeholder="Who are your ideal customers?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Key Differentiators</label>
-                <textarea
-                  value={formData.key_differentiators}
-                  onChange={(e) => setFormData(prev => ({ ...prev, key_differentiators: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={2}
-                  placeholder="What makes you different from competitors?"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Generated Prompts */}
-          <div className="bg-white rounded-lg border shadow-sm p-6">
+        {/* Generated Prompts */}
+        <div className="bg-white rounded-lg border shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="h3">Generated Prompts ({prompts.length}/10)</h2>
               {prompts.length > 0 && (
@@ -644,7 +540,6 @@ const PromptsPage = () => {
                 ))}
               </div>
             )}
-          </div>
         </div>
       </div>
     </AppShell>
