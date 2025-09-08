@@ -134,13 +134,28 @@ export default function Analytics() {
         // Load analytics data that was generated during health check
         // TODO: These should come from the health check context once implemented
         const websiteData = localStorage.getItem('website_analysis')
-        if (websiteData) setWebsiteAnalysis(JSON.parse(websiteData))
+        if (websiteData) {
+          try {
+            const parsed = JSON.parse(websiteData)
+            setWebsiteAnalysis(parsed)
+          } catch {}
+        }
         
         const authorityData = localStorage.getItem('authority_analysis')
-        if (authorityData) setAuthorityAnalysis(JSON.parse(authorityData))
+        if (authorityData) {
+          try {
+            const parsed = JSON.parse(authorityData)
+            setAuthorityAnalysis(parsed?.analysis ?? parsed)
+          } catch {}
+        }
         
         const benchmarkData = localStorage.getItem('benchmark_analysis')
-        if (benchmarkData) setIndustryBenchmark(JSON.parse(benchmarkData))
+        if (benchmarkData) {
+          try {
+            const parsed = JSON.parse(benchmarkData)
+            setIndustryBenchmark(parsed?.benchmark ?? parsed)
+          } catch {}
+        }
         
         const trendingData = localStorage.getItem('trending_analysis')
         if (trendingData) {
