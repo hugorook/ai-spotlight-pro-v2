@@ -102,12 +102,16 @@ const PromptsPage = () => {
             timestamp: Date.now()
           };
           localStorage.setItem(`health_check_${urlHash}`, JSON.stringify(cacheData));
+          
+          // We successfully loaded from database, so skip the rest
+          setLoading(false);
+          return;
         }
       } catch (err) {
         console.warn('Could not load recent prompts from database:', err);
       }
       
-      // Load company information
+      // Only load company information if we didn't find prompts in the database
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
