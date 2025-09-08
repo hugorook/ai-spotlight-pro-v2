@@ -1138,7 +1138,7 @@ export default function CleanGeoPage() {
           .single();
           
         if (!sessionError && recentSession) {
-          console.log('Loading most recent health check session from database:', recentSession.id);
+          console.log('💾 LOADING: Most recent health check session from database:', recentSession.id);
           
           // Set basic health check data
           setHealthScore(recentSession.health_score || 0);
@@ -1147,6 +1147,10 @@ export default function CleanGeoPage() {
           if (recentSession.company_data) {
             setCachedCompanyData(recentSession.company_data);
           }
+          
+          // Clear any old test results to prevent interference with new health checks
+          setTestResults([]);
+          setLastResults([]);
           
           // Load analytics data for this session
           const { data: analyticsData, error: analyticsError } = await supabase
@@ -1314,40 +1318,53 @@ export default function CleanGeoPage() {
   };
 
   const runHealthCheck = async () => {
-    // First try to get the most recent prompts from the database
+    if (!user?.id) {
+      alert('Please log in to run health check.');
+      return;
+    }
+    
+    console.log('🔍 HEALTH CHECK: Loading latest prompts from database for user:', user.id);
+    
+    // ONLY use database - no localStorage fallback for health check
     let healthCheckData = null;
     
     try {
       const { data: recentPrompts, error } = await supabase
         .from('generated_prompts')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('generated_at', { ascending: false })
         .limit(1)
         .single();
         
-      if (!error && recentPrompts) {
-        healthCheckData = {
-          prompts: recentPrompts.prompts,
-          companyData: recentPrompts.company_data,
-          websiteUrl: recentPrompts.website_url
-        };
-        console.log('Using latest prompts from database for health check:', recentPrompts.prompts.length);
+      console.log('Database query result:', { data: recentPrompts, error });
+        
+      if (error) {
+        console.error('❌ Failed to load prompts from database:', error);
+        alert('❌ No prompts found in database. Please generate prompts first on the Prompts page.');
+        return;
       }
+      
+      if (!recentPrompts || !recentPrompts.prompts || recentPrompts.prompts.length === 0) {
+        alert('❌ No valid prompts found. Please generate new prompts on the Prompts page.');
+        return;
+      }
+        
+      healthCheckData = {
+        prompts: recentPrompts.prompts,
+        companyData: recentPrompts.company_data,
+        websiteUrl: recentPrompts.website_url
+      };
+      
+      console.log('✅ HEALTH CHECK: Using fresh prompts from database:', {
+        promptCount: recentPrompts.prompts.length,
+        company: recentPrompts.company_data?.companyName,
+        generatedAt: recentPrompts.generated_at
+      });
+      
     } catch (err) {
-      console.warn('Could not load latest prompts from database:', err);
-    }
-    
-    // Fallback to localStorage if database fails
-    if (!healthCheckData) {
-      healthCheckData = findHealthCheckData();
-      if (healthCheckData) {
-        console.log('Using cached prompts from localStorage for health check');
-      }
-    }
-    
-    if (!healthCheckData) {
-      alert('Please generate prompts first by going to the Prompts page and entering your website URL.');
+      console.error('❌ Database error loading prompts:', err);
+      alert('❌ Failed to load prompts from database. Please try again or regenerate prompts.');
       return;
     }
 
@@ -1504,8 +1521,15 @@ export default function CleanGeoPage() {
         });
       }
 
-      setTestResults(results);
-      setLastResults(results);
+      // Clear old results and set ONLY current health check results
+      setTestResults([]); // Clear historical results  
+      setLastResults(results); // Set current health check results ONLY
+      
+      console.log('📊 RESULTS: Set current health check results:', {
+        resultCount: results.length,
+        mentions: results.filter(r => r.mentioned).length,
+        clearingHistorical: true
+      });
       calculateHealthScore(results);
       generateContentOpportunities(results, company);
       try {
@@ -1519,35 +1543,50 @@ export default function CleanGeoPage() {
       console.log(`Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate).`);
       toast({ title: 'Health Check Complete', description: `${successRate}% mention rate across ${results.length} prompts.` });
       
-      // Save health check session to database for persistence
+      // Save health check session to database for persistence  
       let healthCheckSessionId = null;
+      
+      console.log('💾 PERSISTENCE: Saving health check session to database...');
+      
       try {
-        const { data: sessionData, error: sessionError } = await supabase
+        const sessionData = {
+          user_id: user?.id,
+          company_id: null, // Always null for URL-based workflow
+          website_url: companyData.websiteUrl || healthCheckData.websiteUrl,
+          company_data: companyData,
+          prompts_used: prompts,
+          total_prompts: results.length,
+          mention_rate: successRate,
+          average_position: avgPosition,
+          health_score: Math.round(successRate), // Direct success rate
+          session_type: 'url_only',
+          completed_at: new Date().toISOString()
+        };
+        
+        console.log('Session data to insert:', sessionData);
+        
+        const { data: insertedSession, error: sessionError } = await supabase
           .from('health_check_sessions')
-          .insert({
-            user_id: user?.id,
-            company_id: cachedCompanyData ? null : company?.id, // Only set if using company profile
-            website_url: companyData.websiteUrl || null,
-            company_data: cachedCompanyData ? companyData : null, // Only store for URL-based workflow
-            prompts_used: prompts,
-            total_prompts: results.length,
-            mention_rate: successRate,
-            average_position: avgPosition,
-            health_score: Math.round((successRate / 100) * 100), // Simple health score
-            session_type: cachedCompanyData ? 'url_only' : 'company_profile',
-            completed_at: new Date().toISOString()
-          })
+          .insert(sessionData)
           .select()
           .single();
           
-        if (!sessionError && sessionData) {
-          healthCheckSessionId = sessionData.id;
-          console.log('Saved health check session to database:', sessionData.id);
+        if (sessionError) {
+          console.error('❌ CRITICAL: Health check session save failed:', sessionError);
+          console.error('Session error details:', {
+            message: sessionError.message,
+            details: sessionError.details,
+            hint: sessionError.hint,
+            code: sessionError.code
+          });
+          // Continue without session ID - analytics won't persist but health check can complete
         } else {
-          console.warn('Could not save health check session:', sessionError);
+          healthCheckSessionId = insertedSession.id;
+          console.log('✅ PERSISTENCE: Health check session saved with ID:', insertedSession.id);
         }
       } catch (dbError) {
-        console.warn('Database save failed for health check session:', dbError);
+        console.error('❌ CRITICAL: Database error saving health check session:', dbError);
+        // Continue without session ID - analytics won't persist but health check can complete
       }
 
       // Trigger animated path completion and show results section
@@ -1555,21 +1594,62 @@ export default function CleanGeoPage() {
         setShowResultsSection(true);
       }, 1000);
 
-      // Run all analytics in parallel for better performance
-      console.log('Running analytics with session ID:', healthCheckSessionId);
+      // Run analytics individually with proper error handling
+      console.log('🔄 ANALYTICS: Starting all analytics with session ID:', healthCheckSessionId);
       
-      await Promise.allSettled([
-        // Website analysis
-        getWebsiteAnalysis(companyData, healthCheckSessionId),
-        // Trending opportunities
-        getTrendingOpportunities(companyData, healthCheckSessionId),
-        // Authority analysis  
-        loadAuthorityAnalysis(companyData, healthCheckSessionId),
-        // Industry benchmark
-        loadIndustryBenchmark(companyData, healthCheckSessionId, results)
-      ]);
-
-      console.log('All analytics completed');
+      if (!healthCheckSessionId) {
+        console.warn('⚠️ No session ID available - analytics won\'t persist to database');
+      }
+      
+      const analyticsResults = {
+        website: false,
+        trending: false,
+        authority: false,
+        benchmark: false
+      };
+      
+      // Website Analysis
+      try {
+        console.log('🔄 Running website analysis...');
+        await getWebsiteAnalysis(companyData, healthCheckSessionId);
+        analyticsResults.website = true;
+        console.log('✅ Website analysis completed');
+      } catch (error) {
+        console.error('❌ Website analysis failed:', error);
+      }
+      
+      // Trending Opportunities
+      try {
+        console.log('🔄 Running trending opportunities...');
+        await getTrendingOpportunities(companyData, healthCheckSessionId);
+        analyticsResults.trending = true;
+        console.log('✅ Trending opportunities completed');
+      } catch (error) {
+        console.error('❌ Trending opportunities failed:', error);
+      }
+      
+      // Authority Analysis
+      try {
+        console.log('🔄 Running authority analysis...');
+        await loadAuthorityAnalysis(companyData, healthCheckSessionId);
+        analyticsResults.authority = true;
+        console.log('✅ Authority analysis completed');
+      } catch (error) {
+        console.error('❌ Authority analysis failed:', error);
+      }
+      
+      // Industry Benchmark
+      try {
+        console.log('🔄 Running industry benchmark...');
+        await loadIndustryBenchmark(companyData, healthCheckSessionId, results);
+        analyticsResults.benchmark = true;
+        console.log('✅ Industry benchmark completed');
+      } catch (error) {
+        console.error('❌ Industry benchmark failed:', error);
+      }
+      
+      const completedCount = Object.values(analyticsResults).filter(Boolean).length;
+      console.log(`🎯 ANALYTICS COMPLETE: ${completedCount}/4 analytics completed:`, analyticsResults);
 
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
