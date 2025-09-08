@@ -40,22 +40,29 @@ async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Pr
     console.log('Analyzing website to extract company information...');
     
     try {
-      const websiteAnalysisPrompt = `Analyze this website URL: ${companyInfo.websiteUrl}
+      const websiteAnalysisPrompt = `Analyze this company: ${companyInfo.websiteUrl}
 
-Visit this website and extract the following information:
+Using your knowledge about this company AND what you can infer from their domain/URL, provide DETAILED, SPECIFIC information:
+
 1. Company name
-2. Industry/sector
-3. Brief description of what they do
-4. Target customers/market
-5. Key differentiators/unique value proposition
+2. SPECIFIC industry/niche (not just "technology" - be precise like "due diligence research", "background verification", "regulatory compliance software")
+3. DETAILED description of their core services/products
+4. SPECIFIC target customers (not just "businesses" - be specific like "private equity firms", "law firms", "financial institutions")
+5. UNIQUE differentiators/USPs that set them apart from competitors
+6. Key services they're known for
+7. Their main value proposition
+
+Be SPECIFIC and DETAILED. If this is Xapien, mention due diligence research, background checks, regulatory compliance, automated research, etc.
 
 Return ONLY JSON format:
 {
   "companyName": "Company Name",
-  "industry": "Industry",
-  "description": "What they do",
-  "targetCustomers": "Who they serve",
-  "keyDifferentiators": "What makes them unique"
+  "industry": "Specific industry/niche",
+  "description": "Detailed description of core services",
+  "targetCustomers": "Specific customer types",
+  "keyDifferentiators": "Unique advantages and specializations",
+  "coreServices": "Main services they provide",
+  "valueProposition": "What problem they solve uniquely"
 }`;
 
       const analysisRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -81,8 +88,8 @@ Return ONLY JSON format:
           companyInfo.industry = parsed.industry || 'Technology';
           companyInfo.description = parsed.description || '';
           companyInfo.targetCustomers = parsed.targetCustomers || '';
-          companyInfo.keyDifferentiators = parsed.keyDifferentiators || '';
-          console.log('Extracted company info:', parsed);
+          companyInfo.keyDifferentiators = `${parsed.keyDifferentiators || ''} ${parsed.coreServices || ''} ${parsed.valueProposition || ''}`.trim();
+          console.log('Extracted detailed company info:', parsed);
         } catch (parseError) {
           console.warn('Failed to parse website analysis:', parseError);
           throw new Error('Could not analyze website. Please check the URL is valid and accessible.');
@@ -250,9 +257,13 @@ Description: ${companyInfo.description || 'Not provided'}
 Target Customers: ${companyInfo.targetCustomers || 'Not provided'}
 Key Differentiators: ${companyInfo.keyDifferentiators || 'Not provided'}
 
-TASK: Create ${companyInfo.requestedCount || 10} REALISTIC search prompts that actual customers would search for when looking for companies like ${companyInfo.companyName}. Goal: 50%+ mention rate on easy-wins. NO company name mentions.
+TASK: Create ${companyInfo.requestedCount || 10} REALISTIC search prompts that actual customers would search for when looking for companies like ${companyInfo.companyName}. Goal: 80%+ mention rate on easy-wins. NO company name mentions.
 
-CRITICAL: Balance REALISTIC human searches with enough SPECIFICITY to favor established players.
+CRITICAL: Use SPECIFIC services, capabilities, and customer types - not generic industry terms. Balance REALISTIC human searches with enough SPECIFICITY to favor established players like ${companyInfo.companyName}.
+
+FOCUS ON THEIR SPECIFIC SERVICES: ${companyInfo.keyDifferentiators}
+TARGET THEIR ACTUAL CUSTOMERS: ${companyInfo.targetCustomers}
+THEIR UNIQUE NICHE: ${companyInfo.industry}
 
 For Czarnikow specifically (major sugar trading house):
 - Sugar mill owner needing capital: "sugar trading companies that provide mill financing" (realistic + financing USP)
@@ -419,8 +430,8 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
   
   console.log('Raw AI response:', responseText);
   
-  const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms/i.test(t) || /which\s+.*companies/i.test(t) || /^(best|top|leading)\b/i.test(t);
-  const isBanned = (t: string) => /^(how to|what|best practices|benefits|why)\b/i.test(t);
+  const isListQuery = (t: string) => /companies|providers|vendors|consultants|agencies|firms|services|platforms|tools|solutions/i.test(t) || /which\s+.*companies/i.test(t) || /^(best|top|leading)\b/i.test(t);
+  const isBanned = (t: string) => /^(how\s+to|what\s+are|what\s+is|best\s+practices|benefits\s+of|why\s+do)\b/i.test(t);
 
   try {
     const parsed = JSON.parse(responseText);
@@ -438,6 +449,11 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
 
     // Filter out generic prompts; require list-style queries
     validatedPrompts = validatedPrompts.filter(p => p.text && !isBanned(p.text) && isListQuery(p.text));
+
+    console.log(`After filtering: ${validatedPrompts.length} valid prompts out of ${prompts.length}`);
+    if (validatedPrompts.length < prompts.length) {
+      console.log('Filtered out prompts:', prompts.filter(p => !p.text || isBanned(p.text) || !isListQuery(p.text)).map(p => p.text));
+    }
 
     // If too few remain, run a second strictly constrained pass to rewrite into list queries
     if (validatedPrompts.length < 10) {
