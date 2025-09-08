@@ -452,7 +452,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             const result: TestResult = {
               prompt_text: prompt.text,
               prompt_id: prompt.id || null,
-              ai_model: 'openai-gpt-4o-mini',
+              ai_model: 'openai-gpt-4o',
               company_mentioned: testResult.mentioned || false,
               mention_position: testResult.position || null,
               sentiment: testResult.sentiment || null,
@@ -479,7 +479,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             return {
               prompt_text: prompt.text,
               prompt_id: prompt.id || null,
-              ai_model: 'openai-gpt-4o-mini',
+              ai_model: 'openai-gpt-4o',
               company_mentioned: false,
               mention_position: null,
               sentiment: null,

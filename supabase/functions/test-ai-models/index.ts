@@ -133,10 +133,18 @@ async function evaluatePrompt(input: {
       differentiators: input.differentiators
     });
     
-    // Return both the original response and the analysis
+    // Heuristic fallback: simple string check to avoid false negatives
+    const normalizedResponse = actualResponse.toLowerCase();
+    const normalizedName = input.companyName.toLowerCase();
+    const nameStripped = normalizedName.replace(/[^a-z0-9\s]/gi, '').trim();
+    const mentionedByString = normalizedResponse.includes(normalizedName) || (nameStripped && normalizedResponse.includes(nameStripped));
+    const finalMentioned = analysis.mentioned || mentionedByString;
+    const finalPosition = analysis.position || (mentionedByString ? 1 : 0);
+
+    // Return both the original response and the consolidated analysis
     const result = {
-      mentioned: analysis.mentioned,
-      position: analysis.position,
+      mentioned: finalMentioned,
+      position: finalPosition,
       sentiment: analysis.sentiment,
       context: analysis.context,
       response: actualResponse
