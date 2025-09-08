@@ -991,22 +991,7 @@ export default function CleanGeoPage() {
   const [cachedCompanyData, setCachedCompanyData] = useState<any>(null);
   
   // Helper function to find cached health check data
-  const findHealthCheckData = () => {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('health_check_')) {
-        try {
-          const data = JSON.parse(localStorage.getItem(key) || '{}');
-          if (data.prompts && data.companyData) {
-            return data;
-          }
-        } catch (e) {
-          console.warn('Could not parse health check data:', key);
-        }
-      }
-    }
-    return null;
-  };
+  const findHealthCheckData = () => null;
 
   // On mount, load any persisted last run
   useEffect(() => {
@@ -1077,25 +1062,8 @@ export default function CleanGeoPage() {
           setScheduledWeekly(schedules[0].weekly_health_check || false);
         }
         
-        // Load AI test results
-        const { data: aiTests } = await supabase
-          .from('ai_tests')
-          .select('*')
-          .eq('company_id', company.id)
-          .order('test_date', { ascending: false });
-
-        if (aiTests) {
-          const results = aiTests.map((test) => ({
-            prompt: test.prompt_id || 'Custom prompt',
-            mentioned: test.company_mentioned,
-            position: test.mention_position || 0,
-            sentiment: test.sentiment || 'neutral' as 'positive' | 'neutral' | 'negative',
-            context: test.mention_context || ''
-          }));
-          setTestResults(results);
-          calculateHealthScore(results);
-          generateContentOpportunities(results, company);
-        }
+        // Do not prefill results with historical ai_tests; only show current run
+        setTestResults([]);
       }
     } catch (error) {
       console.error('Error loading company data:', error);
@@ -1539,6 +1507,13 @@ export default function CleanGeoPage() {
       
       const mentionCount = results.filter(r => r.mentioned).length;
       const successRate = Math.round((mentionCount / results.length) * 100);
+      const avgPosition = results.filter(r => r.mentioned).length > 0 
+        ? Math.round(
+            results
+              .filter(r => r.mentioned)
+              .reduce((sum, r, _, arr) => sum + r.position / arr.length, 0)
+          )
+        : 0;
       
       console.log(`Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate).`);
       toast({ title: 'Health Check Complete', description: `${successRate}% mention rate across ${results.length} prompts.` });
@@ -2246,7 +2221,7 @@ export default function CleanGeoPage() {
             <div className="flex items-center justify-between rounded-md border border-border bg-muted/10 p-4">
               <div>
                 <p className="text-sm font-medium text-foreground m-0">Auto-run Health Check weekly</p>
-                <p className="text-xs text-muted-foreground m-0">We’ll run it in the background and notify you</p>
+                <p className="text-xs text-muted-foreground m-0">We'll run it in the background and notify you</p>
               </div>
               <button
                 onClick={async () => {
