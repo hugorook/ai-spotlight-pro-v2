@@ -507,7 +507,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
             const result: TestResult = {
               prompt_text: prompt.text,
-              prompt_id: prompt.id || null,
+              prompt_id: null, // Don't use string IDs for UUID field
               ai_model: 'openai-gpt-4o',
               company_mentioned: testResult.mentioned || false,
               mention_position: testResult.position || null,
@@ -536,7 +536,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             // Return a failed result so we can continue with other tests
             return {
               prompt_text: prompt.text,
-              prompt_id: prompt.id || null,
+              prompt_id: null, // Don't use string IDs for UUID field
               ai_model: 'openai-gpt-4o',
               company_mentioned: false,
               mention_position: null,
