@@ -59,6 +59,51 @@ const PromptsPage = () => {
     try {
       setLoading(true);
       
+      // First, try to load most recent generated prompts from database
+      try {
+        const { data: recentPrompts, error: promptsError } = await supabase
+          .from('generated_prompts')
+          .select('*')
+          .eq('user_id', user?.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
+          .single();
+          
+        if (!promptsError && recentPrompts) {
+          console.log('Loaded most recent prompts from database:', recentPrompts);
+          
+          // Set prompts from database
+          const convertedPrompts = recentPrompts.prompts.map((p: any, index: number) => ({
+            id: `prompt-${index + 1}`,
+            text: p.text,
+            category: p.category || 'moderate',
+            intent: p.intent || 'User is looking for company recommendations',
+            isEditing: false
+          }));
+          
+          setPrompts(convertedPrompts);
+          setExtractedCompanyData(recentPrompts.company_data);
+          
+          // Also update form data with the website URL
+          setFormData(prev => ({ 
+            ...prev, 
+            website: recentPrompts.website_url || ''
+          }));
+          
+          // Save to localStorage for immediate access
+          const urlHash = btoa(recentPrompts.website_url).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+          const cacheData = {
+            prompts: convertedPrompts,
+            companyData: recentPrompts.company_data,
+            websiteUrl: recentPrompts.website_url,
+            timestamp: Date.now()
+          };
+          localStorage.setItem(`health_check_${urlHash}`, JSON.stringify(cacheData));
+        }
+      } catch (err) {
+        console.warn('Could not load recent prompts from database:', err);
+      }
+      
       // Load company information
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
@@ -194,6 +239,32 @@ const PromptsPage = () => {
         console.log('Saved prompts and company data for health check:', cacheData);
       } catch (e) {
         console.warn('Could not save to localStorage:', e);
+      }
+      
+      // Save to database for cross-device persistence
+      try {
+        const { error: dbError } = await supabase
+          .from('generated_prompts')
+          .upsert({
+            user_id: user?.id,
+            website_url: formData.website,
+            company_data: companyData,
+            prompts: generatedPrompts,
+            prompt_count: generatedPrompts.length,
+            generation_method: 'url_analysis',
+            generated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,website_url',
+            ignoreDuplicates: false
+          });
+          
+        if (dbError) {
+          console.warn('Could not save prompts to database:', dbError);
+        } else {
+          console.log('Successfully saved prompts to database for cross-device access');
+        }
+      } catch (dbError) {
+        console.warn('Database save failed:', dbError);
       }
       
       toast({ 

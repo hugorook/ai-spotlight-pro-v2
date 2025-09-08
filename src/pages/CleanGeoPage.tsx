@@ -1124,30 +1124,90 @@ export default function CleanGeoPage() {
 
   // Load persisted health check data on mount
   useEffect(() => {
-    const stored = localStorage.getItem('geo_health_check_data');
-    if (stored) {
+    const loadPersistedData = async () => {
+      if (!user?.id) return;
+      
       try {
-        const healthData = JSON.parse(stored);
-        // Only load if data is less than 24 hours old
-        if (healthData.timestamp && Date.now() - healthData.timestamp < 24 * 60 * 60 * 1000) {
-          if (healthData.authorityAnalysis) {
-            setAuthorityAnalysis(healthData.authorityAnalysis);
+        // First, try to load from database (most recent session)
+        const { data: recentSession, error: sessionError } = await supabase
+          .from('health_check_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('completed_at', { ascending: false })
+          .limit(1)
+          .single();
+          
+        if (!sessionError && recentSession) {
+          console.log('Loading most recent health check session from database:', recentSession.id);
+          
+          // Set basic health check data
+          setHealthScore(recentSession.health_score || 0);
+          
+          // Store the cached company data if available
+          if (recentSession.company_data) {
+            setCachedCompanyData(recentSession.company_data);
           }
-          if (healthData.industryBenchmark) {
-            setIndustryBenchmark(healthData.industryBenchmark);
+          
+          // Load analytics data for this session
+          const { data: analyticsData, error: analyticsError } = await supabase
+            .from('analytics_data')
+            .select('*')
+            .eq('health_check_session_id', recentSession.id);
+            
+          if (!analyticsError && analyticsData) {
+            analyticsData.forEach(item => {
+              switch (item.analytics_type) {
+                case 'authority_analysis':
+                  setAuthorityAnalysis(item.data);
+                  break;
+                case 'industry_benchmark':
+                  setIndustryBenchmark(item.data);
+                  break;
+                case 'trending_opportunities':
+                  setTrendingOpportunities(item.data);
+                  break;
+                case 'website_analysis':
+                  setWebsiteAnalysis(item.data);
+                  break;
+              }
+            });
+            console.log(`Loaded ${analyticsData.length} analytics items from database`);
           }
-          if (healthData.trendingOpportunities) {
-            setTrendingOpportunities(healthData.trendingOpportunities);
-          }
-          if (healthData.websiteAnalysis) {
-            setWebsiteAnalysis(healthData.websiteAnalysis);
+        } else {
+          console.log('No recent health check session found in database, trying localStorage');
+          
+          // Fallback to localStorage
+          const stored = localStorage.getItem('geo_health_check_data');
+          if (stored) {
+            try {
+              const healthData = JSON.parse(stored);
+              // Only load if data is less than 24 hours old
+              if (healthData.timestamp && Date.now() - healthData.timestamp < 24 * 60 * 60 * 1000) {
+                if (healthData.authorityAnalysis) {
+                  setAuthorityAnalysis(healthData.authorityAnalysis);
+                }
+                if (healthData.industryBenchmark) {
+                  setIndustryBenchmark(healthData.industryBenchmark);
+                }
+                if (healthData.trendingOpportunities) {
+                  setTrendingOpportunities(healthData.trendingOpportunities);
+                }
+                if (healthData.websiteAnalysis) {
+                  setWebsiteAnalysis(healthData.websiteAnalysis);
+                }
+              }
+            } catch (error) {
+              console.error('Error loading persisted health data from localStorage:', error);
+            }
           }
         }
       } catch (error) {
         console.error('Error loading persisted health data:', error);
       }
-    }
-  }, []);
+    };
+    
+    loadPersistedData();
+  }, [user?.id]);
 
   const calculateHealthScore = (results: TestResult[]) => {
     if (results.length === 0) {
@@ -1429,17 +1489,48 @@ export default function CleanGeoPage() {
       console.log(`Health check completed! Found ${mentionCount} mentions out of ${results.length} tests (${successRate}% mention rate).`);
       toast({ title: 'Health Check Complete', description: `${successRate}% mention rate across ${results.length} prompts.` });
       
+      // Save health check session to database for persistence
+      let healthCheckSessionId = null;
+      try {
+        const { data: sessionData, error: sessionError } = await supabase
+          .from('health_check_sessions')
+          .insert({
+            user_id: user?.id,
+            company_id: cachedCompanyData ? null : company?.id, // Only set if using company profile
+            website_url: companyData.websiteUrl || null,
+            company_data: cachedCompanyData ? companyData : null, // Only store for URL-based workflow
+            prompts_used: prompts,
+            total_prompts: results.length,
+            mention_rate: successRate,
+            average_position: avgPosition,
+            health_score: Math.round((successRate / 100) * 100), // Simple health score
+            session_type: cachedCompanyData ? 'url_only' : 'company_profile',
+            completed_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+          
+        if (!sessionError && sessionData) {
+          healthCheckSessionId = sessionData.id;
+          console.log('Saved health check session to database:', sessionData.id);
+        } else {
+          console.warn('Could not save health check session:', sessionError);
+        }
+      } catch (dbError) {
+        console.warn('Database save failed for health check session:', dbError);
+      }
+
       // Trigger animated path completion and show results section
       setTimeout(() => {
         setShowResultsSection(true);
       }, 1000);
 
       // Get trending opportunities for this company
-      await getTrendingOpportunities(companyData);
+      await getTrendingOpportunities(companyData, healthCheckSessionId);
 
       // Load authority analysis and industry benchmark
-      await loadAuthorityAnalysis(companyData);
-      await loadIndustryBenchmark(companyData);
+      await loadAuthorityAnalysis(companyData, healthCheckSessionId);
+      await loadIndustryBenchmark(companyData, healthCheckSessionId, results);
 
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
@@ -1465,7 +1556,7 @@ export default function CleanGeoPage() {
   };
 
   // Get trending opportunities for the company
-  const getTrendingOpportunities = async (companyData: any) => {
+  const getTrendingOpportunities = async (companyData: any, sessionId?: string) => {
     try {
       console.log('Getting trending opportunities for:', companyData.companyName);
       
@@ -1485,6 +1576,28 @@ export default function CleanGeoPage() {
 
       if (data?.opportunities) {
         setTrendingOpportunities(data.opportunities);
+        
+        // Save to database for persistence
+        if (sessionId) {
+          try {
+            const { error: dbError } = await supabase
+              .from('analytics_data')
+              .upsert({
+                user_id: user?.id,
+                health_check_session_id: sessionId,
+                analytics_type: 'trending_opportunities',
+                data: data.opportunities,
+                generated_at: new Date().toISOString()
+              });
+              
+            if (dbError) {
+              console.warn('Could not save trending opportunities to database:', dbError);
+            }
+          } catch (err) {
+            console.warn('Database save failed for trending opportunities:', err);
+          }
+        }
+        
         // Persist to localStorage
         const stored = localStorage.getItem('geo_health_check_data');
         const healthData = stored ? JSON.parse(stored) : {};
@@ -1598,7 +1711,7 @@ export default function CleanGeoPage() {
   };
 
   // Load authority analysis during health check
-  const loadAuthorityAnalysis = async (companyData: any) => {
+  const loadAuthorityAnalysis = async (companyData: any, sessionId?: string) => {
     try {
       console.log('Loading authority analysis for:', companyData.companyName);
       const { data, error } = await supabase.functions.invoke('analyze-competitive-authority', {
@@ -1611,6 +1724,28 @@ export default function CleanGeoPage() {
 
       if (!error && data?.analysis) {
         setAuthorityAnalysis(data.analysis);
+        
+        // Save to database for persistence
+        if (sessionId) {
+          try {
+            const { error: dbError } = await supabase
+              .from('analytics_data')
+              .upsert({
+                user_id: user?.id,
+                health_check_session_id: sessionId,
+                analytics_type: 'authority_analysis',
+                data: data.analysis,
+                generated_at: new Date().toISOString()
+              });
+              
+            if (dbError) {
+              console.warn('Could not save authority analysis to database:', dbError);
+            }
+          } catch (err) {
+            console.warn('Database save failed for authority analysis:', err);
+          }
+        }
+        
         // Persist to localStorage
         const stored = localStorage.getItem('geo_health_check_data');
         const healthData = stored ? JSON.parse(stored) : {};
@@ -1625,7 +1760,7 @@ export default function CleanGeoPage() {
   };
 
   // Load industry benchmark during health check  
-  const loadIndustryBenchmark = async (companyData: any, results: TestResult[] = []) => {
+  const loadIndustryBenchmark = async (companyData: any, sessionId?: string, results: TestResult[] = []) => {
     if (results.length === 0) return;
     
     try {
@@ -1646,6 +1781,28 @@ export default function CleanGeoPage() {
 
       if (!error && data?.benchmark) {
         setIndustryBenchmark(data.benchmark);
+        
+        // Save to database for persistence
+        if (sessionId) {
+          try {
+            const { error: dbError } = await supabase
+              .from('analytics_data')
+              .upsert({
+                user_id: user?.id,
+                health_check_session_id: sessionId,
+                analytics_type: 'industry_benchmark',
+                data: data.benchmark,
+                generated_at: new Date().toISOString()
+              });
+              
+            if (dbError) {
+              console.warn('Could not save industry benchmark to database:', dbError);
+            }
+          } catch (err) {
+            console.warn('Database save failed for industry benchmark:', err);
+          }
+        }
+        
         // Persist to localStorage
         const stored = localStorage.getItem('geo_health_check_data');
         const healthData = stored ? JSON.parse(stored) : {};
