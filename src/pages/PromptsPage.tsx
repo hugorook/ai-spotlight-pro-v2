@@ -42,6 +42,7 @@ const PromptsPage = () => {
   
   // Prompts state
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [extractedCompanyData, setExtractedCompanyData] = useState<any>(null);
   
   // UI state
   const [loading, setLoading] = useState(true);
@@ -168,12 +169,29 @@ const PromptsPage = () => {
         isEditing: false
       }));
 
+      // Extract company data from the API response (the generate-prompts function analyzed the website)
+      const companyData = data.companyData || {
+        companyName: 'Unknown Company',
+        industry: 'Unknown Industry', 
+        description: '',
+        targetCustomers: '',
+        keyDifferentiators: ''
+      };
+
       setPrompts(generatedPrompts);
+      setExtractedCompanyData(companyData);
       
-      // Save to localStorage
+      // Save both prompts AND company data to localStorage with URL-based key
       try {
         const urlHash = btoa(formData.website).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
-        localStorage.setItem(`prompts_${urlHash}`, JSON.stringify(generatedPrompts));
+        const cacheData = {
+          prompts: generatedPrompts,
+          companyData: companyData,
+          websiteUrl: formData.website,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(`health_check_${urlHash}`, JSON.stringify(cacheData));
+        console.log('Saved prompts and company data for health check:', cacheData);
       } catch (e) {
         console.warn('Could not save to localStorage:', e);
       }
@@ -501,6 +519,55 @@ const PromptsPage = () => {
               </div>
             )}
         </div>
+
+        {/* Company Information Display */}
+        {extractedCompanyData && (
+          <div className="bg-white rounded-lg border shadow-sm p-6 mt-6">
+            <h2 className="h3 mb-4">Extracted Company Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-600">Company Name</label>
+                <div className="px-3 py-2 bg-gray-50 border rounded-lg text-sm">
+                  {extractedCompanyData.companyName || 'Not detected'}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-600">Industry</label>
+                <div className="px-3 py-2 bg-gray-50 border rounded-lg text-sm">
+                  {extractedCompanyData.industry || 'Not detected'}
+                </div>
+              </div>
+              
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1 text-gray-600">Description</label>
+                <div className="px-3 py-2 bg-gray-50 border rounded-lg text-sm">
+                  {extractedCompanyData.description || 'Not detected'}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-600">Target Customers</label>
+                <div className="px-3 py-2 bg-gray-50 border rounded-lg text-sm">
+                  {extractedCompanyData.targetCustomers || 'Not detected'}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-600">Key Differentiators</label>
+                <div className="px-3 py-2 bg-gray-50 border rounded-lg text-sm">
+                  {extractedCompanyData.keyDifferentiators || 'Not detected'}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> This information was automatically extracted from your website and will be used for the health check to provide accurate results.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

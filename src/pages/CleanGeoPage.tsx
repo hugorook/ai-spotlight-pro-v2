@@ -986,6 +986,27 @@ export default function CleanGeoPage() {
   // Authority and benchmark analysis data state
   const [authorityAnalysis, setAuthorityAnalysis] = useState<any>(null);
   const [industryBenchmark, setIndustryBenchmark] = useState<any>(null);
+  
+  // Cached company data from URL-based prompts generation
+  const [cachedCompanyData, setCachedCompanyData] = useState<any>(null);
+  
+  // Helper function to find cached health check data
+  const findHealthCheckData = () => {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('health_check_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key) || '{}');
+          if (data.prompts && data.companyData) {
+            return data;
+          }
+        } catch (e) {
+          console.warn('Could not parse health check data:', key);
+        }
+      }
+    }
+    return null;
+  };
 
   // On mount, load any persisted last run
   useEffect(() => {
@@ -1233,103 +1254,55 @@ export default function CleanGeoPage() {
   };
 
   const runHealthCheck = async () => {
-    if (!company) {
-      alert('Please set up your company information first');
+    const healthCheckData = findHealthCheckData();
+    
+    if (!healthCheckData) {
+      alert('Please generate prompts first by going to the Prompts page and entering your website URL.');
       return;
     }
 
-    // Validate required company data
-    if (!company.company_name || !company.industry) {
-      alert('Company name and industry are required for health check. Please update your company profile.');
-      return;
-    }
+    const { prompts, companyData } = healthCheckData;
+    
+    // Store cached company data for use throughout component
+    setCachedCompanyData(companyData);
 
     setIsRunningHealthCheck(true);
     setLastRunType('health');
     setLastResults([]);
-    setTestProgress({ current: 0, total: 25 });
+    setTestProgress({ current: 0, total: prompts.length });
     setShowResultsSection(false);
     
     try {
-      console.log('Starting health check for company:', {
-        name: company.company_name,
-        industry: company.industry,
-        description: company.description
+      console.log('Starting health check with cached data:', {
+        name: companyData.companyName,
+        industry: companyData.industry,
+        promptCount: prompts.length
       });
 
-      // Generate 10 specific prompts for this company
-      const getCompanyPrompts = async (): Promise<string[]> => {
-        try {
-          // Try cached prompts first
-          const saved = localStorage.getItem(`prompts_${company.id}`);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            const texts = (parsed || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-            if (texts.length >= 10) {
-              console.log(`Using ${texts.length} cached prompts`);
-              return texts.slice(0, 10);
-            }
-          }
-        } catch {}
+      const promptTexts = prompts.map((p: any) => p.text);
 
-        // Generate new prompts using AI
-        const { data, error } = await supabase.functions.invoke('generate-prompts', {
-          body: {
-            companyName: company.company_name,
-            industry: company.industry,
-            description: company.description,
-            targetCustomers: company.target_customers,
-            keyDifferentiators: company.key_differentiators,
-            websiteUrl: company.website_url,
-            requestedCount: 10
-          }
-        });
-        
-        if (error) {
-          console.error('Failed to generate prompts:', error);
-          console.error('Full error details:', JSON.stringify(error, null, 2));
-          throw new Error(`Prompt generation failed: ${error.message || JSON.stringify(error)}`);
-        }
+      setTestProgress({ current: 0, total: promptTexts.length });
 
-        const prompts = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());
-        
-        if (prompts.length < 10) {
-          throw new Error(`Only generated ${prompts.length} prompts, need 10`);
-        }
-
-        // Cache the prompts
-        try { 
-          localStorage.setItem(`prompts_${company.id}`, JSON.stringify(data.prompts)); 
-        } catch {}
-
-        console.log(`Generated ${prompts.length} company-specific prompts`);
-        return prompts.slice(0, 10);
-      };
-
-      const prompts = await getCompanyPrompts();
-
-      setTestProgress({ current: 0, total: prompts.length });
-
-      console.log('Using company-specific prompts:', prompts.slice(0, 3), '... and', prompts.length - 3, 'more');
-      toast({ title: `Testing ${prompts.length} company-specific prompts`, description: 'AI-generated prompts tailored to your business.' });
+      console.log('Using cached prompts:', promptTexts.slice(0, 3), '... and', promptTexts.length - 3, 'more');
+      toast({ title: `Testing ${promptTexts.length} company-specific prompts`, description: 'Using prompts generated from your website.' });
 
       const results: TestResult[] = [];
       const errors: string[] = [];
       
-      for (let i = 0; i < prompts.length; i++) {
-        const currentPrompt = prompts[i];
+      for (let i = 0; i < promptTexts.length; i++) {
+        const currentPrompt = promptTexts[i];
         setCurrentTestPrompt(`Testing: "${currentPrompt}"`);
-        setTestProgress({ current: i + 1, total: prompts.length });
+        setTestProgress({ current: i + 1, total: promptTexts.length });
         
         try {
-          console.log(`Testing prompt ${i + 1}/${prompts.length}: "${currentPrompt}"`);
+          console.log(`Testing prompt ${i + 1}/${promptTexts.length}: "${currentPrompt}"`);
           
           const requestBody = {
             prompt: currentPrompt,
-            companyName: company.company_name,
-            industry: company.industry,
-            description: company.description || '',
-            differentiators: company.key_differentiators || ''
+            companyName: companyData.companyName,
+            industry: companyData.industry,
+            description: companyData.description || '',
+            differentiators: companyData.keyDifferentiators || ''
           };
           
           console.log('Sending request to test-ai-models:', requestBody);
@@ -1366,8 +1339,8 @@ export default function CleanGeoPage() {
                 const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-prompt-failure', {
                   body: {
                     prompt: currentPrompt,
-                    companyName: company.company_name,
-                    companyWebsite: company.website_url || '',
+                    companyName: companyData.companyName,
+                    companyWebsite: companyData.websiteUrl || '',
                     mentioned: testResult.mentioned,
                     position: testResult.position,
                     aiResponse: testResult.response
@@ -1384,29 +1357,12 @@ export default function CleanGeoPage() {
             
             results.push(testResult);
             
-            // Save each result to database immediately
-            try {
-              const { error: insertError } = await supabase
-                .from('ai_tests')
-                .insert({
-                  company_id: company.id,
-                  ai_model: 'openai-gpt-4o-mini',
-                  prompt_text: currentPrompt,
-                  response_text: result.response || '',
-                  company_mentioned: Boolean(result.mentioned),
-                  mention_position: Number(result.position) || 0,
-                  sentiment: result.sentiment || 'neutral',
-                  mention_context: result.context || '',
-                  test_date: new Date().toISOString(),
-                  competitors_mentioned: []
-                });
-              
-              if (insertError) {
-                console.error('Error saving test result:', insertError);
-              }
-            } catch (dbError) {
-              console.error('Database error:', dbError);
-            }
+            // Skip database saving for URL-based health checks (no company ID)
+            console.log(`Prompt ${i + 1} result:`, {
+              mentioned: testResult.mentioned,
+              position: testResult.position,
+              sentiment: testResult.sentiment
+            });
             
             const currentMentions = results.filter(r => r.mentioned).length;
             setCurrentTestPrompt(`Found ${currentMentions} mentions so far...`);
@@ -1433,10 +1389,10 @@ export default function CleanGeoPage() {
         console.error('Total errors:', errors.length);
         console.error('Detailed errors:', errors);
         console.error('Company data used:', { 
-          name: company.company_name, 
-          industry: company.industry,
-          hasDescription: !!company.description,
-          hasDifferentiators: !!company.key_differentiators 
+          name: companyData.companyName, 
+          industry: companyData.industry,
+          hasDescription: !!companyData.description,
+          hasDifferentiators: !!companyData.keyDifferentiators 
         });
         
         alert(`❌ Health check failed!\n\n${errorSummary}\n\nCheck the browser console (F12) for detailed technical information.`);
@@ -1479,11 +1435,11 @@ export default function CleanGeoPage() {
       }, 1000);
 
       // Get trending opportunities for this company
-      await getTrendingOpportunities();
+      await getTrendingOpportunities(companyData);
 
       // Load authority analysis and industry benchmark
-      await loadAuthorityAnalysis();
-      await loadIndustryBenchmark();
+      await loadAuthorityAnalysis(companyData);
+      await loadIndustryBenchmark(companyData);
 
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
@@ -1509,18 +1465,16 @@ export default function CleanGeoPage() {
   };
 
   // Get trending opportunities for the company
-  const getTrendingOpportunities = async () => {
-    if (!company) return;
-
+  const getTrendingOpportunities = async (companyData: any) => {
     try {
-      console.log('Getting trending opportunities for:', company.company_name);
+      console.log('Getting trending opportunities for:', companyData.companyName);
       
       const { data, error } = await supabase.functions.invoke('trending-opportunities', {
         body: {
-          industry: company.industry,
-          companyName: company.company_name,
-          services: company.key_differentiators?.split(',').map(s => s.trim()) || [],
-          keywords: [company.industry, company.company_name]
+          industry: companyData.industry,
+          companyName: companyData.companyName,
+          services: companyData.keyDifferentiators?.split(',').map(s => s.trim()) || [],
+          keywords: [companyData.industry, companyData.companyName]
         }
       });
 
@@ -1545,20 +1499,20 @@ export default function CleanGeoPage() {
   };
 
   // Generate strategies from all available test results (both automated and custom)
-  const getWebsiteAnalysis = async () => {
-    if (!company?.website_url) {
+  const getWebsiteAnalysis = async (companyData: any) => {
+    if (!companyData?.websiteUrl) {
       console.log('No website URL available for analysis');
       return null;
     }
     
     try {
-      console.log('Analyzing website:', company.website_url);
+      console.log('Analyzing website:', companyData.websiteUrl);
       const { data, error } = await supabase.functions.invoke('analyze-website', {
         body: {
-          url: company.website_url,
-          companyName: company.company_name,
-          industry: company.industry,
-          description: company.description
+          url: companyData.websiteUrl,
+          companyName: companyData.companyName,
+          industry: companyData.industry,
+          description: companyData.description
         }
       });
       
@@ -1644,16 +1598,14 @@ export default function CleanGeoPage() {
   };
 
   // Load authority analysis during health check
-  const loadAuthorityAnalysis = async () => {
-    if (!company) return;
-    
+  const loadAuthorityAnalysis = async (companyData: any) => {
     try {
-      console.log('Loading authority analysis for:', company.company_name);
+      console.log('Loading authority analysis for:', companyData.companyName);
       const { data, error } = await supabase.functions.invoke('analyze-competitive-authority', {
         body: {
-          companyName: company.company_name,
-          industry: company.industry,
-          keyDifferentiators: company.key_differentiators
+          companyName: companyData.companyName,
+          industry: companyData.industry,
+          keyDifferentiators: companyData.keyDifferentiators
         }
       });
 
@@ -1673,20 +1625,20 @@ export default function CleanGeoPage() {
   };
 
   // Load industry benchmark during health check  
-  const loadIndustryBenchmark = async () => {
-    if (!company || testResults.length === 0) return;
+  const loadIndustryBenchmark = async (companyData: any, results: TestResult[] = []) => {
+    if (results.length === 0) return;
     
     try {
-      console.log('Loading industry benchmark for:', company.company_name);
-      const mentionRate = testResults.length > 0 ? Math.round((testResults.filter(r => r.mentioned).length / testResults.length) * 100) : 0;
-      const avgPosition = testResults.filter(r => r.mentioned).length > 0 
-        ? Math.round(testResults.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / testResults.filter(r => r.mentioned).length)
+      console.log('Loading industry benchmark for:', companyData.companyName);
+      const mentionRate = results.length > 0 ? Math.round((results.filter(r => r.mentioned).length / results.length) * 100) : 0;
+      const avgPosition = results.filter(r => r.mentioned).length > 0 
+        ? Math.round(results.filter(r => r.mentioned).reduce((sum, r) => sum + r.position, 0) / results.filter(r => r.mentioned).length)
         : 0;
 
       const { data, error } = await supabase.functions.invoke('industry-benchmarking', {
         body: {
-          industry: company.industry,
-          companyName: company.company_name,
+          industry: companyData.industry,
+          companyName: companyData.companyName,
           currentMentionRate: mentionRate,
           currentAvgPosition: avgPosition
         }
@@ -1718,10 +1670,10 @@ export default function CleanGeoPage() {
       const { data: result, error } = await supabase.functions.invoke('test-ai-models', {
         body: {
           prompt: customPrompt,
-          companyName: company.company_name,
-          industry: company.industry,
-          description: company.description,
-          differentiators: company.key_differentiators
+          companyName: companyData.companyName,
+          industry: companyData.industry,
+          description: companyData.description,
+          differentiators: companyData.keyDifferentiators
         }
       });
 
@@ -1828,19 +1780,33 @@ export default function CleanGeoPage() {
     );
   }
 
-  if (!company) {
+  // Check if user can access health check (either has company profile OR cached URL-based data)
+  const hasHealthCheckData = findHealthCheckData();
+  
+  if (!company && !hasHealthCheckData) {
     return (
       <AppShell title="AI Health Check" subtitle="Test how visible your company is to AI models">
           <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-80">⚠️</div>
-          <h2 className="h2 mb-2">Company Profile Required</h2>
-          <p className="text-muted-foreground mb-6">Set up your company profile to start using AI Visibility testing and analysis.</p>
-          <button
-            onClick={() => setShowCompanySetup(true)}
-            className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90"
-          >
-            Set Up Company Profile
-          </button>
+          <h2 className="h2 mb-2">No Data Found</h2>
+          <p className="text-muted-foreground mb-6">
+            Please generate prompts first by going to the Prompts page and entering your website URL, 
+            or set up a company profile for full functionality.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => window.location.href = '/prompts'}
+              className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90"
+            >
+              Generate Prompts from URL
+            </button>
+            <button
+              onClick={() => setShowCompanySetup(true)}
+              className="inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              Set Up Company Profile
+            </button>
+          </div>
         </div>
         {showCompanySetup && (
           <div className="pt-4">
@@ -1855,7 +1821,7 @@ export default function CleanGeoPage() {
     );
   }
 
-  // Show edit form when in edit mode (but only after loading is complete)
+  // Show edit form when in edit mode (but only after loading is complete and company profile exists)
   if (isEditingProfile && !loading && company) {
     return (
       <AppShell title="Edit Company Profile" subtitle="Update your company information">
@@ -1913,7 +1879,7 @@ export default function CleanGeoPage() {
             strategies={autoStrategies}
             strategyLoading={strategyLoading}
             strategyError={strategyError}
-            company={company}
+            company={cachedCompanyData || company}
             onExportCsv={() => downloadCsv('geo-health-check.csv', lastResults as any)}
             onPrintReport={() => printReport('geo-report')}
             onCopyResults={copyGeoResultsToClipboard}

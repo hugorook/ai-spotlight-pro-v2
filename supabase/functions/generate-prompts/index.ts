@@ -570,8 +570,21 @@ serve(async (req: Request) => {
     
     const prompts = await generateRealisticPrompts(body);
     
+    // Also return the company data that was extracted/analyzed
+    const companyData = {
+      companyName: body.companyName,
+      industry: body.industry,
+      description: body.description,
+      targetCustomers: body.targetCustomers,
+      keyDifferentiators: body.keyDifferentiators,
+      websiteUrl: body.websiteUrl
+    };
+    
     console.log('generate-prompts completed successfully');
-    return new Response(JSON.stringify({ prompts }), { 
+    return new Response(JSON.stringify({ 
+      prompts,
+      companyData 
+    }), { 
       headers: { 'Content-Type': 'application/json', ...corsHeaders } 
     });
     
