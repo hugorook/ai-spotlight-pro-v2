@@ -48,6 +48,7 @@ async function analyzeResponse(input: {
   industry?: string;
   description?: string;
   differentiators?: string;
+  websiteUrl?: string;
 }) {
   if (!OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not set');
@@ -59,7 +60,7 @@ async function analyzeResponse(input: {
     + 'Determine: 1) mentioned (boolean), 2) position (1-10 where 1 = first mentioned, 0 = not mentioned), 3) sentiment, 4) context.'
     + " Return STRICT JSON: { \"mentioned\": boolean, \"position\": number, \"sentiment\": 'positive'|'neutral'|'negative', \"context\": string }.";
     
-  const user = `Original prompt: "${input.prompt}"\n\nAI Response to analyze:\n"${input.response}"\n\nCompany to look for:\nCompany: ${input.companyName}\nIndustry: ${input.industry ?? ''}\nDescription: ${input.description ?? ''}\nKey Differentiators: ${input.differentiators ?? ''}\n\nAnalyze this ACTUAL AI response - is the company mentioned by name or clearly referenced? What position? What sentiment?`;
+  const user = `Original prompt: "${input.prompt}"\n\nAI Response to analyze:\n"${input.response}"\n\nCompany to look for:\nCompany: ${input.companyName}\nIndustry: ${input.industry ?? ''}\nDescription: ${input.description ?? ''}\nKey Differentiators: ${input.differentiators ?? ''}\nKnown website/domain: ${input.websiteUrl ?? ''}\n\nRules: Treat an explicit brand name or clear website/domain reference (including variations like www., https, or bare domain) as a mention.\n\nAnalyze this ACTUAL AI response - is the company mentioned by name or clearly referenced? What position? What sentiment?`;
 
   console.log('Analyzing response for company mentions');
   
@@ -112,6 +113,7 @@ async function evaluatePrompt(input: {
   industry?: string;
   description?: string;
   differentiators?: string;
+  websiteUrl?: string;
 }) {
   try {
     // Step 1: Get the actual AI response to the prompt
@@ -130,7 +132,8 @@ async function evaluatePrompt(input: {
       companyName: input.companyName,
       industry: input.industry,
       description: input.description,
-      differentiators: input.differentiators
+      differentiators: input.differentiators,
+      websiteUrl: input.websiteUrl
     });
     
     // Heuristic fallback: simple string check to avoid false negatives
@@ -138,7 +141,16 @@ async function evaluatePrompt(input: {
     const normalizedName = input.companyName.toLowerCase();
     const nameStripped = normalizedName.replace(/[^a-z0-9\s]/gi, '').trim();
     const mentionedByString = normalizedResponse.includes(normalizedName) || (nameStripped && normalizedResponse.includes(nameStripped));
-    const finalMentioned = analysis.mentioned || mentionedByString;
+    // Check domain presence as a mention as well
+    let mentionedByDomain = false;
+    if (input.websiteUrl) {
+      try {
+        const url = new URL(input.websiteUrl.startsWith('http') ? input.websiteUrl : `https://${input.websiteUrl}`);
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        mentionedByDomain = normalizedResponse.includes(host);
+      } catch {}
+    }
+    const finalMentioned = analysis.mentioned || mentionedByString || mentionedByDomain;
     const finalPosition = analysis.position || (mentionedByString ? 1 : 0);
 
     // Return both the original response and the consolidated analysis

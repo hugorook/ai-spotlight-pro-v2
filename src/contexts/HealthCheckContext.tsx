@@ -443,7 +443,8 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
                 companyName: brandName,
                 industry: brandIndustry || '',
                 description: brandDescription || '',
-                differentiators: brandDifferentiators || ''
+                differentiators: brandDifferentiators || '',
+                websiteUrl: websiteUrl
               }
             });
 
