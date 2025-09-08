@@ -516,7 +516,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               competitors_mentioned: testResult.competitors_mentioned || [],
               response_text: testResult.response || '',
               test_date: new Date().toISOString(),
-              company_id: company.id,
+              company_id: companies?.[0]?.id || null,
             };
 
             // Save to database immediately
@@ -525,7 +525,9 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               .insert({ ...result, health_check_session_id: sessionId });
 
             if (insertError) {
-              console.error('Error saving test result:', insertError);
+              console.error('🔍 SAVING DEBUG: Error saving test result:', insertError);
+            } else if (globalIndex === 0) {
+              console.log('🔍 SAVING DEBUG: Successfully saved test result to ai_tests table');
             }
 
             return result;
@@ -543,7 +545,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               competitors_mentioned: [],
               response_text: 'Test failed',
               test_date: new Date().toISOString(),
-              company_id: company.id,
+              company_id: companies?.[0]?.id || null,
             } as TestResult;
           }
         });
@@ -608,7 +610,15 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       await generateAnalyticsData(brandForAnalytics, testResults, sessionId);
 
       // Mark session complete with summary metrics
-      await supabase
+      console.log('🔍 SAVING DEBUG: Updating session with results:', {
+        sessionId,
+        mention_rate: Math.round(mentionRate),
+        average_position: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
+        health_score: visibilityScore,
+        total_tests: testResults.length
+      });
+      
+      const { error: updateError } = await supabase
         .from('health_check_sessions')
         .update({
           completed_at: new Date().toISOString(),
@@ -617,6 +627,36 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           health_score: visibilityScore
         })
         .eq('id', sessionId);
+      
+      if (updateError) {
+        console.error('🔍 SAVING DEBUG: Failed to update session:', updateError);
+      } else {
+        console.log('🔍 SAVING DEBUG: Session updated successfully');
+      }
+
+      // Verify data was saved by attempting to load it back
+      console.log('🔍 VERIFICATION DEBUG: Verifying saved data...');
+      try {
+        const { data: verifySession } = await supabase
+          .from('health_check_sessions')
+          .select('id, completed_at, mention_rate, health_score')
+          .eq('id', sessionId)
+          .single();
+        
+        const { data: verifyTests } = await supabase
+          .from('ai_tests')
+          .select('id')
+          .eq('health_check_session_id', sessionId);
+        
+        console.log('🔍 VERIFICATION DEBUG: Data verification complete:', {
+          session: verifySession,
+          testCount: verifyTests?.length || 0,
+          sessionHasCompletedAt: !!verifySession?.completed_at,
+          sessionHasMetrics: !!verifySession?.mention_rate
+        });
+      } catch (verifyError) {
+        console.error('🔍 VERIFICATION DEBUG: Could not verify saved data:', verifyError);
+      }
 
       setState(prev => ({
         ...prev,
