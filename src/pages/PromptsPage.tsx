@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppShell from '@/components/layout/AppShell';
 import { useToast } from '@/components/ui/use-toast';
-import { Wand2, Save, RefreshCw, Globe, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
+import { Wand2, RefreshCw, Globe, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
 
 interface Prompt {
   id: string;
@@ -47,7 +47,6 @@ const PromptsPage = () => {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -375,33 +374,7 @@ const PromptsPage = () => {
     ));
   };
 
-  const savePrompts = async () => {
-    if (!company) return;
-    
-    setSaving(true);
-    
-    try {
-      const dbPrompts = prompts.map(p => ({
-        company_id: company.id,
-        text: p.text
-        // Note: Removed tags for now due to schema issue
-      }));
-      
-      await supabase.from('prompts').delete().eq('company_id', company.id);
-      const { error: insertError } = await supabase.from('prompts').insert(dbPrompts);
-      
-      if (insertError) throw insertError;
-      
-      setPrompts(prev => prev.map(p => ({ ...p, isEditing: false })));
-      
-      toast({ title: 'Success', description: 'Prompts saved successfully' });
-    } catch (error) {
-      console.error('Error saving prompts:', error);
-      toast({ title: 'Error', description: 'Failed to save prompts', variant: 'destructive' });
-    } finally {
-      setSaving(false);
-    }
-  };
+  // Prompts are automatically cached to localStorage when generated
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -469,23 +442,10 @@ const PromptsPage = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="h3">Generated Prompts ({prompts.length}/10)</h2>
               {prompts.length > 0 && (
-                <button
-                  onClick={savePrompts}
-                  disabled={saving}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Save All
-                    </>
-                  )}
-                </button>
+                <div className="text-sm text-green-600 flex items-center gap-2">
+                  <Check className="w-4 h-4" />
+                  Auto-saved to cache
+                </div>
               )}
             </div>
 
@@ -493,7 +453,7 @@ const PromptsPage = () => {
               <div className="text-center py-8 text-gray-500">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No prompts generated yet</p>
-                <p className="text-sm">Fill in company info and click "Generate Prompts"</p>
+                <p className="text-sm">Enter a website URL and click "Generate Prompts"</p>
               </div>
             ) : (
               <div className="space-y-3">
