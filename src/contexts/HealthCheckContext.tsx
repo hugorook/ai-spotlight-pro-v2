@@ -337,6 +337,28 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       // Load existing test prompts or generate new ones as fallback
       setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
       const prompts = await loadExistingPrompts(company);
+
+      // Brand/company info (from latest generated_prompts), fallback to company profile
+      let brandName = company.company_name as string;
+      let brandIndustry = company.industry as string | undefined;
+      let brandDescription = company.description as string | undefined;
+      let brandDifferentiators = (company as any).key_differentiators as string | undefined;
+      try {
+        const { data: latestGen } = await supabase
+          .from('generated_prompts')
+          .select('company_data')
+          .eq('user_id', user.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (latestGen?.company_data) {
+          const cd: any = latestGen.company_data;
+          brandName = cd.companyName || brandName;
+          brandIndustry = cd.industry || brandIndustry;
+          brandDescription = cd.description || brandDescription;
+          brandDifferentiators = cd.keyDifferentiators || brandDifferentiators;
+        }
+      } catch {}
       
       if (!prompts.length) {
         throw new Error('No prompts generated. Please try again.');
@@ -363,10 +385,10 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             const { data: testResult, error: testError } = await supabase.functions.invoke('test-ai-models', {
               body: {
                 prompt: prompt.text,
-                companyName: company.company_name,
-                industry: company.industry || '',
-                description: company.description || '',
-                model: 'openai-gpt-4o-mini'
+                companyName: brandName,
+                industry: brandIndustry || '',
+                description: brandDescription || '',
+                differentiators: brandDifferentiators || ''
               }
             });
 
