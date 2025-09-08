@@ -18,13 +18,13 @@ async function getActualAIResponse(prompt: string): Promise<string> {
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: 'You are a helpful AI assistant. Answer the user\'s question naturally and comprehensively.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.7,
-      max_tokens: 500,
+      temperature: 0.2,
+      max_tokens: 700,
     }),
   });
   
@@ -54,11 +54,10 @@ async function analyzeResponse(input: {
   }
   
   const sys =
-    'You are analyzing an AI response to determine if a specific company was mentioned. '
-    + 'Look at the actual response and determine: 1) if the company is mentioned by name or clearly implied, '
-    + '2) what position it appears in (1-10, where 1 = first mentioned), 3) the sentiment of the mention. '
-    + 'Return STRICT JSON with keys: mentioned (boolean), position (integer 1-10 where 1=first mentioned, 0=not mentioned), '
-    + "sentiment ('positive'|'neutral'|'negative'), context (brief explanation of the mention or why not mentioned). No extra text.";
+    'You are analyzing an AI response to determine if a target company is mentioned. '
+    + 'Consider exact names, common misspellings, plural/singular, website/brand references, and unambiguous descriptions. '
+    + 'Determine: 1) mentioned (boolean), 2) position (1-10 where 1 = first mentioned, 0 = not mentioned), 3) sentiment, 4) context.'
+    + " Return STRICT JSON: { \"mentioned\": boolean, \"position\": number, \"sentiment\": 'positive'|'neutral'|'negative', \"context\": string }.";
     
   const user = `Original prompt: "${input.prompt}"\n\nAI Response to analyze:\n"${input.response}"\n\nCompany to look for:\nCompany: ${input.companyName}\nIndustry: ${input.industry ?? ''}\nDescription: ${input.description ?? ''}\nKey Differentiators: ${input.differentiators ?? ''}\n\nAnalyze this ACTUAL AI response - is the company mentioned by name or clearly referenced? What position? What sentiment?`;
 
@@ -71,7 +70,7 @@ async function analyzeResponse(input: {
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: user },
