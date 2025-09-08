@@ -100,6 +100,22 @@ export default function Analytics() {
   // Historical data for progress tracking
   const [historicalTests, setHistoricalTests] = useState<any[]>([])
 
+  // One-time cleanup of legacy/stale localStorage keys that could show old results
+  useEffect(() => {
+    try {
+      const legacyKeys = [
+        'website_analysis',
+        'authority_analysis',
+        'benchmark_analysis',
+        'trending_analysis',
+        'website_analysis_enhanced',
+        'geo_last_run',
+        'geo_health_check_data'
+      ]
+      legacyKeys.forEach(k => localStorage.removeItem(k))
+    } catch {}
+  }, [])
+
   const tabs = [
     { id: 'results', label: 'Results', icon: BarChart3 },
     { id: 'website', label: 'Website Analysis', icon: Globe },
