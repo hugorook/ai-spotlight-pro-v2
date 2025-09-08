@@ -1287,7 +1287,8 @@ export default function CleanGeoPage() {
         
         if (error) {
           console.error('Failed to generate prompts:', error);
-          throw new Error(`Prompt generation failed: ${error.message}`);
+          console.error('Full error details:', JSON.stringify(error, null, 2));
+          throw new Error(`Prompt generation failed: ${error.message || JSON.stringify(error)}`);
         }
 
         const prompts = (data?.prompts || []).map((p: any) => p.text).filter((t: string) => t && t.trim());

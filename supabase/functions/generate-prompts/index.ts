@@ -31,7 +31,8 @@ interface GeneratedPrompt {
 
 async function generateRealisticPrompts(companyInfo: GeneratePromptsRequest): Promise<GeneratedPrompt[]> {
   if (!OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY not set');
+    console.error('OPENAI_API_KEY environment variable not set');
+    throw new Error('OPENAI_API_KEY not configured. Please check environment variables.');
   }
 
   console.log('Generating prompts from saved company fields only...');
