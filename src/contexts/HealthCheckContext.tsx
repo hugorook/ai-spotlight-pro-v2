@@ -88,13 +88,24 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       
       const company = companies[0];
 
-      // Load recent test results (last 25 tests)
+      // Load MOST RECENT session's results only
+      const { data: recentSession } = await supabase
+        .from('health_check_sessions')
+        .select('id, completed_at, started_at')
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false, nullsFirst: false })
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!recentSession) return;
+
       const { data: tests, error: testsError } = await supabase
         .from('ai_tests')
         .select('*')
         .eq('company_id', company.id)
-        .order('test_date', { ascending: false })
-        .limit(25);
+        .eq('health_check_session_id', recentSession.id)
+        .order('test_date', { ascending: false });
 
       if (testsError) {
         console.error('Error loading test results:', testsError);
@@ -334,6 +345,18 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
       const company = companies[0];
 
+      // Create a new health check session
+      const { data: sessionInsert, error: sessionError } = await supabase
+        .from('health_check_sessions')
+        .insert({ user_id: user.id, started_at: new Date().toISOString() })
+        .select('id')
+        .single();
+
+      if (sessionError || !sessionInsert) {
+        throw new Error('Failed to create health check session');
+      }
+      const sessionId = sessionInsert.id as string;
+
       // Load existing test prompts or generate new ones as fallback
       setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
       const prompts = await loadExistingPrompts(company);
@@ -411,7 +434,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             // Save to database immediately
             const { error: insertError } = await supabase
               .from('ai_tests')
-              .insert(result);
+              .insert({ ...result, health_check_session_id: sessionId });
 
             if (insertError) {
               console.error('Error saving test result:', insertError);
@@ -471,6 +494,17 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         website_url: (company as any).website_url
       };
       await generateAnalyticsData(brandForAnalytics, testResults);
+
+      // Mark session complete with summary metrics
+      await supabase
+        .from('health_check_sessions')
+        .update({
+          completed_at: new Date().toISOString(),
+          mention_rate: Math.round(mentionRate),
+          average_position: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
+          visibility_score: visibilityScore
+        })
+        .eq('id', sessionId);
 
       setState(prev => ({
         ...prev,
