@@ -268,13 +268,24 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
   const loadExistingPrompts = async (userId: string) => {
     try {
       // 1) Prefer latest prompts generated from Prompts page (persistent and user-specific)
+      console.log('🔍 HEALTH CHECK DEBUG: Loading prompts for user:', userId);
+      
       const { data: latestGen, error: genErr } = await supabase
         .from('generated_prompts')
-        .select('prompts, website_url, generated_at')
+        .select('*')
         .eq('user_id', userId)
         .order('generated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
+
+      console.log('🔍 HEALTH CHECK DEBUG: Database query result:', { 
+        data: latestGen, 
+        error: genErr,
+        hasData: !!latestGen,
+        promptsArray: latestGen?.prompts,
+        promptsLength: latestGen?.prompts?.length,
+        isArray: Array.isArray(latestGen?.prompts)
+      });
 
       if (genErr) {
         console.warn('generated_prompts query error:', genErr);
@@ -282,12 +293,17 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
       if (latestGen && Array.isArray(latestGen.prompts) && latestGen.prompts.length > 0) {
         console.log(`✅ Loaded ${latestGen.prompts.length} prompts from generated_prompts`);
+        console.log('🔍 First prompt sample:', latestGen.prompts[0]);
+        
         // Normalize shape: accept { text } objects or plain strings
-        return latestGen.prompts.map((p: any, idx: number) => ({
+        const normalizedPrompts = latestGen.prompts.map((p: any, idx: number) => ({
           text: typeof p === 'string' ? p : p.text || '',
           id: p.id || `gen-${idx}`,
           category: p.category || 'moderate'
         }));
+        
+        console.log('🔍 Normalized prompts sample:', normalizedPrompts[0]);
+        return normalizedPrompts;
       }
 
       // 2) Fallback to prompts table if user hasn’t generated prompts yet
