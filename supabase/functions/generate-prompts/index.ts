@@ -56,7 +56,7 @@ Using your knowledge about this company AND what you can infer from their domain
 6. Key services they're known for
 7. Their main value proposition
 
-Be SPECIFIC and DETAILED. If this is Xapien, mention due diligence research, background checks, regulatory compliance, automated research, etc.
+Be SPECIFIC and DETAILED based on the company’s own domain and known public knowledge.
 
 Return ONLY JSON format:
 {
@@ -277,11 +277,11 @@ FOCUS ON THEIR SPECIFIC SERVICES: ${companyInfo.keyDifferentiators}
 TARGET THEIR ACTUAL CUSTOMERS: ${companyInfo.targetCustomers}
 THEIR UNIQUE NICHE: ${companyInfo.industry}
 
-For Czarnikow specifically (major sugar trading house):
-- Sugar mill owner needing capital: "sugar trading companies that provide mill financing" (realistic + financing USP)
-- Food manufacturer needing risk coverage: "sugar trading firms with price risk management" (realistic + risk USP)  
-- Ethanol producer: "sugar and ethanol trading companies" (realistic + integrated complex USP)
-- Procurement manager needing full service: "sugar trading companies with integrated logistics" (realistic + logistics USP)
+Example patterns for established players in any industry (generic, not company-specific):
+- Procurement manager needing capital support: "[service] companies that provide [financing capability]"
+- Manufacturer needing risk coverage: "[industry] firms with [risk capability]"  
+- Operators needing integrated solutions: "[industry] companies with [integrated capability set]"
+- Procurement manager needing full service: "[industry] companies with [logistics/operations capability]"
 
 CUSTOMER-PERSPECTIVE PROMPTS (KEY STRATEGY):
 Think from the perspective of their ACTUAL customers - what would these people realistically search for?
@@ -417,7 +417,7 @@ JSON FORMAT (EXACTLY ${companyInfo.requestedCount || 10} prompts):
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { 
           role: 'system', 
@@ -492,12 +492,12 @@ CRITICAL STRATEGY:
 - Current industry trends (AI, sustainability, digital transformation, etc.)
 - Combined with their core services
 
-For Czarnikow example - EASY-WIN realistic specificity:
-❌ "Sugar trading companies" (too broad, hundreds of results)
-✅ "Major sugar trading companies globally" (realistic search, naturally favors established leaders)
-✅ "Sugar trading companies in Brazil" (real geographic need, their key strength)
-✅ "Largest sugar commodity traders" (realistic analyst search, targets major players)
-✅ "Sugar trading firms with mill financing" (real customer need they fulfill)
+Generic example pattern for EASY-WIN specificity:
+❌ "[industry] companies" (too broad)
+✅ "Major [industry] companies globally" (realistic search, favors established leaders)
+✅ "[industry] companies in [key market]" (real geographic need)
+✅ "Largest [service] providers" (realistic analyst search)
+✅ "[service] firms with [key capability]" (real customer need)
 
 The easy-wins should be REALISTIC SEARCHES that naturally favor established market leaders like this company.`;
 
@@ -508,7 +508,7 @@ The easy-wins should be REALISTIC SEARCHES that naturally favor established mark
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: 'Return ONLY valid JSON in the provided schema.' },
             { role: 'user', content: `${promptGenerationRequest}\n\n${strictPrompt}` },

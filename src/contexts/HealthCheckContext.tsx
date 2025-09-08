@@ -461,7 +461,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
       // Generate analytics data to populate all analytics hub sections
       setState(prev => ({ ...prev, currentPrompt: 'Generating analytics insights...' }));
-      await generateAnalyticsData(company, testResults);
+      // Generate analytics bound to the same brand/companydata we just used
+      const brandForAnalytics = {
+        ...company,
+        company_name: brandName,
+        industry: brandIndustry || company.industry,
+        description: brandDescription || company.description,
+        key_differentiators: brandDifferentiators || (company as any).key_differentiators,
+        website_url: (company as any).website_url
+      };
+      await generateAnalyticsData(brandForAnalytics, testResults);
 
       setState(prev => ({
         ...prev,
