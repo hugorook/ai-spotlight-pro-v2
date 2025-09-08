@@ -240,32 +240,37 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
 
   const loadExistingPrompts = async (company: any) => {
     try {
-      // First, try to load existing prompts from localStorage (from PromptsPage/CompanyProfile)
-      const savedPrompts = localStorage.getItem(`prompts_${company.id}`);
-      if (savedPrompts) {
-        try {
-          const parsed = JSON.parse(savedPrompts);
-          if (parsed && parsed.length > 0) {
-            console.log(`Loaded ${parsed.length} existing prompts from localStorage`);
-            return parsed.map((p: any) => ({
-              text: p.text,
-              id: p.id,
-              category: p.category
-            }));
-          }
-        } catch (e) {
-          console.error('Error parsing saved prompts:', e);
-        }
+      // 1) Prefer latest prompts generated from Prompts page (persistent and user-specific)
+      const { data: latestGen, error: genErr } = await supabase
+        .from('generated_prompts')
+        .select('prompts, website_url, generated_at')
+        .eq('user_id', company.user_id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (genErr) {
+        console.warn('generated_prompts query error:', genErr);
       }
 
-      // If no prompts in localStorage, check database prompts table
+      if (latestGen && Array.isArray(latestGen.prompts) && latestGen.prompts.length > 0) {
+        console.log(`Loaded ${latestGen.prompts.length} prompts from generated_prompts`);
+        // Normalize shape: accept { text } objects or plain strings
+        return latestGen.prompts.map((p: any, idx: number) => ({
+          text: typeof p === 'string' ? p : p.text || '',
+          id: p.id || `gen-${idx}`,
+          category: p.category || 'moderate'
+        }));
+      }
+
+      // 2) Fallback to prompts table if user hasn’t generated prompts yet
       const { data: dbPrompts } = await supabase
         .from('prompts')
-        .select('*')
+        .select('id, text')
         .eq('company_id', company.id);
 
       if (dbPrompts && dbPrompts.length > 0) {
-        console.log(`Loaded ${dbPrompts.length} existing prompts from database`);
+        console.log(`Loaded ${dbPrompts.length} prompts from prompts table`);
         return dbPrompts.map((p: any) => ({
           text: p.text,
           id: p.id,
@@ -273,8 +278,8 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         }));
       }
 
-      // If still no prompts found, generate new ones as fallback
-      console.log('No existing prompts found, generating new ones...');
+      // 3) As a last resort, generate fresh prompts
+      console.log('No stored prompts found, generating new ones as fallback...');
       const { data, error } = await supabase.functions.invoke('generate-prompts', {
         body: {
           companyName: company.company_name,
@@ -288,7 +293,12 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       });
 
       if (error) throw error;
-      return data?.prompts || [];
+      const generated = (data?.prompts || []).map((p: any, idx: number) => ({
+        text: typeof p === 'string' ? p : p.text || '',
+        id: p.id || `gen-fallback-${idx}`,
+        category: p.category || 'moderate'
+      }));
+      return generated;
     } catch (error) {
       console.error('Error loading prompts:', error);
       throw new Error('Failed to load test prompts');
