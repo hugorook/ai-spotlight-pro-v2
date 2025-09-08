@@ -409,17 +409,17 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         .from('health_check_sessions')
         .insert({ 
           user_id: user.id, 
-          company_id: company.id,
-          website_url: (company as any).website_url || null,
+          company_id: companies?.[0]?.id || null, // Only use real company ID, null for URL-only workflow
+          website_url: company.website_url || null,
           company_data: {
             company_name: company.company_name,
             industry: company.industry,
             description: company.description,
-            key_differentiators: (company as any).key_differentiators
+            key_differentiators: company.key_differentiators
           },
           prompts_used: prompts.map((p: any) => p.text),
           total_prompts: prompts.length,
-          session_type: 'company_profile',
+          session_type: companies?.[0] ? 'company_profile' : 'url_analysis',
           created_at: new Date().toISOString(),
           started_at: new Date().toISOString()
         })
@@ -427,7 +427,8 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         .single();
 
       if (sessionError || !sessionInsert) {
-        throw new Error('Failed to create health check session');
+        console.error('🔍 HEALTH CHECK DEBUG: Session creation error:', sessionError);
+        throw new Error(`Failed to create health check session: ${sessionError?.message || 'No session data returned'}`);
       }
       const sessionId = sessionInsert.id as string;
 
