@@ -1314,7 +1314,37 @@ export default function CleanGeoPage() {
   };
 
   const runHealthCheck = async () => {
-    const healthCheckData = findHealthCheckData();
+    // First try to get the most recent prompts from the database
+    let healthCheckData = null;
+    
+    try {
+      const { data: recentPrompts, error } = await supabase
+        .from('generated_prompts')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .single();
+        
+      if (!error && recentPrompts) {
+        healthCheckData = {
+          prompts: recentPrompts.prompts,
+          companyData: recentPrompts.company_data,
+          websiteUrl: recentPrompts.website_url
+        };
+        console.log('Using latest prompts from database for health check:', recentPrompts.prompts.length);
+      }
+    } catch (err) {
+      console.warn('Could not load latest prompts from database:', err);
+    }
+    
+    // Fallback to localStorage if database fails
+    if (!healthCheckData) {
+      healthCheckData = findHealthCheckData();
+      if (healthCheckData) {
+        console.log('Using cached prompts from localStorage for health check');
+      }
+    }
     
     if (!healthCheckData) {
       alert('Please generate prompts first by going to the Prompts page and entering your website URL.');
@@ -1525,12 +1555,21 @@ export default function CleanGeoPage() {
         setShowResultsSection(true);
       }, 1000);
 
-      // Get trending opportunities for this company
-      await getTrendingOpportunities(companyData, healthCheckSessionId);
+      // Run all analytics in parallel for better performance
+      console.log('Running analytics with session ID:', healthCheckSessionId);
+      
+      await Promise.allSettled([
+        // Website analysis
+        getWebsiteAnalysis(companyData, healthCheckSessionId),
+        // Trending opportunities
+        getTrendingOpportunities(companyData, healthCheckSessionId),
+        // Authority analysis  
+        loadAuthorityAnalysis(companyData, healthCheckSessionId),
+        // Industry benchmark
+        loadIndustryBenchmark(companyData, healthCheckSessionId, results)
+      ]);
 
-      // Load authority analysis and industry benchmark
-      await loadAuthorityAnalysis(companyData, healthCheckSessionId);
-      await loadIndustryBenchmark(companyData, healthCheckSessionId, results);
+      console.log('All analytics completed');
 
       // Generate strategy using all available results
       await generateStrategiesFromAllResults();
@@ -1612,7 +1651,7 @@ export default function CleanGeoPage() {
   };
 
   // Generate strategies from all available test results (both automated and custom)
-  const getWebsiteAnalysis = async (companyData: any) => {
+  const getWebsiteAnalysis = async (companyData: any, sessionId?: string) => {
     if (!companyData?.websiteUrl) {
       console.log('No website URL available for analysis');
       return null;
@@ -1634,7 +1673,40 @@ export default function CleanGeoPage() {
         return null;
       }
       
-      console.log('Website analysis completed');
+      if (data) {
+        setWebsiteAnalysis(data);
+        
+        // Save to database for persistence
+        if (sessionId) {
+          try {
+            const { error: dbError } = await supabase
+              .from('analytics_data')
+              .upsert({
+                user_id: user?.id,
+                health_check_session_id: sessionId,
+                analytics_type: 'website_analysis',
+                data: data,
+                generated_at: new Date().toISOString()
+              });
+              
+            if (dbError) {
+              console.warn('Could not save website analysis to database:', dbError);
+            }
+          } catch (err) {
+            console.warn('Database save failed for website analysis:', err);
+          }
+        }
+        
+        // Also persist to localStorage
+        const stored = localStorage.getItem('geo_health_check_data');
+        const healthData = stored ? JSON.parse(stored) : {};
+        healthData.websiteAnalysis = data;
+        healthData.timestamp = Date.now();
+        localStorage.setItem('geo_health_check_data', JSON.stringify(healthData));
+        
+        console.log('Website analysis completed and saved');
+      }
+      
       return data;
     } catch (error) {
       console.error('Failed to analyze website:', error);
