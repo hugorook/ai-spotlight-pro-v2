@@ -134,55 +134,50 @@ export default function Analytics() {
     }
   }, [])
 
-  // Load analytics data from most recent health check
+  // Load analytics data from most recent health check SESSION (from DB, not localStorage)
   useEffect(() => {
     try {
-      // Analytics data should come from health check context, not localStorage
-      // Only load if we have health check results
-      if (healthCheckResults.length > 0) {
-        setShowResultsSection(true)
+      const load = async () => {
+        if (!user) return
         
-        // Generate content opportunities from health check results
-        if (company) {
-          generateContentOpportunities(testResults, company)
+        // Determine most recent session
+        const { data: session } = await supabase
+          .from('health_check_sessions')
+          .select('id, completed_at')
+          .eq('user_id', user.id)
+          .order('completed_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (!session) return
+
+        // Load analytics data for that session in parallel
+        const { data: analyticsRows } = await supabase
+          .from('analytics_data')
+          .select('analytics_type, data')
+          .eq('health_check_session_id', session.id)
+          .eq('user_id', user.id)
+
+        if (analyticsRows && analyticsRows.length > 0) {
+          for (const row of analyticsRows) {
+            if (row.analytics_type === 'website_analysis') setWebsiteAnalysis(row.data)
+            if (row.analytics_type === 'authority_analysis') setAuthorityAnalysis(row.data?.analysis ?? row.data)
+            if (row.analytics_type === 'industry_benchmark') setIndustryBenchmark(row.data?.benchmark ?? row.data)
+            if (row.analytics_type === 'trending_opportunities') setTrendingOpportunities(row.data?.opportunities || [])
+          }
         }
-        
-        // Load analytics data that was generated during health check
-        // TODO: These should come from the health check context once implemented
-        const websiteData = localStorage.getItem('website_analysis')
-        if (websiteData) {
-          try {
-            const parsed = JSON.parse(websiteData)
-            setWebsiteAnalysis(parsed)
-          } catch {}
-        }
-        
-        const authorityData = localStorage.getItem('authority_analysis')
-        if (authorityData) {
-          try {
-            const parsed = JSON.parse(authorityData)
-            setAuthorityAnalysis(parsed?.analysis ?? parsed)
-          } catch {}
-        }
-        
-        const benchmarkData = localStorage.getItem('benchmark_analysis')
-        if (benchmarkData) {
-          try {
-            const parsed = JSON.parse(benchmarkData)
-            setIndustryBenchmark(parsed?.benchmark ?? parsed)
-          } catch {}
-        }
-        
-        const trendingData = localStorage.getItem('trending_analysis')
-        if (trendingData) {
-          const parsed = JSON.parse(trendingData)
-          setTrendingOpportunities(parsed.opportunities || [])
+
+        // Show results when we have test results in context or from DB
+        if (healthCheckResults.length > 0) {
+          setShowResultsSection(true)
+          if (company) generateContentOpportunities(testResults, company)
         }
       }
+      load()
     } catch (error) {
       console.error('Error loading analytics data:', error)
     }
-  }, [healthCheckResults, company, testResults])
+  }, [healthCheckResults, company, testResults, user])
 
   const loadCompanyData = useCallback(async () => {
     if (!user) return

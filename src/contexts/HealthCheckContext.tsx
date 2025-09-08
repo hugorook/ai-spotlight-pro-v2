@@ -140,7 +140,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
     }
   };
 
-  const generateAnalyticsData = async (company: any, testResults: TestResult[]) => {
+  const generateAnalyticsData = async (company: any, testResults: TestResult[], sessionId: string) => {
     try {
       // Generate all analytics data in parallel to populate analytics hub sections
       const analyticsPromises = [];
@@ -167,12 +167,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               companyName: company.company_name,
               industry: company.industry
             }
-          }).then(result => {
+          }).then(async result => {
             if (result.data) {
-              localStorage.setItem('website_analysis', JSON.stringify({
-                ...result.data,
-                fetchedAt: new Date().toISOString()
-              }));
+              await supabase
+                .from('analytics_data')
+                .insert({
+                  user_id: company.user_id,
+                  health_check_session_id: sessionId,
+                  analytics_type: 'website_analysis',
+                  data: result.data
+                });
             }
           }).catch(error => console.error('Website analysis failed:', error))
         );
@@ -186,12 +190,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
             industry: company.industry,
             keyDifferentiators: company.key_differentiators
           }
-        }).then(result => {
+        }).then(async result => {
           if (result.data) {
-            localStorage.setItem('authority_analysis', JSON.stringify({
-              ...result.data,
-              generatedAt: new Date().toISOString()
-            }));
+            await supabase
+              .from('analytics_data')
+              .insert({
+                user_id: company.user_id,
+                health_check_session_id: sessionId,
+                analytics_type: 'authority_analysis',
+                data: result.data
+              });
           }
         }).catch(error => console.error('Authority analysis failed:', error))
       );
@@ -207,12 +215,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               .reduce((sum, r, _, arr) => sum + (r.mention_position || 0) / arr.length, 0) || 0,
             testResults: testResults
           }
-        }).then(result => {
+        }).then(async result => {
           if (result.data) {
-            localStorage.setItem('benchmark_analysis', JSON.stringify({
-              ...result.data,
-              analyzedAt: new Date().toISOString()
-            }));
+            await supabase
+              .from('analytics_data')
+              .insert({
+                user_id: company.user_id,
+                health_check_session_id: sessionId,
+                analytics_type: 'industry_benchmark',
+                data: result.data
+              });
           }
         }).catch(error => console.error('Benchmark analysis failed:', error))
       );
@@ -229,12 +241,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               .filter(Boolean),
             keywords: [company.industry, company.company_name]
           }
-        }).then(result => {
+        }).then(async result => {
           if (result.data) {
-            localStorage.setItem('trending_analysis', JSON.stringify({
-              ...result.data,
-              generatedAt: new Date().toISOString()
-            }));
+            await supabase
+              .from('analytics_data')
+              .insert({
+                user_id: company.user_id,
+                health_check_session_id: sessionId,
+                analytics_type: 'trending_opportunities',
+                data: result.data
+              });
           }
         }).catch(error => console.error('Trending analysis failed:', error))
       );
@@ -346,9 +362,29 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       const company = companies[0];
 
       // Create a new health check session
+      // Load existing test prompts or generate new ones as fallback
+      setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
+      const prompts = await loadExistingPrompts(company);
+
+      // Create a new health check session AFTER loading prompts, so we can persist required fields
       const { data: sessionInsert, error: sessionError } = await supabase
         .from('health_check_sessions')
-        .insert({ user_id: user.id, started_at: new Date().toISOString() })
+        .insert({ 
+          user_id: user.id, 
+          company_id: company.id,
+          website_url: (company as any).website_url || null,
+          company_data: {
+            company_name: company.company_name,
+            industry: company.industry,
+            description: company.description,
+            key_differentiators: (company as any).key_differentiators
+          },
+          prompts_used: prompts.map((p: any) => p.text),
+          total_prompts: prompts.length,
+          session_type: 'company_profile',
+          created_at: new Date().toISOString(),
+          started_at: new Date().toISOString()
+        })
         .select('id')
         .single();
 
@@ -356,10 +392,6 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         throw new Error('Failed to create health check session');
       }
       const sessionId = sessionInsert.id as string;
-
-      // Load existing test prompts or generate new ones as fallback
-      setState(prev => ({ ...prev, currentPrompt: 'Loading test prompts...' }));
-      const prompts = await loadExistingPrompts(company);
 
       // Brand/company info (from latest generated_prompts), fallback to company profile
       let brandName = company.company_name as string;
@@ -493,7 +525,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         key_differentiators: brandDifferentiators || (company as any).key_differentiators,
         website_url: (company as any).website_url
       };
-      await generateAnalyticsData(brandForAnalytics, testResults);
+      await generateAnalyticsData(brandForAnalytics, testResults, sessionId);
 
       // Mark session complete with summary metrics
       await supabase

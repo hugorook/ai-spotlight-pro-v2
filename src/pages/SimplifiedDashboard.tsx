@@ -277,7 +277,7 @@ export default function TodayDashboard() {
         }
       }
 
-      // Update dashboard data with health check results
+      // Update dashboard data with health check results (always latest session via context)
       setData(prev => ({
         ...prev,
         wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
