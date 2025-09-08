@@ -254,9 +254,45 @@ export default function Analytics() {
   const runHealthCheck = async () => {
     try {
       const result = await contextRunHealthCheck()
+      // Robust: compute metrics from latest session in DB to avoid any transient state
+      let displayMention = (result as any)?.mentionRate ?? null
+      let displayScore = (result as any)?.visibilityScore ?? null
+
+      try {
+        if (!displayMention || displayScore == null) {
+          const { data: session } = await supabase
+            .from('health_check_sessions')
+            .select('id')
+            .eq('user_id', user!.id)
+            .order('completed_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (session) {
+            const { data: tests } = await supabase
+              .from('ai_tests')
+              .select('company_mentioned, mention_position')
+              .eq('company_id', company?.id!)
+              .eq('health_check_session_id', session.id)
+
+            if (tests && tests.length > 0) {
+              const mentioned = tests.filter(t => t.company_mentioned)
+              const mr = Math.round((mentioned.length / tests.length) * 100)
+              const avgPos = mentioned.length > 0 
+                ? mentioned.reduce((s, t) => s + (t.mention_position || 0), 0) / mentioned.length
+                : 0
+              const positionScore = avgPos ? Math.max(0, (11 - avgPos) / 10) : 0
+              const vs = Math.round(mr * 0.7 + positionScore * 100 * 0.3)
+              displayMention = displayMention ?? mr
+              displayScore = displayScore ?? vs
+            }
+          }
+        }
+      } catch {}
+
       toast({
         title: 'Health Check Complete',
-        description: `Found ${result && 'mentionRate' in result ? result.mentionRate : mentionRate}% mention rate with visibility score of ${result && 'visibilityScore' in result ? result.visibilityScore : visibilityScore}`
+        description: `Found ${displayMention ?? 0}% mention rate with visibility score of ${displayScore ?? 0}`
       })
     } catch (error) {
       console.error('Error running health check:', error)

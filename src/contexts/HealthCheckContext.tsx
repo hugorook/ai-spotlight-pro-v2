@@ -534,7 +534,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
           completed_at: new Date().toISOString(),
           mention_rate: Math.round(mentionRate),
           average_position: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
-          visibility_score: visibilityScore
+          health_score: visibilityScore
         })
         .eq('id', sessionId);
 
