@@ -337,12 +337,12 @@ export default function TodayDashboard() {
                       No results yet. Run a report to get started.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                  <div className="flex-shrink-0 mt-3">
                     <button 
-                      onClick={() => navigate('/wins')}
-                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                      onClick={() => navigate('/analytics?tab=results')}
+                      className="text-[12px] text-[#3d3d38] hover:underline"
                     >
-                      View All
+                      View Details
                     </button>
                   </div>
                 </CardContent>
@@ -362,12 +362,12 @@ export default function TodayDashboard() {
                       No results yet. Run a report to get started.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                  <div className="flex-shrink-0 mt-3">
                     <button 
-                      onClick={() => navigate('/actions')}
-                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                      onClick={() => navigate('/analytics?tab=results')}
+                      className="text-[12px] text-[#3d3d38] hover:underline"
                     >
-                      View All
+                      View Details
                     </button>
                   </div>
                 </CardContent>
@@ -387,12 +387,12 @@ export default function TodayDashboard() {
                       No results yet. Run a report to get started.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                  <div className="flex-shrink-0 mt-3">
                     <button 
-                      onClick={() => navigate('/improvements')}
-                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                      onClick={() => navigate('/analytics?tab=results')}
+                      className="text-[12px] text-[#3d3d38] hover:underline"
                     >
-                      View All
+                      View Details
                     </button>
                   </div>
                 </CardContent>

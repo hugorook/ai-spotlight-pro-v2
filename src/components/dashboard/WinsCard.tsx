@@ -126,12 +126,14 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
         </>
       )}
 
-      <button 
-        onClick={() => navigate('/analytics?tab=results')}
-        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
-      >
-        View all wins →
-      </button>
+      {!embedded && (
+        <button 
+          onClick={() => navigate('/analytics?tab=results')}
+          className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
+        >
+          View all wins →
+        </button>
+      )}
     </div>
   )
 }
