@@ -62,9 +62,9 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-60 z-[100] flex flex-col">
+    <div className="fixed left-0 top-0 bottom-0 w-60 z-[100] flex flex-col pointer-events-none">
       {/* Landing-style Sidebar Box */}
-      <div className="flex-1 mx-6 my-6 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm flex flex-col gap-3">
+      <div className="flex-1 mx-6 my-6 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm flex flex-col gap-3 pointer-events-auto">
         {/* Logo */}
         <div className="px-3 pt-3 pb-2 text-[14px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
 
@@ -101,7 +101,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       </div>
 
       {/* Login box below or user */}
-      <div className="mx-6 mb-6 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2">
+      <div className="mx-6 mb-6 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2 pointer-events-auto">
         {user ? (
           <div className="flex items-center gap-2 px-2">
             <button

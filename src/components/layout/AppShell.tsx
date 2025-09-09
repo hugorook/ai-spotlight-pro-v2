@@ -29,7 +29,7 @@ export default function AppShell({
   const isHealthCheckPage = showHealthCheckSidebar;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#ece7e0] text-foreground">
       {/* Enhanced Sidebar with all navigation */}
       <EnhancedSidebar 
         activeHealthTab={isHealthCheckPage ? activeTab : undefined}
