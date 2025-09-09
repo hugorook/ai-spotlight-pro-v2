@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Brain, BarChart3, User, Settings, MessageSquare, ChevronDown, ChevronRight, Activity, Globe, TrendingUp, Award } from 'lucide-react';
+import { Brain, BarChart3, User, Settings, MessageSquare, Activity, Globe, LogIn as LogInIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -66,7 +66,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       {/* Landing-style Sidebar Box */}
       <div className="flex-1 mx-6 my-6 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm flex flex-col gap-3 pointer-events-auto">
         {/* Logo */}
-        <div className="px-3 pt-3 pb-2 text-[14px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
+        <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
 
         {/* Navigation */}
         <nav className="px-2 space-y-1 flex-1">
@@ -81,10 +81,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   : "text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
               )}
             >
-              <span className="flex items-center gap-2">
-                {React.cloneElement(item.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
-                {item.label}
-              </span>
+              <span className="text-[13px] font-normal">{item.label}</span>
+              {React.cloneElement(item.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
             </button>
           ))}
         </nav>
@@ -95,7 +93,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
             onClick={() => navigate('/settings')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors text-[13px] text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
           >
-            <span className="flex items-center gap-2"><Settings className="w-3.5 h-3.5" /> Settings</span>
+            <span className="text-[13px] font-normal">Settings</span>
+            <Settings className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -120,7 +119,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
             onClick={() => navigate('/auth')}
             className="w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors text-[13px] text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
           >
-            <span>Log in</span>
+            <span className="text-[13px] font-normal">Log in</span>
+            <LogInIcon className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
