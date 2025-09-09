@@ -273,10 +273,9 @@ export default function TodayDashboard() {
       <div className="min-h-screen bg-[#ece7e0]">
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-corben text-[#282823] text-4xl" style={{fontWeight: 400}}>
-              Dashboard
-            </h1>
+          <div className="mb-6">
+            <h1 className="font-corben text-[#282823] text-3xl" style={{fontWeight: 400}}>Dashboard</h1>
+            <p className="text-[12px] text-[#3d3d38]">Your AI visibility at a glance</p>
           </div>
 
 
@@ -319,24 +318,22 @@ export default function TodayDashboard() {
           {/* Main dashboard grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Wins Card */}
-            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-corben text-[#282823] text-xl" style={{fontWeight: 400}}>
-                    Wins
-                  </h3>
-                  <TrendingUp className="w-5 h-5 text-[#3d3d38]" />
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
                 </div>
+                <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                 <WinsCard
                   wins={data.wins}
                   isLoading={isLoading || isRunningHealthCheck}
                   onRefresh={handleRunHealthCheck}
                   embedded
                 />
-                <div className="mt-4">
+                <div className="mt-3">
                   <button 
                     onClick={() => navigate('/wins')}
-                    className="text-sm font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
                   >
                     View All
                   </button>
@@ -347,22 +344,20 @@ export default function TodayDashboard() {
             {/* Actions Card */}
             <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-corben text-[#282823] text-xl" style={{fontWeight: 400}}>
-                    Actions
-                  </h3>
-                  <Target className="w-5 h-5 text-[#3d3d38]" />
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
                 </div>
+                <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                 <TopActionsCard
                   actions={data.actions}
                   isLoading={isLoading || isRunningHealthCheck}
                   onActionClick={handleActionClick}
                   embedded
                 />
-                <div className="mt-4">
+                <div className="mt-3">
                   <button 
                     onClick={() => navigate('/actions')}
-                    className="text-sm font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
                   >
                     View All
                   </button>
@@ -373,22 +368,20 @@ export default function TodayDashboard() {
             {/* Improvements Card */}
             <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-corben text-[#282823] text-xl" style={{fontWeight: 400}}>
-                    Improvements
-                  </h3>
-                  <Sparkles className="w-5 h-5 text-[#3d3d38]" />
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
                 </div>
+                <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                 <ImprovementsCard
                   improvements={data.improvements}
                   isLoading={isLoading || isRunningHealthCheck}
                   onRefresh={handleRunHealthCheck}
                   embedded
                 />
-                <div className="mt-4">
+                <div className="mt-3">
                   <button 
                     onClick={() => navigate('/improvements')}
-                    className="text-sm font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
                   >
                     View All
                   </button>
