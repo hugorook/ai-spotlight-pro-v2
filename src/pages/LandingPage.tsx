@@ -135,7 +135,6 @@ const LandingPage = () => {
     { label: "Analytics", icon: BarChart3, href: "/analytics" },
     { label: "Auto-pilot", icon: Zap, href: "/site-connection" },
     { label: "Prompts", icon: FileText, href: "/prompts" },
-    { label: "Company", icon: Building2, href: "/content" },
   ];
 
   const settingsItems = [
