@@ -52,22 +52,27 @@ export default function TodayDashboard() {
     improvements: []
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
-  // Load dashboard data
+  // Single effect to handle all data loading consistently
   useEffect(() => {
     if (user) {
-      loadDashboardData()
+      loadAllData()
     }
   }, [user])
 
-  // Update dashboard data when health check results change
+  // Only update health check data after initial load, and debounce it
   useEffect(() => {
-    if (healthCheckResults.length > 0) {
-      updateDashboardWithHealthCheckResults()
+    if (dataLoaded && healthCheckResults.length > 0) {
+      const timeoutId = setTimeout(() => {
+        updateDashboardWithHealthCheckResults()
+      }, 100) // Small delay to prevent race conditions
+      
+      return () => clearTimeout(timeoutId)
     }
-  }, [healthCheckResults])
+  }, [healthCheckResults, dataLoaded])
 
-  const loadDashboardData = async () => {
+  const loadAllData = async () => {
     try {
       setIsLoading(true)
 
@@ -128,12 +133,15 @@ export default function TodayDashboard() {
       const wins = winsResult.data?.wins || []
       const actions = actionsResult.data?.recommendations || []
 
-      setData({
+      const finalData = {
         project,
         wins: Array.isArray(wins) ? wins : (wins.wins || []),
         actions: Array.isArray(actions) ? actions : [],
         improvements: [] // Initialize as empty array until health check runs
-      })
+      }
+      
+      setData(finalData)
+      setDataLoaded(true)
     } catch (error) {
       console.error('Error loading dashboard:', error)
       toast({
@@ -148,6 +156,8 @@ export default function TodayDashboard() {
 
 
   const updateDashboardWithHealthCheckResults = async () => {
+    if (!dataLoaded) return // Don't update until initial data is loaded
+    
     try {
       // Convert health check results to dashboard format
       const wins: any[] = []
@@ -217,13 +227,16 @@ export default function TodayDashboard() {
         }
       }
 
-      // Update dashboard data with health check results (always latest session via context)
-      setData(prev => ({
-        ...prev,
-        wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
-        actions,
-        improvements: improvements.slice(0, 8) // Show top 8 improvements
-      }))
+      // Update dashboard data with health check results atomically
+      setData(prev => {
+        const updatedData = {
+          ...prev,
+          wins: wins.length > 0 ? wins.sort((a, b) => a.rank - b.rank) : prev.wins,
+          actions: actions.length > 0 ? actions : prev.actions,
+          improvements: improvements.length > 0 ? improvements.slice(0, 8) : prev.improvements
+        }
+        return updatedData
+      })
 
     } catch (error) {
       console.error('Error updating dashboard with health check results:', error)
