@@ -465,9 +465,16 @@ const LandingPage = () => {
                           suffix={suffix}
                           className="font-corben text-[#282823] text-4xl md:text-5xl lg:text-6xl"
                         />
-                        <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-3 md:mt-4">
-                          {stat.description}
-                        </div>
+                        {(() => {
+                          const caption = stat.description
+                            .replace(/\sUsers\b/, "\nUsers")
+                            .replace(/\sTraffic\b/, "\nTraffic");
+                          return (
+                            <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-3 md:mt-4 whitespace-pre-line">
+                              {caption}
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
