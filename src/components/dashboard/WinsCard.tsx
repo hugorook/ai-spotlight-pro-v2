@@ -43,36 +43,30 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
 
   return (
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
-      {!embedded && (
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="h3">Where you're winning</h3>
-          {(wins || []).length > 0 && (
-            <div className="flex items-center gap-1 text-green-600">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-xs font-medium">{(wins || []).length} live</span>
-            </div>
-          )}
-        </div>
-      )}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Where you're winning</h3>
+        {(wins || []).length > 0 && (
+          <div className="flex items-center gap-1 text-green-600">
+            <TrendingUp className="w-4 h-4" />
+            <span className="text-xs font-medium">{(wins || []).length} live</span>
+          </div>
+        )}
+      </div>
       
       {(wins || []).length === 0 ? (
-        <div className="text-center py-4">
-          {!embedded && (
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <TrendingUp className="w-6 h-6 text-gray-400" />
-            </div>
-          )}
-          <p className={`${embedded ? 'text-[12px]' : 'text-sm'} text-gray-600 mb-1`}>
+        <div className="text-center py-6">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <TrendingUp className="w-6 h-6 text-gray-400" />
+          </div>
+          <p className="text-sm text-gray-600 mb-3">
             No wins yet
           </p>
-          {!embedded && (
-            <button
-              onClick={onRefresh}
-              className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              Run health check
-            </button>
-          )}
+          <button
+            onClick={onRefresh}
+            className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            Run health check
+          </button>
         </div>
       ) : (
         <>
@@ -132,14 +126,12 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
         </>
       )}
 
-      {!embedded && (
-        <button 
-          onClick={() => navigate('/analytics?tab=results')}
-          className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
-        >
-          View all wins →
-        </button>
-      )}
+      <button 
+        onClick={() => navigate('/analytics?tab=results')}
+        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
+      >
+        View all wins →
+      </button>
     </div>
   )
 }
