@@ -43,13 +43,13 @@ export function AutopilotCard({
         
         <div className="flex gap-2">
           <button 
-            onClick={!scriptConnected ? () => navigate('/settings/connections') : onToggleAutopilot}
+            onClick={!scriptConnected ? () => navigate('/site-connection') : onToggleAutopilot}
             className="px-4 py-2 bg-[#5F209B] text-white rounded-md text-sm hover:opacity-90 transition-opacity font-medium"
           >
             {!scriptConnected ? 'Connect Site' : 'Enable Autopilot'}
           </button>
           <button 
-            onClick={() => navigate('/analytics')}
+            onClick={() => navigate('/site-connection')}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-md transition-colors"
           >
             View details →
@@ -127,13 +127,13 @@ export function AutopilotCard({
 
       <div className="flex items-center justify-between">
         <button 
-          onClick={() => navigate('/analytics')}
+          onClick={() => navigate('/site-connection')}
           className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
         >
           View details →
         </button>
         <button
-          onClick={() => navigate('/settings/connections')}
+          onClick={() => navigate('/site-connection')}
           className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           title="Autopilot Settings"
         >

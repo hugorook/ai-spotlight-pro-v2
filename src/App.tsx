@@ -6,6 +6,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import CleanAuthPage from "./pages/CleanAuthPage";
 import SimplifiedDashboard from "./pages/SimplifiedDashboard";
+import SiteConnection from "./pages/SiteConnection";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ConnectionsSettings from "./pages/settings/connections";
@@ -33,6 +34,13 @@ const App = () => (
               <ProtectedRoute>
                 <ErrorBoundary>
                   <SimplifiedDashboard />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/site-connection" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <SiteConnection />
                 </ErrorBoundary>
               </ProtectedRoute>
             } />

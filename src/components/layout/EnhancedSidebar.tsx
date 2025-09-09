@@ -38,6 +38,11 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       icon: <BarChart3 className="w-5 h-5" />
     },
     { 
+      path: "/site-connection", 
+      label: "Site Connection", 
+      icon: <Globe className="w-5 h-5" />
+    },
+    { 
       path: "/analytics", 
       label: "Analytics Hub", 
       icon: <Brain className="w-5 h-5" />
