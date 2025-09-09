@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
-import { AutopilotCard } from '@/components/dashboard/AutopilotCard'
 import { WinsCard } from '@/components/dashboard/WinsCard'
 import { TopActionsCard } from '@/components/dashboard/TopActionsCard'
 import { ImprovementsCard } from '@/components/dashboard/ImprovementsCard'
@@ -27,9 +26,6 @@ interface DashboardData {
   wins: any[]
   actions: any[]
   improvements: any[]
-  recentChanges: number
-  lastRunAt?: string
-  recentFixes: any[]
 }
 
 export default function TodayDashboard() {
@@ -52,12 +48,9 @@ export default function TodayDashboard() {
     project: null,
     wins: [],
     actions: [],
-    improvements: [],
-    recentChanges: 0,
-    recentFixes: []
+    improvements: []
   })
   const [isLoading, setIsLoading] = useState(true)
-  const [isApplying, setIsApplying] = useState(false)
 
   // Load dashboard data
   useEffect(() => {
@@ -121,43 +114,24 @@ export default function TodayDashboard() {
         throw new Error('Could not create or load project')
       }
 
-      // Load wins, actions, and recent changes in parallel using Supabase edge functions
-      const [winsResult, actionsResult, changelogResult] = await Promise.all([
+      // Load wins and actions in parallel using Supabase edge functions
+      const [winsResult, actionsResult] = await Promise.all([
         supabase.functions.invoke('get-wins', {
           body: { projectId: project.id, limit: 8 }
         }),
         supabase.functions.invoke('get-recommendations', {
           body: { projectId: project.id, limit: 3 }
-        }),
-        supabase.functions.invoke('get-changelog', {
-          body: { projectId: project.id, limit: 10 }
         })
       ])
 
       const wins = winsResult.data?.wins || []
       const actionsData = { recommendations: actionsResult.data?.recommendations || [] }
-      const changelog = { changelog: changelogResult.data?.changelog || [] }
-
-      // Calculate recent changes (last 7 days)
-      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-      const recentChanges = changelog.changelog?.filter((change: any) => 
-        new Date(change.appliedAt).getTime() > sevenDaysAgo
-      ) || []
-
-      const recentFixes = recentChanges.slice(0, 3).map((change: any) => ({
-        scope: change.scope,
-        description: change.description,
-        count: change.diff?.after?.count || 1
-      }))
 
       setData({
         project,
         wins: wins.wins || [],
         actions: actionsData.recommendations || [],
-        improvements: [], // Initialize as empty array until health check runs
-        recentChanges: recentChanges.length,
-        lastRunAt: recentChanges[0]?.appliedAt,
-        recentFixes
+        improvements: [] // Initialize as empty array until health check runs
       })
     } catch (error) {
       console.error('Error loading dashboard:', error)
@@ -171,67 +145,6 @@ export default function TodayDashboard() {
     }
   }
 
-  const handleApplyFixes = async () => {
-    if (!data.project) return
-
-    try {
-      setIsApplying(true)
-      
-      const { data: result, error } = await supabase.functions.invoke('apply-changes', {
-        body: { projectId: data.project.id }
-      })
-
-      if (error) {
-        throw new Error(error.message || 'Failed to apply fixes')
-      }
-
-      toast({
-        title: 'Success',
-        description: `Applied ${result.appliedCount} fixes to your site`
-      })
-
-      // Refresh dashboard data
-      await loadDashboardData()
-    } catch (error: any) {
-      console.error('Error applying fixes:', error)
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to apply fixes',
-        variant: 'destructive'
-      })
-    } finally {
-      setIsApplying(false)
-    }
-  }
-
-  const handleToggleAutopilot = async () => {
-    if (!data.project) return
-
-    try {
-      const { data: result, error } = await supabase.functions.invoke('toggle-autopilot', {
-        body: {
-          projectId: data.project.id,
-          enabled: !data.project.autopilot_enabled
-        }
-      })
-
-      if (error) throw new Error(error.message || 'Failed to toggle autopilot')
-
-      toast({
-        title: 'Success',
-        description: `Autopilot ${result.project.autopilot_enabled ? 'enabled' : 'disabled'}`
-      })
-
-      // Refresh data
-      await loadDashboardData()
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to toggle autopilot',
-        variant: 'destructive'
-      })
-    }
-  }
 
   const updateDashboardWithHealthCheckResults = async () => {
     try {
@@ -366,23 +279,6 @@ export default function TodayDashboard() {
             </h1>
           </div>
 
-          {/* Autopilot Card */}
-          <div className="mb-8">
-            <Card className="bg-white border-[#e7e5df] shadow-sm">
-              <CardContent className="p-6">
-                <AutopilotCard
-                  isEnabled={data.project?.autopilot_enabled || false}
-                  scriptConnected={data.project?.site_script_status === 'connected'}
-                  recentChanges={data.recentChanges}
-                  lastRunAt={data.lastRunAt}
-                  isApplying={isApplying}
-                  recentFixes={data.recentFixes}
-                  onApplyFixes={handleApplyFixes}
-                  onToggleAutopilot={handleToggleAutopilot}
-                />
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Health Check Loading State */}
           {isRunningHealthCheck && (
