@@ -18,7 +18,8 @@ import {
   Target,
   LineChart,
   Zap,
-  Building2
+  Building2,
+  LogIn as LogInIcon
 } from "lucide-react";
 
 // Custom hook for typewriter effect
@@ -238,11 +239,11 @@ const LandingPage = () => {
         <aside className={`hidden lg:block fixed top-6 bottom-6 left-6 z-50 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
           <div className="h-full w-44 flex flex-col gap-3">
             {/* Nav box */}
-            <div className="flex-1 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm overflow-hidden">
+            <div className="flex-1 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm overflow-hidden flex flex-col">
               <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
 
               {/* Main Navigation */}
-              <nav className="px-2 space-y-1">
+              <nav className="px-2 space-y-1 flex-1">
                 {navigationItems.map((item) => (
                   <a
                     key={item.label}
@@ -255,11 +256,8 @@ const LandingPage = () => {
                 ))}
               </nav>
 
-              {/* Separator */}
-              <div className="mx-2 my-3 border-t border-[#e7e5df]"></div>
-
-              {/* Settings Navigation */}
-              <nav className="px-2 pb-3 space-y-1">
+              {/* Settings Navigation (stuck to bottom of white box) */}
+              <nav className="px-2 pb-3 space-y-1 mt-auto">
                 {settingsItems.map((item) => (
                   <a
                     key={item.label}
@@ -275,13 +273,13 @@ const LandingPage = () => {
 
             {/* Login box (same style) */}
             <div className="bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/auth')}
-                className="w-full bg-white border-[#3b3b3738] text-[#282823] font-corben rounded-xl"
+              <a
+                href="/auth"
+                className="w-full block text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
               >
-                Log In
-              </Button>
+                <span className="text-[13px] font-normal">Log in</span>
+                <LogInIcon className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
         </aside>
