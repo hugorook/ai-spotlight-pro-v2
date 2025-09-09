@@ -399,7 +399,7 @@ const LandingPage = () => {
               <div className="bg-[#ddff89] rounded-2xl px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row items-center md:items-center justify-between gap-12">
                 {/* Left: Headline, subcopy, CTA */}
                 <div className="order-1 flex-1 w-full text-left">
-                  <h3 className="font-corben text-[#282823] text-2xl md:text-4xl lg:text-5xl mb-2" style={{fontWeight: 400}}>
+                  <h3 className="font-corben text-[#282823] text-xl md:text-2xl mb-2" style={{fontWeight: 400}}>
                     Your customers are already here
                   </h3>
                   <p className="text-[#3d3d38] text-sm md:text-base mb-4">
@@ -417,10 +417,10 @@ const LandingPage = () => {
                 <div className="order-2 flex-1 grid grid-cols-3 gap-10 md:gap-12 w-full justify-items-center">
                   {statisticsData.map((stat) => (
                     <div key={stat.description} className="text-center">
-                      <div className="font-corben text-[#282823] text-4xl md:text-6xl lg:text-7xl" style={{fontWeight: 400}}>
+                      <div className="font-corben text-[#282823] text-4xl md:text-5xl lg:text-6xl" style={{fontWeight: 400}}>
                         {stat.value}
                       </div>
-                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-1">
+                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-3 md:mt-4">
                         {stat.description}
                       </div>
                     </div>
