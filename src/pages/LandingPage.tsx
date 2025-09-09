@@ -132,8 +132,8 @@ const LandingPage = () => {
 
   const navigationItems = [
     { label: "Dashboard", icon: TrendingUp, href: "/dashboard" },
-    { label: "Analytics", icon: BarChart3, href: "/analytics" },
-    { label: "Auto-pilot", icon: Zap, href: "/site-connection" },
+    { label: "Site Connection", icon: Building2, href: "/settings/connections" },
+    { label: "Analytics Hub", icon: BarChart3, href: "/analytics" },
     { label: "Prompts", icon: FileText, href: "/prompts" },
   ];
 
@@ -234,41 +234,55 @@ const LandingPage = () => {
           <div className="w-full max-w-[1830px] h-full mx-auto bg-[#ffffff78] rounded-[50%] blur-[200px]" />
         </div>
 
-        {/* Fixed Left Vertical Nav */}
-        <aside className={`hidden lg:block fixed top-6 left-6 z-50 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
-          <div className="w-40 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm">
-            <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
-            
-            {/* Main Navigation */}
-            <nav className="px-2 space-y-1">
-              {navigationItems.map((item, index) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
-                >
-                  <span className="text-[13px] font-normal">{item.label}</span>
-                  <item.icon className="w-3.5 h-3.5" />
-                </a>
-              ))}
-            </nav>
-            
-            {/* Separator */}
-            <div className="mx-2 my-3 border-t border-[#e7e5df]"></div>
-            
-            {/* Settings Navigation */}
-            <nav className="px-2 pb-2 space-y-1">
-              {settingsItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
-                >
-                  <span className="text-[13px] font-normal">{item.label}</span>
-                  <item.icon className="w-3.5 h-3.5" />
-                </a>
-              ))}
-            </nav>
+        {/* Fixed Left Vertical Nav - full height with separate Login box below */}
+        <aside className={`hidden lg:block fixed top-6 bottom-6 left-6 z-50 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
+          <div className="h-full w-44 flex flex-col gap-3">
+            {/* Nav box */}
+            <div className="flex-1 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm overflow-hidden">
+              <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
+
+              {/* Main Navigation */}
+              <nav className="px-2 space-y-1">
+                {navigationItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
+                  >
+                    <span className="text-[13px] font-normal">{item.label}</span>
+                    <item.icon className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </nav>
+
+              {/* Separator */}
+              <div className="mx-2 my-3 border-t border-[#e7e5df]"></div>
+
+              {/* Settings Navigation */}
+              <nav className="px-2 pb-3 space-y-1">
+                {settingsItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
+                  >
+                    <span className="text-[13px] font-normal">{item.label}</span>
+                    <item.icon className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </nav>
+            </div>
+
+            {/* Login box (same style) */}
+            <div className="bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/auth')}
+                className="w-full bg-white border-[#3b3b3738] text-[#282823] font-corben rounded-xl"
+              >
+                Log In
+              </Button>
+            </div>
           </div>
         </aside>
 
