@@ -345,7 +345,7 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#ddff89] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.wins && data.wins.length > 0) ? (
@@ -383,7 +383,7 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.actions && data.actions.length > 0) ? (
@@ -421,7 +421,7 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.improvements && data.improvements.length > 0) ? (
