@@ -83,7 +83,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
         <>
           <div className="mb-4">
             {(improvements || []).slice(0, 8).map((improvement, index) => (
-              <div key={improvement.id} className="relative mb-2 last:mb-0">
+              <div key={improvement.id} className="relative mb-3 last:mb-0">
                 <div className="flex items-start">
                   <span className="text-[#3d3d38] flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
                   <div className="flex-1 pr-20">
