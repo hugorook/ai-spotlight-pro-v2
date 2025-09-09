@@ -396,11 +396,14 @@ const LandingPage = () => {
             
             {/* Inline Green Stats + CTA panel */}
             <div className="mt-10 md:mt-12">
-              <div className="bg-[#ddff89] rounded-2xl px-6 py-8 md:px-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                {/* CTA left */}
-                <div className="order-1 w-full md:w-auto flex flex-col items-center md:items-start">
-                  <p className="text-[#3d3d38] text-sm md:text-base mb-3 md:mb-2 font-medium">
+              <div className="bg-[#ddff89] rounded-2xl px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row items-center md:items-center justify-between gap-12">
+                {/* Left: Headline, subcopy, CTA */}
+                <div className="order-1 flex-1 w-full text-left">
+                  <h3 className="font-corben text-[#282823] text-2xl md:text-4xl lg:text-5xl mb-2" style={{fontWeight: 400}}>
                     Your customers are already here
+                  </h3>
+                  <p className="text-[#3d3d38] text-sm md:text-base mb-4">
+                    Show up early. Own your category.
                   </p>
                   <Button
                     onClick={() => navigate('/auth')}
@@ -410,14 +413,14 @@ const LandingPage = () => {
                     <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
                   </Button>
                 </div>
-                {/* Numbers right */}
-                <div className="order-2 grid grid-cols-3 gap-8 w-full md:w-auto">
+                {/* Right: Stats */}
+                <div className="order-2 flex-1 grid grid-cols-3 gap-10 md:gap-12 w-full justify-items-center">
                   {statisticsData.map((stat) => (
                     <div key={stat.description} className="text-center">
-                      <div className="font-corben text-[#282823] text-4xl md:text-5xl" style={{fontWeight: 400}}>
+                      <div className="font-corben text-[#282823] text-4xl md:text-6xl lg:text-7xl" style={{fontWeight: 400}}>
                         {stat.value}
                       </div>
-                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium">
+                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-1">
                         {stat.description}
                       </div>
                     </div>
