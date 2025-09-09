@@ -81,17 +81,19 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
         </div>
       ) : (
         <>
-          <div className="space-y-2 mb-4">
+          <div className="mb-4">
             {(improvements || []).slice(0, 8).map((improvement, index) => (
-              <div key={improvement.id} className="flex items-start relative">
-                <span className="text-[#3d3d38] mr-3 flex-shrink-0 ml-0" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
-                <div className="flex-1 pr-20">
-                  <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
-                    {improvement.prompt}
-                  </p>
+              <div key={improvement.id} className="relative mb-2 last:mb-0">
+                <div className="flex items-start" style={{marginLeft: 0, paddingLeft: 0}}>
+                  <span className="text-[#3d3d38] flex-shrink-0" style={{lineHeight: '1.4em', marginTop: '0.1em', marginLeft: 0, marginRight: 12}}>•</span>
+                  <div className="flex-1 pr-20">
+                    <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
+                      {improvement.prompt}
+                    </p>
+                  </div>
                 </div>
                 <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
-                  <span className={`px-1.5 py-0.5 text-[9px] font-medium rounded ${getPriorityColor(improvement.priority)}`}>
+                  <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#ddff89] text-[#282823]">
                     {improvement.priority}
                   </span>
                 </div>
