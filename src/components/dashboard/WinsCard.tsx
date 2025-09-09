@@ -84,7 +84,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
                   </div>
                 </div>
                 <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
-                  <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#282823] text-[#ddff89]">
+                  <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#282823] text-white">
                     #{win.rank}
                   </span>
                 </div>
