@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { ArrowLeft, Globe, Settings, Shield, Code, Copy, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
+import { CMSSetupDialog } from '@/components/CMSSetupDialog'
 
 interface Project {
   id: string
@@ -37,6 +38,7 @@ export default function ConnectionsSettings() {
   const [loading, setLoading] = useState(true)
   const [scriptCopied, setScriptCopied] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [showCMSSetup, setShowCMSSetup] = useState<string | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -172,6 +174,82 @@ export default function ConnectionsSettings() {
       toast({
         title: 'Error',
         description: 'Failed to update connection status',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  const handleCMSSetup = (cmsType: string) => {
+    if (project?.cms_provider === cmsType) {
+      // Already connected, show disconnect option
+      handleCMSDisconnect()
+    } else {
+      // Show setup dialog
+      setShowCMSSetup(cmsType)
+    }
+  }
+
+  const handleCMSDisconnect = async () => {
+    if (!project) return
+    
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ 
+          cms_provider: 'manual',
+          cms_credentials: {}
+        })
+        .eq('id', project.id)
+
+      if (error) throw error
+
+      setProject({
+        ...project,
+        cms_provider: 'manual'
+      })
+
+      toast({
+        title: 'Disconnected',
+        description: 'CMS connection removed - switched to manual mode'
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to disconnect CMS',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  const completeCMSSetup = async (cmsType: string, credentials: any) => {
+    if (!project) return
+    
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ 
+          cms_provider: cmsType,
+          cms_credentials: credentials
+        })
+        .eq('id', project.id)
+
+      if (error) throw error
+
+      setProject({
+        ...project,
+        cms_provider: cmsType
+      })
+
+      setShowCMSSetup(null)
+
+      toast({
+        title: 'Success',
+        description: `${cmsType} connected successfully! Autopilot can now modify your website automatically.`
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: `Failed to connect ${cmsType}`,
         variant: 'destructive'
       })
     }
@@ -394,28 +472,121 @@ export default function ConnectionsSettings() {
                 CMS Integration
               </CardTitle>
               <p className="text-gray-600">
-                Connect your content management system
+                Connect your content management system for automated website modifications
               </p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* Current CMS Status */}
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium capitalize">{project.cms_provider}</h4>
                   <p className="text-sm text-gray-600">
                     {project.cms_provider === 'manual' 
-                      ? 'Manual integration - changes applied via script'
+                      ? 'No CMS connected - using manual instructions mode'
                       : `Connected to ${project.cms_provider}`}
                   </p>
                 </div>
-                <Badge variant="outline">
+                <Badge variant={project.cms_provider === 'manual' ? 'outline' : 'default'}>
                   {project.cms_provider === 'manual' ? 'Manual' : 'Connected'}
                 </Badge>
               </div>
-              
+
+              {/* CMS Provider Selection */}
+              <div className="space-y-3">
+                <h4 className="font-medium">Connect Your CMS</h4>
+                <div className="grid gap-3">
+                  {/* WordPress */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">W</span>
+                        </div>
+                        <div>
+                          <h5 className="font-medium">WordPress</h5>
+                          <p className="text-sm text-gray-600">Self-hosted WordPress sites</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant={project.cms_provider === 'wordpress' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleCMSSetup('wordpress')}
+                      >
+                        {project.cms_provider === 'wordpress' ? 'Connected' : 'Connect'}
+                      </Button>
+                    </div>
+                    {project.cms_provider === 'wordpress' && (
+                      <div className="text-sm text-green-700 bg-green-50 p-2 rounded">
+                        ✅ WordPress connected - can modify posts, pages, and media
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Webflow */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-purple-600 rounded flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">W</span>
+                        </div>
+                        <div>
+                          <h5 className="font-medium">Webflow</h5>
+                          <p className="text-sm text-gray-600">Webflow designer sites</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant={project.cms_provider === 'webflow' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleCMSSetup('webflow')}
+                      >
+                        {project.cms_provider === 'webflow' ? 'Connected' : 'Connect'}
+                      </Button>
+                    </div>
+                    {project.cms_provider === 'webflow' && (
+                      <div className="text-sm text-green-700 bg-green-50 p-2 rounded">
+                        ✅ Webflow connected - can modify pages, CMS content, and meta tags
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Shopify */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">S</span>
+                        </div>
+                        <div>
+                          <h5 className="font-medium">Shopify</h5>
+                          <p className="text-sm text-gray-600">Shopify e-commerce stores</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant={project.cms_provider === 'shopify' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleCMSSetup('shopify')}
+                      >
+                        {project.cms_provider === 'shopify' ? 'Connected' : 'Connect'}
+                      </Button>
+                    </div>
+                    {project.cms_provider === 'shopify' && (
+                      <div className="text-sm text-green-700 bg-green-50 p-2 rounded">
+                        ✅ Shopify connected - can modify products, pages, and SEO settings
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Manual Mode Info */}
               {project.cms_provider === 'manual' && (
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">
-                    Webflow integration coming soon. Currently using manual script-based improvements.
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h4 className="font-medium text-yellow-900 mb-2">Manual Mode Active</h4>
+                  <p className="text-sm text-yellow-800 mb-3">
+                    Autopilot will provide detailed instructions for SEO fixes instead of applying them automatically.
+                  </p>
+                  <p className="text-xs text-yellow-700">
+                    Connect a CMS above to enable automatic website modifications.
                   </p>
                 </div>
               )}
@@ -423,6 +594,13 @@ export default function ConnectionsSettings() {
           </Card>
         </div>
       </div>
+
+      <CMSSetupDialog
+        cmsType={showCMSSetup}
+        open={!!showCMSSetup}
+        onClose={() => setShowCMSSetup(null)}
+        onComplete={completeCMSSetup}
+      />
     </AppShell>
   )
 }

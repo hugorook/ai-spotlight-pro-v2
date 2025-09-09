@@ -494,6 +494,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         {activeTab === 'website' && (
           <div className={tabContentClass}>
+            {(() => {
+              console.log('🌐 WEBSITE TAB DEBUG: Rendering website tab', {
+                hasWebsiteAnalysis: !!websiteAnalysis,
+                websiteAnalysisKeys: websiteAnalysis ? Object.keys(websiteAnalysis) : [],
+                hasAnalysisObject: !!websiteAnalysis?.analysis,
+                analysisKeys: websiteAnalysis?.analysis ? Object.keys(websiteAnalysis.analysis) : [],
+                hasError: !!websiteAnalysis?.error,
+                error: websiteAnalysis?.error
+              });
+              return null;
+            })()}
             {websiteAnalysis ? (
               <div className="space-y-6">
                 {/* Content Summary */}

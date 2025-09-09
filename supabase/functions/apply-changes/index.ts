@@ -66,45 +66,104 @@ serve(async (req: Request) => {
     let appliedCount = 0;
     const appliedChanges = [];
 
-    // Apply each change (simulate for now - in production this would make actual API calls to the site)
+    // Apply each change using real website modifications
     for (const change of pendingChanges || []) {
       try {
-        // For now, we'll simulate applying the change by updating its status
-        const { error: updateError } = await supabase
-          .from('recommendations')
-          .update({
-            status: 'completed',
-            completed_at: new Date().toISOString()
-          })
-          .eq('id', change.id);
+        // Generate rollback token for safety
+        const rollbackToken = crypto.randomUUID();
+        
+        // Call the website-modifier function to make real changes
+        const modificationRequest = {
+          projectId: body.projectId,
+          actionType: change.action_type,
+          target: change.target_element || change.target_page || 'homepage',
+          changes: {
+            before: change.current_value || '',
+            after: change.suggested_value || change.description,
+            metadata: change.metadata || {}
+          },
+          rollbackToken
+        };
 
-        if (!updateError) {
-          appliedCount++;
-          appliedChanges.push({
-            id: change.id,
-            title: change.title,
-            type: change.action_type,
-            impact: change.impact
-          });
+        console.log('Calling website-modifier for change:', change.id);
+        const { data: modificationResult, error: modError } = await supabase.functions.invoke('website-modifier', {
+          body: modificationRequest
+        });
 
-          // Log to changelog
+        if (modError) {
+          console.error('Website modification failed:', modError);
+          // Mark as failed but don't stop processing other changes
           await supabase
-            .from('changelog')
-            .insert({
-              project_id: body.projectId,
-              recommendation_id: change.id,
-              action_type: change.action_type,
-              description: change.title,
-              scope: change.action_type,
-              applied_at: new Date().toISOString(),
-              diff: {
-                before: { status: 'todo' },
-                after: { status: 'completed', count: 1 }
-              }
-            });
+            .from('recommendations')
+            .update({
+              status: 'failed',
+              error_message: modError.message || 'Modification failed'
+            })
+            .eq('id', change.id);
+          continue;
         }
+
+        if (modificationResult?.success) {
+          // Update recommendation status to completed
+          const { error: updateError } = await supabase
+            .from('recommendations')
+            .update({
+              status: 'completed',
+              completed_at: new Date().toISOString(),
+              rollback_token: rollbackToken
+            })
+            .eq('id', change.id);
+
+          if (!updateError) {
+            appliedCount++;
+            appliedChanges.push({
+              id: change.id,
+              title: change.title,
+              type: change.action_type,
+              impact: change.impact,
+              rollbackToken
+            });
+
+            // Log to changelog with rollback data
+            await supabase
+              .from('changelog')
+              .insert({
+                project_id: body.projectId,
+                recommendation_id: change.id,
+                action_type: change.action_type,
+                description: change.title,
+                scope: change.action_type,
+                applied_at: new Date().toISOString(),
+                rollback_token: rollbackToken,
+                rollback_data: modificationResult.rollbackData,
+                diff: {
+                  before: modificationRequest.changes.before,
+                  after: modificationRequest.changes.after,
+                  success: true
+                }
+              });
+          }
+        } else {
+          // Mark as failed with error details
+          await supabase
+            .from('recommendations')
+            .update({
+              status: 'failed',
+              error_message: modificationResult?.error || 'Unknown modification error'
+            })
+            .eq('id', change.id);
+        }
+
       } catch (error) {
         console.error('Error applying change:', change.id, error);
+        // Mark as failed
+        await supabase
+          .from('recommendations')
+          .update({
+            status: 'failed',
+            error_message: error instanceof Error ? error.message : String(error)
+          })
+          .eq('id', change.id);
       }
     }
 

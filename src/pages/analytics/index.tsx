@@ -184,13 +184,22 @@ export default function Analytics() {
           console.log('📊 ANALYTICS LOADING DEBUG: Found analytics data:', analyticsRows.map(r => r.analytics_type));
           for (const row of analyticsRows) {
             if (row.analytics_type === 'website_analysis') {
-              console.log('🌐 WEBSITE ANALYSIS LOADING DEBUG: Setting website analysis data');
+              console.log('🌐 WEBSITE ANALYSIS LOADING DEBUG: Website analysis data:', {
+                hasData: !!row.data,
+                dataKeys: row.data ? Object.keys(row.data) : [],
+                hasAnalysis: !!row.data?.analysis,
+                analysisKeys: row.data?.analysis ? Object.keys(row.data.analysis) : [],
+                hasError: !!row.data?.error,
+                error: row.data?.error
+              });
               setWebsiteAnalysis(row.data)
             }
             if (row.analytics_type === 'authority_analysis') setAuthorityAnalysis(row.data?.analysis ?? row.data)
             if (row.analytics_type === 'industry_benchmark') setIndustryBenchmark(row.data?.benchmark ?? row.data)
             if (row.analytics_type === 'trending_opportunities') setTrendingOpportunities(row.data?.opportunities || [])
           }
+        } else {
+          console.log('📊 ANALYTICS LOADING DEBUG: No analytics data found for session:', session?.id);
         }
 
         // Show results when we have test results in context or from DB
