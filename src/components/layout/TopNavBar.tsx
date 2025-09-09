@@ -20,26 +20,10 @@ const TopNavBar = () => {
   };
 
   const navItems: NavItem[] = [
-    { 
-      path: "/analytics", 
-      label: "AI Health Check", 
-      icon: <Brain className="w-4 h-4" />
-    },
-    { 
-      path: "/dashboard", 
-      label: "Results Dashboard", 
-      icon: <BarChart3 className="w-4 h-4" />
-    },
-    { 
-      path: "/prompts", 
-      label: "Test Prompts", 
-      icon: <MessageSquare className="w-4 h-4" />
-    },
-    { 
-      path: "/content", 
-      label: "Company Profile", 
-      icon: <User className="w-4 h-4" />
-    },
+    { path: "/dashboard", label: "Dashboard", icon: <BarChart3 className="w-4 h-4" /> },
+    { path: "/settings/connections", label: "Site Connection", icon: <User className="w-4 h-4" /> },
+    { path: "/analytics", label: "Analytics Hub", icon: <Brain className="w-4 h-4" /> },
+    { path: "/prompts", label: "Prompts", icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const isActive = (path: string) => location.pathname === path;
