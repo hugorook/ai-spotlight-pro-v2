@@ -44,7 +44,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
   return (
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="h3">Where you're winning</h3>
+        <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Where you're winning</h3>
         {wins.length > 0 && (
           <div className="flex items-center gap-1 text-green-600">
             <TrendingUp className="w-4 h-4" />
@@ -75,14 +75,14 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
               <div key={win.id} className="group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 line-clamp-1">
+                    <div className="text-[13px] font-medium text-gray-900 line-clamp-1">
                       "{win.prompt}"
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500 truncate">
+                      <span className="text-[12px] text-gray-500 truncate">
                         {new URL(win.url).pathname}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-[12px] text-gray-400">
                         · {new Date(win.lastSeen).toLocaleDateString()}
                       </span>
                     </div>

@@ -385,40 +385,40 @@ export default function TodayDashboard() {
         {/* 3-column dashboard layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Column 1: Winning */}
-          <div className="rounded-xl border bg-lime-200/70 p-5">
+          <div className="rounded-xl border bg-[#DDFB78] p-6">
             <WinsCard
               wins={data.wins}
               isLoading={isLoading || isRunningHealthCheck}
               onRefresh={handleRunHealthCheck}
               embedded
             />
-            <div className="mt-4 flex justify-between text-xs text-gray-600">
+            <div className="mt-4 flex justify-between text-[12px] text-gray-700">
               <span>View All</span>
             </div>
           </div>
 
           {/* Column 2: Top 3 Actions */}
-          <div className="rounded-xl border bg-white p-5">
+          <div className="rounded-xl border bg-white p-6">
             <TopActionsCard
               actions={data.actions}
               isLoading={isLoading || isRunningHealthCheck}
               onActionClick={handleActionClick}
               embedded
             />
-            <div className="mt-4 flex justify-between text-xs text-gray-600">
+            <div className="mt-4 flex justify-between text-[12px] text-gray-700">
               <span>View All</span>
             </div>
           </div>
 
           {/* Column 3: Improvements */}
-          <div className="rounded-xl border bg-white p-5">
+          <div className="rounded-xl border bg-white p-6">
             <ImprovementsCard
               improvements={data.improvements}
               isLoading={isLoading || isRunningHealthCheck}
               onRefresh={handleRunHealthCheck}
               embedded
             />
-            <div className="mt-4 flex justify-between text-xs text-gray-600">
+            <div className="mt-4 flex justify-between text-[12px] text-gray-700">
               <span>View All</span>
             </div>
           </div>

@@ -70,8 +70,8 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
 
   return (
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
-      <h3 className="h3 mb-2">Your Top 3 for the next 30 days</h3>
-      <p className="text-sm text-gray-600 mb-4">Non-automatable, high-leverage actions</p>
+      <h3 className={`${embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'} mb-1`}>Your Top 3 for the next 30 days</h3>
+      <p className={`${embedded ? 'text-[12px]' : 'text-sm'} text-gray-600 mb-4`}>Non-automatable, high-leverage actions</p>
       
       <div className="space-y-3 mb-4">
         {actions.slice(0, 3).map((action, index) => (
@@ -82,7 +82,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
             }`}></div>
             
             <div className="flex items-start justify-between mb-2">
-              <h4 className="text-sm font-medium text-gray-900 flex-1">
+              <h4 className={`${embedded ? 'text-[13px]' : 'text-sm'} font-medium text-gray-900 flex-1`}>
                 {action.title}
               </h4>
               <div className="flex gap-1 ml-3 flex-shrink-0">
@@ -96,7 +96,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
               </div>
             </div>
             
-            <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+            <p className={`${embedded ? 'text-[12px]' : 'text-xs'} text-gray-600 mb-3 line-clamp-2`}>
               {action.rationale}
             </p>
             
