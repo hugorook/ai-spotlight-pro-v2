@@ -158,18 +158,16 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       // Generate all analytics data in parallel to populate analytics hub sections
       const analyticsPromises = [];
 
-      // Determine website URL: prefer company.website_url else latest generated_prompts.website_url
-      let websiteUrl = company.website_url || '';
-      if (!websiteUrl) {
-        const { data: latestGenerated } = await supabase
-          .from('generated_prompts')
-          .select('website_url')
-          .eq('user_id', company.user_id)
-          .order('generated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        websiteUrl = latestGenerated?.website_url || '';
-      }
+      // Determine website URL: ALWAYS prefer the latest generated_prompts.website_url (Prompts page)
+      let websiteUrl = '';
+      const { data: latestGenerated } = await supabase
+        .from('generated_prompts')
+        .select('website_url')
+        .eq('user_id', company.user_id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      websiteUrl = latestGenerated?.website_url || company.website_url || '';
 
       // 1. Website Analysis - analyze company website for AI optimization (Edge: analyze-website expects { url })
       if (websiteUrl) {
