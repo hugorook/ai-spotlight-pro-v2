@@ -245,11 +245,7 @@ const LandingPage = () => {
                 <a
                   key={item.label}
                   href={item.href}
-                  className={`${
-                    index === 0
-                      ? 'bg-[#ddff89] text-[#282823]'
-                      : 'text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]'
-                  } flex items-center justify-between px-3 py-2 rounded-md transition-colors`}
+                  className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
                 >
                   <span className="text-[13px] font-normal">{item.label}</span>
                   <item.icon className="w-3.5 h-3.5" />
