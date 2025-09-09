@@ -391,20 +391,7 @@ export default function TodayDashboard() {
             </Card>
           </div>
 
-          {/* Bottom controls aligned with card bottoms */}
-          {!isRunningHealthCheck && (
-            <div className="flex justify-center mt-6 mb-8">
-              <Button 
-                onClick={handleRunHealthCheck}
-                disabled={!user}
-                className="group bg-[#282823] text-white hover:bg-white hover:text-[#282823] transition-all font-corben rounded-2xl px-8 py-3 shadow-sm hover:shadow-md"
-              >
-                <Activity className="w-4 h-4 mr-2" />
-                Run Health Check
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          )}
+          {/* Bottom controls removed per request */}
         </div>
       </div>
     </AppShell>
