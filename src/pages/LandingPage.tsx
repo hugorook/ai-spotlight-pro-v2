@@ -396,31 +396,34 @@ const LandingPage = () => {
             
             {/* Inline Green Stats + CTA panel */}
             <div className="mt-10 md:mt-12">
-              <div className="bg-[#ddff89] rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="order-2 md:order-1 grid grid-cols-3 gap-6 w-full md:w-auto">
-                  {statisticsData.map((stat) => (
-                    <div key={stat.description} className="text-center">
-                      <div className="font-corben text-[#282823] text-3xl md:text-4xl" style={{fontWeight: 400}}>
-                        {stat.value}
-                  </div>
-                      <div className="text-[#3d3d38] text-[11px] md:text-xs font-medium">
-                        {stat.description}
-                  </div>
-                </div>
-              ))}
-                </div>
-                <div className="order-1 md:order-2 w-full md:w-auto flex flex-col items-center md:items-start">
+              <div className="bg-[#ddff89] rounded-2xl px-6 py-8 md:px-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                {/* CTA left */}
+                <div className="order-1 w-full md:w-auto flex flex-col items-center md:items-start">
                   <p className="text-[#3d3d38] text-sm md:text-base mb-3 md:mb-2 font-medium">
                     Your customers are already here
                   </p>
                   <Button
                     onClick={() => navigate('/auth')}
-                    className="group bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-5 py-2"
+                    className="group bg-[#282823] text-white hover:bg-white hover:text-[#262622] transition-colors font-corben rounded-2xl px-6 py-2.5"
                   >
                     Leverage this traffic
                     <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
                   </Button>
                 </div>
+                {/* Numbers right */}
+                <div className="order-2 grid grid-cols-3 gap-8 w-full md:w-auto">
+                  {statisticsData.map((stat) => (
+                    <div key={stat.description} className="text-center">
+                      <div className="font-corben text-[#282823] text-4xl md:text-5xl" style={{fontWeight: 400}}>
+                        {stat.value}
+                      </div>
+                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium">
+                        {stat.description}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
