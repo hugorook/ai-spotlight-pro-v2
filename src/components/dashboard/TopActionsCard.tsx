@@ -69,7 +69,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
   }
 
   return (
-    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
+    <div className={`${embedded ? '' : 'bg-white rounded-lg p-4 border shadow-sm'}`} style={embedded ? {marginLeft: -16} : {}}>
       {!embedded && (
         <>
           <h3 className="h3 mb-1">Your Top 3 for the next 30 days</h3>
@@ -80,11 +80,11 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
       <div className="mb-4">
         {(actions || []).slice(0, 5).map((action, index) => (
           <div key={action.id || index} className="relative mb-3 last:mb-0">
-            <div className="flex items-start" style={{marginLeft: 0, paddingLeft: 0}}>
-              <div className="w-5 h-5 bg-[#282823] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{marginLeft: 0, marginRight: 12}}>
+            <div className="flex items-start">
+              <div className="w-5 h-5 bg-[#282823] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
                 <span className="text-[#ddff89] text-[10px] font-bold">{index + 1}</span>
               </div>
-              <div className="flex-1 pr-24">
+              <div className="flex-1 pr-20">
                 <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words mb-1">
                   {action.title}
                 </p>
@@ -95,10 +95,6 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
             </div>
             <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
               <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#ddff89] text-[#282823]">
-                {action.impact}
-              </span>
-              <span className="px-1.5 py-0.5 text-[9px] font-medium rounded flex items-center gap-1 bg-[#ddff89] text-[#282823]">
-                {getOwnerIcon(action.suggestedOwner)}
                 {action.suggestedOwner}
               </span>
             </div>

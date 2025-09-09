@@ -51,7 +51,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
   }
 
   return (
-    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
+    <div className={`${embedded ? '' : 'bg-white rounded-lg p-4 border shadow-sm'}`} style={embedded ? {marginLeft: -16} : {}}>
       {!embedded && (
         <div className="flex items-center justify-between mb-3">
           <h3 className="h3">Key areas to improve</h3>
@@ -84,8 +84,8 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
           <div className="mb-4">
             {(improvements || []).slice(0, 8).map((improvement, index) => (
               <div key={improvement.id} className="relative mb-2 last:mb-0">
-                <div className="flex items-start" style={{marginLeft: 0, paddingLeft: 0}}>
-                  <span className="text-[#3d3d38] flex-shrink-0" style={{lineHeight: '1.4em', marginTop: '0.1em', marginLeft: 0, marginRight: 12}}>•</span>
+                <div className="flex items-start">
+                  <span className="text-[#3d3d38] flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
                   <div className="flex-1 pr-20">
                     <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
                       {improvement.prompt}
