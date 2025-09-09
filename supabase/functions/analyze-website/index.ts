@@ -85,7 +85,9 @@ async function analyzeWebsiteContent(content: string, companyInfo: any): Promise
     throw new Error('OPENAI_API_KEY not set');
   }
   
-  const analysisPrompt = `Analyze this website content for AI optimization opportunities. Company info: ${JSON.stringify(companyInfo)}
+  const analysisPrompt = `Analyze ONLY the website content below for AI optimization opportunities. Use the provided company info for context but do not hallucinate unrelated brands or products. If a brand/product is mentioned, it must come from the provided content.
+
+Company info: ${JSON.stringify(companyInfo)}
 
 Website Content:
 ${content}
@@ -110,11 +112,11 @@ Focus on making the content more discoverable by AI models like ChatGPT when use
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { 
           role: 'system', 
-          content: 'You are an expert in optimizing website content for AI model discoverability. Analyze content and provide specific, actionable recommendations.'
+          content: 'You are an expert in optimizing website content for AI model discoverability. Analyze content provided by the user and provide specific, actionable recommendations. Do not invent unrelated brands. Base all findings on the given content.'
         },
         { role: 'user', content: analysisPrompt },
       ],
