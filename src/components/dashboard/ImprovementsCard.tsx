@@ -14,9 +14,10 @@ interface ImprovementsCardProps {
   improvements: Improvement[]
   isLoading?: boolean
   onRefresh?: () => void
+  embedded?: boolean
 }
 
-export function ImprovementsCard({ improvements, isLoading = false, onRefresh }: ImprovementsCardProps) {
+export function ImprovementsCard({ improvements, isLoading = false, onRefresh, embedded = false }: ImprovementsCardProps) {
   const navigate = useNavigate()
 
   const getPriorityColor = (priority: string) => {
@@ -30,7 +31,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh }:
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-4 border shadow-sm">
+      <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-48 mb-3"></div>
           <div className="space-y-2">
@@ -50,7 +51,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh }:
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 border shadow-sm">
+    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="h3">Key areas to improve</h3>
         {improvements.length > 0 && (

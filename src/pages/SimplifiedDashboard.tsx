@@ -351,7 +351,7 @@ export default function TodayDashboard() {
 
   return (
     <AppShell>
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Compact Header - no center alignment */}
         <div className="mb-6">
           <h1 className="h1 mb-1">Dashboard</h1>
@@ -382,54 +382,60 @@ export default function TodayDashboard() {
           </div>
         )}
 
-        {/* Single Column Layout - Stacked Flow */}
-        <div className="max-w-2xl mx-auto space-y-4">
-          {/* 1. Autopilot Card */}
-          <AutopilotCard
-            isEnabled={data.project?.autopilot_enabled || false}
-            scriptConnected={data.project?.site_script_status === 'connected'}
-            recentChanges={data.recentChanges}
-            lastRunAt={data.lastRunAt}
-            isApplying={isApplying}
-            recentFixes={data.recentFixes}
-            onApplyFixes={handleApplyFixes}
-            onToggleAutopilot={handleToggleAutopilot}
-          />
-
-          {/* 2. Where You're Winning */}
-          <WinsCard
-            wins={data.wins}
-            isLoading={isLoading || isRunningHealthCheck}
-            onRefresh={handleRunHealthCheck}
-          />
-
-          {/* 3. Your Top 3 */}
-          <TopActionsCard
-            actions={data.actions}
-            isLoading={isLoading || isRunningHealthCheck}
-            onActionClick={handleActionClick}
-          />
-
-          {/* 4. Key Areas to Improve */}
-          <ImprovementsCard
-            improvements={data.improvements}
-            isLoading={isLoading || isRunningHealthCheck}
-            onRefresh={handleRunHealthCheck}
-          />
-
-          {/* Run Health Check Button */}
-          {!isRunningHealthCheck && (
-            <div className="flex justify-center pt-2">
-              <button
-                onClick={handleRunHealthCheck}
-                disabled={!user}
-                className="px-6 py-3 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                Run Health Check
-              </button>
+        {/* 3-column dashboard layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Column 1: Winning */}
+          <div className="rounded-xl border bg-lime-200/70 p-5">
+            <WinsCard
+              wins={data.wins}
+              isLoading={isLoading || isRunningHealthCheck}
+              onRefresh={handleRunHealthCheck}
+              embedded
+            />
+            <div className="mt-4 flex justify-between text-xs text-gray-600">
+              <span>View All</span>
             </div>
-          )}
+          </div>
+
+          {/* Column 2: Top 3 Actions */}
+          <div className="rounded-xl border bg-white p-5">
+            <TopActionsCard
+              actions={data.actions}
+              isLoading={isLoading || isRunningHealthCheck}
+              onActionClick={handleActionClick}
+              embedded
+            />
+            <div className="mt-4 flex justify-between text-xs text-gray-600">
+              <span>View All</span>
+            </div>
+          </div>
+
+          {/* Column 3: Improvements */}
+          <div className="rounded-xl border bg-white p-5">
+            <ImprovementsCard
+              improvements={data.improvements}
+              isLoading={isLoading || isRunningHealthCheck}
+              onRefresh={handleRunHealthCheck}
+              embedded
+            />
+            <div className="mt-4 flex justify-between text-xs text-gray-600">
+              <span>View All</span>
+            </div>
+          </div>
         </div>
+
+        {/* Bottom controls */}
+        {!isRunningHealthCheck && (
+          <div className="flex justify-center pt-6">
+            <button
+              onClick={handleRunHealthCheck}
+              disabled={!user}
+              className="px-6 py-3 bg-[#5F209B] text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              Run Health Check
+            </button>
+          </div>
+        )}
       </div>
     </AppShell>
   )

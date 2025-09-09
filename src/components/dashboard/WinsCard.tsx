@@ -14,14 +14,15 @@ interface WinsCardProps {
   wins: Win[]
   isLoading?: boolean
   onRefresh?: () => void
+  embedded?: boolean
 }
 
-export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) {
+export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false }: WinsCardProps) {
   const navigate = useNavigate()
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-4 border shadow-sm">
+      <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-48 mb-3"></div>
           <div className="space-y-2">
@@ -41,7 +42,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh }: WinsCardProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 border shadow-sm">
+    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="h3">Where you're winning</h3>
         {wins.length > 0 && (

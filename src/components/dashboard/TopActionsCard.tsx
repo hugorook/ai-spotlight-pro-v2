@@ -18,9 +18,10 @@ interface TopActionsCardProps {
   actions: Action[]
   isLoading?: boolean
   onActionClick?: (action: Action) => void
+  embedded?: boolean
 }
 
-export function TopActionsCard({ actions, isLoading = false, onActionClick }: TopActionsCardProps) {
+export function TopActionsCard({ actions, isLoading = false, onActionClick, embedded = false }: TopActionsCardProps) {
   const navigate = useNavigate()
 
   const getImpactColor = (impact: string) => {
@@ -52,7 +53,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-4 border shadow-sm">
+      <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-64 mb-4"></div>
           {[1, 2, 3].map(i => (
@@ -68,7 +69,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick }: To
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 border shadow-sm">
+    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <h3 className="h3 mb-2">Your Top 3 for the next 30 days</h3>
       <p className="text-sm text-gray-600 mb-4">Non-automatable, high-leverage actions</p>
       
