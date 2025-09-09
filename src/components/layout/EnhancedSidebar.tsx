@@ -1,15 +1,7 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, BarChart3, FileText, Settings, Building2, LogIn as LogInIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface NavItem {
-  path: string;
-  label: string;
-  icon: React.ReactNode;
-  children?: NavItem[];
-}
 
 interface EnhancedSidebarProps {
   activeHealthTab?: string;
@@ -18,43 +10,24 @@ interface EnhancedSidebarProps {
   isRunning?: boolean;
 }
 
-const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({ 
-  activeHealthTab, 
-  onHealthTabChange, 
-  onRunHealthCheck, 
-  isRunning 
-}) => {
-  const location = useLocation();
+const EnhancedSidebar: React.FC<EnhancedSidebarProps> = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
   const getUserInitials = (email: string) => {
     return email.split('@')[0].substring(0, 2).toUpperCase();
   };
 
-  const navItems: NavItem[] = [
-    { 
-      path: "/dashboard", 
-      label: "Dashboard", 
-      icon: <TrendingUp className="w-5 h-5" />
-    },
-    { 
-      path: "/site-connection", 
-      label: "Site Connection", 
-      icon: <Building2 className="w-5 h-5" />
-    },
-    { 
-      path: "/analytics", 
-      label: "Analytics Hub", 
-      icon: <BarChart3 className="w-5 h-5" />
-    },
-    { 
-      path: "/prompts", 
-      label: "Prompts", 
-      icon: <FileText className="w-5 h-5" />
-    },
+  const navigationItems = [
+    { label: "Dashboard", icon: TrendingUp, href: "/dashboard" },
+    { label: "Site Connection", icon: Building2, href: "/site-connection" },
+    { label: "Analytics Hub", icon: BarChart3, href: "/analytics" },
+    { label: "Prompts", icon: FileText, href: "/prompts" },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const settingsItems = [
+    { label: "Settings", icon: Settings, href: "/settings" },
+  ];
 
   return (
     <aside className="hidden lg:block fixed top-6 bottom-6 left-6 z-50">
@@ -67,51 +40,69 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
           {/* Main Navigation */}
           <nav className="px-2 space-y-1 flex-1 mt-3">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
+            {navigationItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(item.href);
+                }}
+                className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
               >
                 <span className="text-[13px] font-normal">{item.label}</span>
-                {React.cloneElement(item.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
-              </button>
+                <item.icon className="w-3.5 h-3.5" />
+              </a>
             ))}
           </nav>
 
           {/* Settings Navigation (stuck to bottom of white box) */}
           <nav className="px-2 pb-3 space-y-1 mt-auto">
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
-            >
-              <span className="text-[13px] font-normal">Settings</span>
-              <Settings className="w-3.5 h-3.5" />
-            </button>
+            {settingsItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(item.href);
+                }}
+                className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
+              >
+                <span className="text-[13px] font-normal">{item.label}</span>
+                <item.icon className="w-3.5 h-3.5" />
+              </a>
+            ))}
           </nav>
         </div>
 
         {/* Login box (same style) */}
         <div className="bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2">
           {user ? (
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
-              title={user.email || 'User'}
+            <a
+              href="/settings"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/settings');
+              }}
+              className="w-full block text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
             >
               <span className="text-[13px] font-normal truncate">{user.email}</span>
               <div className="text-[10px] font-medium text-[#282823] bg-[#f0f0f0] px-1.5 py-0.5 rounded flex-shrink-0 ml-2">
                 {getUserInitials(user.email || 'User')}
               </div>
-            </button>
+            </a>
           ) : (
-            <button
-              onClick={() => navigate('/auth')}
-              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
+            <a
+              href="/auth"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/auth');
+              }}
+              className="w-full block text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
             >
               <span className="text-[13px] font-normal">Log in</span>
               <LogInIcon className="w-3.5 h-3.5" />
-            </button>
+            </a>
           )}
         </div>
       </div>
