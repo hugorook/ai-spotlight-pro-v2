@@ -20,6 +20,7 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ["Inter", "ui-sans-serif", "system-ui"],
+				inter: ["Inter", "ui-sans-serif", "system-ui"],
 				serif: ["Hedvig", "Georgia", "serif"],
 				mono: ["JetBrains Mono", "ui-monospace"],
 				corben: ["Corben", "serif"],

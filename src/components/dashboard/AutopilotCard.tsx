@@ -32,25 +32,27 @@ export function AutopilotCard({
   // Show setup state if not enabled or script missing
   if (!isEnabled || !scriptConnected) {
     return (
-      <div className="bg-white rounded-lg p-3 border">
-        <h3 className="h3 mb-1">Ready to improve your site</h3>
-        <p className="text-sm text-gray-600 mb-3">
-          {!scriptConnected 
-            ? 'Connect your website to enable automatic SEO improvements and technical fixes' 
-            : 'Enable Autopilot to apply technical SEO improvements automatically'
-          }
-        </p>
+      <div className="space-y-4">
+        <div>
+          <h3 className="font-corben text-[#282823] text-xl" style={{fontWeight: 400}}>Ready to improve your site</h3>
+          <p className="text-sm font-inter text-[#3d3d38] mt-1">
+            {!scriptConnected 
+              ? 'Connect your website to enable automatic SEO improvements and technical fixes' 
+              : 'Enable Autopilot to apply technical SEO improvements automatically'
+            }
+          </p>
+        </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button 
             onClick={!scriptConnected ? () => navigate('/site-connection') : onToggleAutopilot}
-            className="px-4 py-2 bg-[#5F209B] text-white rounded-md text-sm hover:opacity-90 transition-opacity font-medium"
+            className="group px-4 py-2.5 bg-[#282823] text-white hover:bg-white hover:text-[#282823] rounded-2xl text-sm font-corben transition-colors shadow-sm hover:shadow-md border border-[#282823]"
           >
             {!scriptConnected ? 'Connect Site' : 'Enable Autopilot'}
           </button>
           <button 
             onClick={() => navigate('/site-connection')}
-            className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-md transition-colors"
+            className="px-4 py-2.5 text-sm font-inter text-[#3d3d38] hover:text-[#282823] rounded-2xl transition-colors border border-[#e7e5df] hover:border-[#ddff89]"
           >
             View details →
           </button>
@@ -58,7 +60,7 @@ export function AutopilotCard({
 
         {/* EULA notice for first-time setup */}
         {scriptConnected && !isEnabled && (
-          <p className="text-xs text-gray-500 mt-3">
+          <p className="text-xs font-inter text-[#3d3d38]">
             We'll make safe, reversible SEO fixes. You can review and roll back anytime.
           </p>
         )}
@@ -68,23 +70,23 @@ export function AutopilotCard({
 
   // Show active autopilot state
   return (
-    <div className="bg-white rounded-lg p-3 border">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="h3">We just improved your site</h3>
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-xs text-gray-500">Active</span>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-corben text-[#282823] text-xl" style={{fontWeight: 400}}>We just improved your site</h3>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-[#ddff89] rounded-full animate-pulse"></div>
+          <span className="text-xs font-inter text-[#3d3d38] font-medium">Active</span>
         </div>
       </div>
       
       {recentChanges > 0 ? (
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-inter font-medium text-[#282823]">
               {recentChanges} fixes applied
             </span>
             {lastRunAt && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs font-inter text-[#3d3d38]">
                 · {new Date(lastRunAt).toLocaleDateString()}
               </span>
             )}
@@ -93,13 +95,13 @@ export function AutopilotCard({
           {/* Collapsible recent changes */}
           {recentFixes.length > 0 && (
             <details className="mb-3">
-              <summary className="text-sm text-gray-600 cursor-pointer hover:text-gray-900">
+              <summary className="text-sm font-inter text-[#3d3d38] cursor-pointer hover:text-[#282823]">
                 Recent changes
               </summary>
               <div className="mt-2 space-y-1">
                 {recentFixes.slice(0, 3).map((fix, index) => (
-                  <div key={index} className="text-xs text-gray-500 flex items-center gap-1">
-                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                  <div key={index} className="text-xs font-inter text-[#3d3d38] flex items-center gap-1">
+                    <div className="w-1 h-1 bg-[#ddff89] rounded-full"></div>
                     {fix.description}
                   </div>
                 ))}
@@ -109,14 +111,14 @@ export function AutopilotCard({
         </div>
       ) : (
         <div className="mb-3">
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm font-inter text-[#3d3d38] mb-3">
             Ready to apply new technical fixes to your site.
           </p>
           {onApplyFixes && (
             <button
               onClick={onApplyFixes}
               disabled={isApplying}
-              className="px-4 py-2 bg-[#5F209B] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+              className="group px-4 py-2 bg-[#282823] text-white hover:bg-white hover:text-[#282823] rounded-2xl text-sm font-corben transition-colors disabled:opacity-50 flex items-center gap-2 border border-[#282823]"
             >
               <Activity className={`w-4 h-4 ${isApplying ? 'animate-spin' : ''}`} />
               {isApplying ? 'Applying fixes...' : 'Apply fixes'}
@@ -128,13 +130,13 @@ export function AutopilotCard({
       <div className="flex items-center justify-between">
         <button 
           onClick={() => navigate('/site-connection')}
-          className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="text-sm font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
         >
           View details →
         </button>
         <button
           onClick={() => navigate('/site-connection')}
-          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-sm font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
           title="Autopilot Settings"
         >
           <Settings className="w-4 h-4" />
