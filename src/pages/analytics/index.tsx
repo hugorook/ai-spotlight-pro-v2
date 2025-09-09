@@ -100,21 +100,43 @@ export default function Analytics() {
   // Historical data for progress tracking
   const [historicalTests, setHistoricalTests] = useState<any[]>([])
 
-  // One-time cleanup of legacy/stale localStorage keys that could show old results
+  // One-time cleanup of legacy/stale localStorage keys and old database analytics
   useEffect(() => {
-    try {
-      const legacyKeys = [
-        'website_analysis',
-        'authority_analysis',
-        'benchmark_analysis',
-        'trending_analysis',
-        'website_analysis_enhanced',
-        'geo_last_run',
-        'geo_health_check_data'
-      ]
-      legacyKeys.forEach(k => localStorage.removeItem(k))
-    } catch {}
-  }, [])
+    const cleanup = async () => {
+      try {
+        // Clear localStorage
+        const legacyKeys = [
+          'website_analysis',
+          'authority_analysis', 
+          'benchmark_analysis',
+          'trending_analysis',
+          'website_analysis_enhanced',
+          'geo_last_run',
+          'geo_health_check_data'
+        ]
+        legacyKeys.forEach(k => localStorage.removeItem(k))
+
+        // Clear old analytics data that might contain Xapien results
+        if (user) {
+          console.log('🧹 CLEANUP DEBUG: Clearing old analytics data for fresh analysis');
+          const { error } = await supabase
+            .from('analytics_data')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('analytics_type', 'website_analysis')
+          
+          if (error) {
+            console.warn('Could not clear old website analysis data:', error)
+          } else {
+            console.log('🧹 CLEANUP DEBUG: Old website analysis data cleared successfully')
+          }
+        }
+      } catch (e) {
+        console.warn('Cleanup failed:', e)
+      }
+    }
+    cleanup()
+  }, [user])
 
   const tabs = [
     { id: 'results', label: 'Results', icon: BarChart3 },
