@@ -271,7 +271,7 @@ export default function TodayDashboard() {
   return (
     <AppShell>
       <div className="min-h-screen bg-[#ece7e0]">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-0 py-6">
           {/* Header */}
           <div className="mb-6">
             <h1 className="font-corben text-[#282823] text-3xl" style={{fontWeight: 400}}>Dashboard</h1>
@@ -316,10 +316,11 @@ export default function TodayDashboard() {
           )}
 
           {/* Main dashboard grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Grid with column gaps matching sidebar box spacing (using 24px) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-0">
             {/* Wins Card */}
             <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-6 pb-10">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
                 </div>
@@ -343,7 +344,7 @@ export default function TodayDashboard() {
 
             {/* Actions Card */}
             <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-6 pb-10">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
                 </div>
@@ -367,7 +368,7 @@ export default function TodayDashboard() {
 
             {/* Improvements Card */}
             <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-6 pb-10">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
                 </div>
@@ -390,9 +391,9 @@ export default function TodayDashboard() {
             </Card>
           </div>
 
-          {/* Bottom controls */}
+          {/* Bottom controls aligned with card bottoms */}
           {!isRunningHealthCheck && (
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-6 mb-8">
               <Button 
                 onClick={handleRunHealthCheck}
                 disabled={!user}
