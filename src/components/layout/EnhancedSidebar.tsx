@@ -71,12 +71,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors",
-                  isActive(item.path)
-                    ? "bg-[#ddff89] text-[#282823]"
-                    : "text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
-                )}
+                className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
               >
                 <span className="text-[13px] font-normal">{item.label}</span>
                 {React.cloneElement(item.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
@@ -88,12 +83,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           <nav className="px-2 pb-3 space-y-1 mt-auto">
             <button
               onClick={() => navigate('/settings')}
-              className={cn(
-                "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors",
-                isActive('/settings')
-                  ? "bg-[#ddff89] text-[#282823]"
-                  : "text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
-              )}
+              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
             >
               <span className="text-[13px] font-normal">Settings</span>
               <Settings className="w-3.5 h-3.5" />
@@ -101,25 +91,23 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           </nav>
         </div>
 
-        {/* Login box (same style) or User info */}
+        {/* Login box (same style) */}
         <div className="bg-white rounded-2xl border border-[#d9d9d9] shadow-sm p-2">
           {user ? (
-            <div className="flex items-center gap-2 px-1 py-1">
-              <button
-                onClick={() => navigate('/settings')}
-                className="w-8 h-8 rounded-full bg-[#ddff89] hover:bg-[#c4ee60] text-[#282823] flex items-center justify-center text-xs font-medium transition-colors flex-shrink-0"
-                title={user.email || 'User'}
-              >
+            <button
+              onClick={() => navigate('/settings')}
+              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
+              title={user.email || 'User'}
+            >
+              <span className="text-[13px] font-normal truncate">{user.email}</span>
+              <div className="text-[10px] font-medium text-[#282823] bg-[#f0f0f0] px-1.5 py-0.5 rounded flex-shrink-0 ml-2">
                 {getUserInitials(user.email || 'User')}
-              </button>
-              <div className="flex-1 overflow-hidden">
-                <p className="text-xs text-[#282823] truncate">{user.email}</p>
               </div>
-            </div>
+            </button>
           ) : (
             <button
               onClick={() => navigate('/auth')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]"
+              className="w-full text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] px-3 py-2 rounded-md transition-colors flex items-center justify-between"
             >
               <span className="text-[13px] font-normal">Log in</span>
               <LogInIcon className="w-3.5 h-3.5" />
