@@ -38,7 +38,7 @@ export default function AppShell({
         isRunning={isHealthCheckPage ? isRunning : false}
       />
       
-      {/* Main Content Area - align with landing page layout (12.5rem = 200px) */}
+      {/* Main Content Area - default layout for pages that don't override */}
       <div className="lg:pl-[12.5rem]">
         <div className="px-6 py-6">
           {children}

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
 import AppShell from '@/components/layout/AppShell'
+import EnhancedSidebar from '@/components/layout/EnhancedSidebar'
 import { WinsCard } from '@/components/dashboard/WinsCard'
 import { TopActionsCard } from '@/components/dashboard/TopActionsCard'
 import { ImprovementsCard } from '@/components/dashboard/ImprovementsCard'
@@ -269,131 +270,146 @@ export default function TodayDashboard() {
   }
 
   return (
-    <AppShell>
-      <div className="min-h-screen bg-[#ece7e0]">
-        <div className="px-6 py-6">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="font-corben text-[#282823] text-3xl" style={{fontWeight: 400}}>Dashboard</h1>
+    <div className="min-h-screen bg-[#ece7e0]">
+      {/* Include sidebar directly */}
+      <EnhancedSidebar />
+      
+      <div className="fixed inset-0 bg-[#ece7e0] lg:pl-[12.5rem]">
+        <div className="h-full flex flex-col">
+          {/* Header - Fixed height */}
+          <div className="flex-shrink-0 px-6 pt-6 pb-4">
+            <h1 className="font-corben text-[#282823] text-3xl mb-1" style={{fontWeight: 400}}>Dashboard</h1>
             <p className="text-[12px] text-[#3d3d38]">Your AI visibility at a glance</p>
           </div>
 
-
-          {/* Health Check Loading State */}
+          {/* Health Check Loading State - Fixed height when active */}
           {isRunningHealthCheck && (
-            <Card className="mb-8 bg-white border-[#e7e5df] shadow-sm">
-              <CardContent className="py-8">
-                <div className="text-center space-y-4">
-                  <div className="w-12 h-12 border-4 border-[#ddff89] border-t-[#282823] rounded-full animate-spin mx-auto"></div>
-                  <div>
-                    <h3 className="font-corben text-[#282823] text-xl mb-1" style={{fontWeight: 400}}>
-                      Running Health Check...
-                    </h3>
-                    <p className="text-sm text-[#3d3d38]">
-                      Testing prompt {healthCheckProgress.current} of {healthCheckProgress.total}
-                    </p>
-                  </div>
-                  
-                  {currentTestPrompt && (
-                    <div className="bg-[#f5f5f2] rounded-lg px-4 py-3 max-w-2xl mx-auto">
-                      <p className="text-xs text-[#3d3d38] truncate">
-                        "{currentTestPrompt}"
+            <div className="flex-shrink-0 px-6 pb-4">
+              <Card className="bg-white border-[#e7e5df] shadow-sm">
+                <CardContent className="py-8">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 border-4 border-[#ddff89] border-t-[#282823] rounded-full animate-spin mx-auto"></div>
+                    <div>
+                      <h3 className="font-corben text-[#282823] text-xl mb-1" style={{fontWeight: 400}}>
+                        Running Health Check...
+                      </h3>
+                      <p className="text-sm text-[#3d3d38]">
+                        Testing prompt {healthCheckProgress.current} of {healthCheckProgress.total}
                       </p>
                     </div>
-                  )}
-                  
-                  <div className="w-full max-w-md mx-auto">
-                    <div className="w-full bg-[#e7e5df] rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="bg-[#ddff89] h-full rounded-full transition-all duration-500 ease-out" 
-                        style={{ width: `${(healthCheckProgress.current / healthCheckProgress.total) * 100}%` }}
-                      />
+                    
+                    {currentTestPrompt && (
+                      <div className="bg-[#f5f5f2] rounded-lg px-4 py-3 max-w-2xl mx-auto">
+                        <p className="text-xs text-[#3d3d38] truncate">
+                          "{currentTestPrompt}"
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="w-full max-w-md mx-auto">
+                      <div className="w-full bg-[#e7e5df] rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="bg-[#ddff89] h-full rounded-full transition-all duration-500 ease-out" 
+                          style={{ width: `${(healthCheckProgress.current / healthCheckProgress.total) * 100}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
-          {/* Main dashboard grid */}
-          {/* Grid with column gaps matching sidebar box spacing (using 24px) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-0 items-stretch">
-            {/* Wins Card */}
-            <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
-              <CardContent className="p-6 pb-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
-                </div>
-                <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
-                <WinsCard
-                  wins={data.wins}
-                  isLoading={isLoading || isRunningHealthCheck}
-                  onRefresh={handleRunHealthCheck}
-                  embedded
-                />
-                <div className="mt-3">
-                  <button 
-                    onClick={() => navigate('/wins')}
-                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
-                  >
-                    View All
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Main dashboard grid - Fill remaining space, aligned with sidebar bottom */}
+          <div className="flex-1 px-6 pb-6 min-h-0">
+            <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Wins Card */}
+              <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+                <CardContent className="p-6 h-full flex flex-col">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
+                    </div>
+                    <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <WinsCard
+                      wins={data.wins}
+                      isLoading={isLoading || isRunningHealthCheck}
+                      onRefresh={handleRunHealthCheck}
+                      embedded
+                    />
+                  </div>
+                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                    <button 
+                      onClick={() => navigate('/wins')}
+                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    >
+                      View All
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Actions Card */}
-            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
-              <CardContent className="p-6 pb-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
-                </div>
-                <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
-                <TopActionsCard
-                  actions={data.actions}
-                  isLoading={isLoading || isRunningHealthCheck}
-                  onActionClick={handleActionClick}
-                  embedded
-                />
-                <div className="mt-3">
-                  <button 
-                    onClick={() => navigate('/actions')}
-                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
-                  >
-                    View All
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Actions Card */}
+              <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+                <CardContent className="p-6 h-full flex flex-col">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
+                    </div>
+                    <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <TopActionsCard
+                      actions={data.actions}
+                      isLoading={isLoading || isRunningHealthCheck}
+                      onActionClick={handleActionClick}
+                      embedded
+                    />
+                  </div>
+                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                    <button 
+                      onClick={() => navigate('/actions')}
+                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    >
+                      View All
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Improvements Card */}
-            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
-              <CardContent className="p-6 pb-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
-                </div>
-                <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
-                <ImprovementsCard
-                  improvements={data.improvements}
-                  isLoading={isLoading || isRunningHealthCheck}
-                  onRefresh={handleRunHealthCheck}
-                  embedded
-                />
-                <div className="mt-3">
-                  <button 
-                    onClick={() => navigate('/improvements')}
-                    className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
-                  >
-                    View All
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Improvements Card */}
+              <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+                <CardContent className="p-6 h-full flex flex-col">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
+                    </div>
+                    <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <ImprovementsCard
+                      improvements={data.improvements}
+                      isLoading={isLoading || isRunningHealthCheck}
+                      onRefresh={handleRunHealthCheck}
+                      embedded
+                    />
+                  </div>
+                  <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
+                    <button 
+                      onClick={() => navigate('/improvements')}
+                      className="text-[11px] font-inter text-[#3d3d38] hover:text-[#282823] transition-colors"
+                    >
+                      View All
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-
-          {/* Bottom controls removed per request */}
         </div>
       </div>
-    </AppShell>
+    </div>
   )
 }
