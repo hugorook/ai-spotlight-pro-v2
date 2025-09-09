@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useHealthCheck } from '@/contexts/HealthCheckContext'
 import { supabase } from '@/integrations/supabase/client'
-import AppShell from '@/components/layout/AppShell'
+import EnhancedSidebar from '@/components/layout/EnhancedSidebar'
 import ResultsSection from '@/components/ui/results-section'
 import LoadingOverlay from '@/components/LoadingOverlay'
 import { useToast } from '@/components/ui/use-toast'
@@ -341,15 +341,20 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <AppShell>
-        <LoadingOverlay />
-      </AppShell>
+      <div className="min-h-screen bg-[#ece7e0]">
+        <EnhancedSidebar />
+        <div className="lg:pl-[12.5rem]">
+          <LoadingOverlay />
+        </div>
+      </div>
     )
   }
 
   return (
-    <AppShell>
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#ece7e0]">
+      <EnhancedSidebar />
+      <div className="lg:pl-[12.5rem] px-6 py-6">
+        <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button 
@@ -360,8 +365,8 @@ export default function Analytics() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="h1">Analytics Hub</h1>
-            <p className="body text-gray-600">Detailed insights and performance analysis</p>
+            <h1 className="font-corben text-[#282823] text-3xl mb-1" style={{fontWeight: 400}}>Analytics Hub</h1>
+            <p className="text-[12px] text-[#3d3d38]">Detailed insights and performance analysis</p>
           </div>
           
           {/* Run Health Check Button */}
@@ -541,7 +546,8 @@ export default function Analytics() {
             onTabChange={setActiveTab}
           />
         )}
+        </div>
       </div>
-    </AppShell>
+    </div>
   )
 }

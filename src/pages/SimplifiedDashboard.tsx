@@ -332,13 +332,19 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <WinsCard
-                      wins={data.wins}
-                      isLoading={isLoading || isRunningHealthCheck}
-                      onRefresh={handleRunHealthCheck}
-                      embedded
-                    />
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                    {(!data.wins || data.wins.length === 0) ? (
+                      <p className="text-[11px] text-[#3d3d38] text-center">
+                        No results yet. Run a report to get started.
+                      </p>
+                    ) : (
+                      <WinsCard
+                        wins={data.wins}
+                        isLoading={isLoading || isRunningHealthCheck}
+                        onRefresh={handleRunHealthCheck}
+                        embedded
+                      />
+                    )}
                   </div>
                   <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
                     <button 
@@ -360,13 +366,19 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <TopActionsCard
-                      actions={data.actions}
-                      isLoading={isLoading || isRunningHealthCheck}
-                      onActionClick={handleActionClick}
-                      embedded
-                    />
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                    {(!data.actions || data.actions.length === 0) ? (
+                      <p className="text-[11px] text-[#3d3d38] text-center">
+                        No results yet. Run a report to get started.
+                      </p>
+                    ) : (
+                      <TopActionsCard
+                        actions={data.actions}
+                        isLoading={isLoading || isRunningHealthCheck}
+                        onActionClick={handleActionClick}
+                        embedded
+                      />
+                    )}
                   </div>
                   <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
                     <button 
@@ -388,13 +400,19 @@ export default function TodayDashboard() {
                     </div>
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <ImprovementsCard
-                      improvements={data.improvements}
-                      isLoading={isLoading || isRunningHealthCheck}
-                      onRefresh={handleRunHealthCheck}
-                      embedded
-                    />
+                  <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                    {(!data.improvements || data.improvements.length === 0) ? (
+                      <p className="text-[11px] text-[#3d3d38] text-center">
+                        No results yet. Run a report to get started.
+                      </p>
+                    ) : (
+                      <ImprovementsCard
+                        improvements={data.improvements}
+                        isLoading={isLoading || isRunningHealthCheck}
+                        onRefresh={handleRunHealthCheck}
+                        embedded
+                      />
+                    )}
                   </div>
                   <div className="flex-shrink-0 mt-3 pt-3 border-t border-[#e7e5df]">
                     <button 

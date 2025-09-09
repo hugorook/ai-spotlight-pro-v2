@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import AppShell from '@/components/layout/AppShell';
+import EnhancedSidebar from '@/components/layout/EnhancedSidebar';
 
 const SettingsPage = () => {
   const { user } = useAuth();
@@ -62,16 +62,27 @@ const SettingsPage = () => {
   };
 
   if (!user) {
-    return <div>Please sign in to access settings</div>;
+    return (
+      <div className="min-h-screen bg-[#ece7e0]">
+        <EnhancedSidebar />
+        <div className="lg:pl-[12.5rem] px-6 py-6">
+          <div className="text-center py-12">
+            <p className="text-[#3d3d38]">Please sign in to access settings</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <AppShell>
-      <div className="space-y-4">
+    <div className="min-h-screen bg-[#ece7e0]">
+      <EnhancedSidebar />
+      <div className="lg:pl-[12.5rem] px-6 py-6">
+        <div className="space-y-4">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="h1 mb-2">Settings</h1>
-          <p className="body text-black">
+          <h1 className="font-corben text-[#282823] text-3xl mb-1" style={{fontWeight: 400}}>Settings</h1>
+          <p className="text-[12px] text-[#3d3d38]">
             Manage your account and data preferences
           </p>
         </div>
@@ -121,8 +132,9 @@ const SettingsPage = () => {
             </p>
           </div>
         </div>
+        </div>
       </div>
-    </AppShell>
+    </div>
   );
 };
 

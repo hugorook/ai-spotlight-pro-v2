@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import AppShell from '@/components/layout/AppShell';
+import EnhancedSidebar from '@/components/layout/EnhancedSidebar';
 import { useToast } from '@/components/ui/use-toast';
 import { Wand2, RefreshCw, Globe, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
 
@@ -506,21 +506,26 @@ const PromptsPage = () => {
 
   if (loading) {
     return (
-      <AppShell>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-[#ece7e0]">
+        <EnhancedSidebar />
+        <div className="lg:pl-[12.5rem] px-6 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-pulse text-[#3d3d38]">Loading...</div>
+          </div>
         </div>
-      </AppShell>
+      </div>
     );
   }
 
   return (
-    <AppShell>
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-[#ece7e0]">
+      <EnhancedSidebar />
+      <div className="lg:pl-[12.5rem] px-6 py-6">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="h1 mb-2">Test Prompts</h1>
-          <p className="body text-gray-600">Generate and manage your AI test prompts</p>
+          <h1 className="font-corben text-[#282823] text-3xl mb-1" style={{fontWeight: 400}}>Test Prompts</h1>
+          <p className="text-[12px] text-[#3d3d38]">Generate and manage your AI test prompts</p>
         </div>
 
         {/* URL Input Box */}
@@ -668,8 +673,9 @@ const PromptsPage = () => {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </AppShell>
+    </div>
   );
 };
 
