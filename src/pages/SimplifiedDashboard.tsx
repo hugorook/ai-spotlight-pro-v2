@@ -52,6 +52,7 @@ export default function TodayDashboard() {
     improvements: []
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
 
   // Load dashboard data
   useEffect(() => {
@@ -62,10 +63,10 @@ export default function TodayDashboard() {
 
   // Update dashboard data when health check results change
   useEffect(() => {
-    if (healthCheckResults.length > 0) {
+    if (healthCheckResults.length > 0 && initialLoadComplete) {
       updateDashboardWithHealthCheckResults()
     }
-  }, [healthCheckResults])
+  }, [healthCheckResults, initialLoadComplete])
 
   const loadDashboardData = async () => {
     try {
@@ -126,14 +127,16 @@ export default function TodayDashboard() {
       ])
 
       const wins = winsResult.data?.wins || []
-      const actionsData = { recommendations: actionsResult.data?.recommendations || [] }
+      const actions = actionsResult.data?.recommendations || []
 
       setData({
         project,
-        wins: wins.wins || [],
-        actions: actionsData.recommendations || [],
+        wins: Array.isArray(wins) ? wins : (wins.wins || []),
+        actions: Array.isArray(actions) ? actions : [],
         improvements: [] // Initialize as empty array until health check runs
       })
+      
+      setInitialLoadComplete(true)
     } catch (error) {
       console.error('Error loading dashboard:', error)
       toast({
@@ -218,12 +221,22 @@ export default function TodayDashboard() {
       }
 
       // Update dashboard data with health check results (always latest session via context)
-      setData(prev => ({
-        ...prev,
-        wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
-        actions,
-        improvements: improvements.slice(0, 8) // Show top 8 improvements
-      }))
+      setData(prev => {
+        const newData = {
+          ...prev,
+          wins: wins.sort((a, b) => a.rank - b.rank), // Sort by rank
+          actions,
+          improvements: improvements.slice(0, 8) // Show top 8 improvements
+        }
+        
+        // Only update if data actually changed to prevent unnecessary re-renders
+        if (JSON.stringify(prev.wins) !== JSON.stringify(newData.wins) ||
+            JSON.stringify(prev.actions) !== JSON.stringify(newData.actions) ||
+            JSON.stringify(prev.improvements) !== JSON.stringify(newData.improvements)) {
+          return newData
+        }
+        return prev
+      })
 
     } catch (error) {
       console.error('Error updating dashboard with health check results:', error)
@@ -333,14 +346,16 @@ export default function TodayDashboard() {
                     <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                   </div>
                   <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
-                    {(!data.wins || data.wins.length === 0) ? (
+                    {isLoading || isRunningHealthCheck ? (
+                      <div className="w-6 h-6 border-2 border-[#ddff89] border-t-[#282823] rounded-full animate-spin"></div>
+                    ) : (!data.wins || data.wins.length === 0) ? (
                       <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     ) : (
                       <WinsCard
                         wins={data.wins}
-                        isLoading={isLoading || isRunningHealthCheck}
+                        isLoading={false}
                         onRefresh={handleRunHealthCheck}
                         embedded
                       />
@@ -367,14 +382,16 @@ export default function TodayDashboard() {
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
                   <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
-                    {(!data.actions || data.actions.length === 0) ? (
+                    {isLoading || isRunningHealthCheck ? (
+                      <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
+                    ) : (!data.actions || data.actions.length === 0) ? (
                       <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     ) : (
                       <TopActionsCard
                         actions={data.actions}
-                        isLoading={isLoading || isRunningHealthCheck}
+                        isLoading={false}
                         onActionClick={handleActionClick}
                         embedded
                       />
@@ -401,14 +418,16 @@ export default function TodayDashboard() {
                     <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                   </div>
                   <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
-                    {(!data.improvements || data.improvements.length === 0) ? (
+                    {isLoading || isRunningHealthCheck ? (
+                      <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
+                    ) : (!data.improvements || data.improvements.length === 0) ? (
                       <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     ) : (
                       <ImprovementsCard
                         improvements={data.improvements}
-                        isLoading={isLoading || isRunningHealthCheck}
+                        isLoading={false}
                         onRefresh={handleRunHealthCheck}
                         embedded
                       />
