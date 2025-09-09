@@ -169,14 +169,22 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         .maybeSingle();
       websiteUrl = latestGenerated?.website_url || company.website_url || '';
 
+      console.log('🔍 ANALYTICS DEBUG: URL source -', {
+        fromGeneratedPrompts: latestGenerated?.website_url,
+        fromCompany: company.website_url,
+        finalUrl: websiteUrl
+      });
+
       // 1. Website Analysis - analyze company website for AI optimization (Edge: analyze-website expects { url })
       if (websiteUrl) {
+        console.log('🌐 WEBSITE ANALYSIS DEBUG: Analyzing website URL:', websiteUrl);
         analyticsPromises.push(
           supabase.functions.invoke('analyze-website', {
             body: {
               url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`
             }
           }).then(async result => {
+            console.log('🌐 WEBSITE ANALYSIS DEBUG: Analysis completed for:', websiteUrl, result.data ? 'SUCCESS' : 'FAILED');
             if (result.data) {
               await supabase
                 .from('analytics_data')

@@ -159,8 +159,12 @@ export default function Analytics() {
           .eq('user_id', user.id)
 
         if (analyticsRows && analyticsRows.length > 0) {
+          console.log('📊 ANALYTICS LOADING DEBUG: Found analytics data:', analyticsRows.map(r => r.analytics_type));
           for (const row of analyticsRows) {
-            if (row.analytics_type === 'website_analysis') setWebsiteAnalysis(row.data)
+            if (row.analytics_type === 'website_analysis') {
+              console.log('🌐 WEBSITE ANALYSIS LOADING DEBUG: Setting website analysis data');
+              setWebsiteAnalysis(row.data)
+            }
             if (row.analytics_type === 'authority_analysis') setAuthorityAnalysis(row.data?.analysis ?? row.data)
             if (row.analytics_type === 'industry_benchmark') setIndustryBenchmark(row.data?.benchmark ?? row.data)
             if (row.analytics_type === 'trending_opportunities') setTrendingOpportunities(row.data?.opportunities || [])
