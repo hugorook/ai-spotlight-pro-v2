@@ -16,7 +16,9 @@ import {
   Check,
   Eye,
   Target,
-  LineChart
+  LineChart,
+  Zap,
+  Building2
 } from "lucide-react";
 
 // Custom hook for typewriter effect
@@ -129,11 +131,15 @@ const LandingPage = () => {
   };
 
   const navigationItems = [
-    { label: "How it works", icon: Home, href: "#how" },
     { label: "Dashboard", icon: TrendingUp, href: "/dashboard" },
     { label: "Analytics", icon: BarChart3, href: "/analytics" },
+    { label: "Auto-pilot", icon: Zap, href: "/site-connection" },
     { label: "Prompts", icon: FileText, href: "/prompts" },
-    { label: "Company", icon: Settings, href: "/content" },
+    { label: "Company", icon: Building2, href: "/content" },
+  ];
+
+  const settingsItems = [
+    { label: "Settings", icon: Settings, href: "/settings" },
   ];
 
   const statisticsData = [
@@ -233,7 +239,9 @@ const LandingPage = () => {
         <aside className={`hidden lg:block fixed top-6 left-6 z-50 ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
           <div className="w-40 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm">
             <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
-            <nav className="px-2 pb-2 space-y-1">
+            
+            {/* Main Navigation */}
+            <nav className="px-2 space-y-1">
               {navigationItems.map((item, index) => (
                 <a
                   key={item.label}
@@ -243,6 +251,23 @@ const LandingPage = () => {
                       ? 'bg-[#ddff89] text-[#282823]'
                       : 'text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823]'
                   } flex items-center justify-between px-3 py-2 rounded-md transition-colors`}
+                >
+                  <span className="text-[13px] font-normal">{item.label}</span>
+                  <item.icon className="w-3.5 h-3.5" />
+                </a>
+              ))}
+            </nav>
+            
+            {/* Separator */}
+            <div className="mx-2 my-3 border-t border-[#e7e5df]"></div>
+            
+            {/* Settings Navigation */}
+            <nav className="px-2 pb-2 space-y-1">
+              {settingsItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-[#282823b3] hover:bg-[#e7f8be] hover:text-[#282823] flex items-center justify-between px-3 py-2 rounded-md transition-colors"
                 >
                   <span className="text-[13px] font-normal">{item.label}</span>
                   <item.icon className="w-3.5 h-3.5" />
