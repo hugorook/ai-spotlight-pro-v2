@@ -172,10 +172,14 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
       console.log('🔍 ANALYTICS DEBUG: URL source -', {
         fromGeneratedPrompts: latestGenerated?.website_url,
         fromCompany: company.website_url,
-        finalUrl: websiteUrl
+        finalUrl: websiteUrl,
+        isEmpty: !websiteUrl,
+        needsProtocol: websiteUrl && !websiteUrl.startsWith('http')
       });
 
       // 1. Website Analysis - analyze company website for AI optimization (Edge: analyze-website expects { url })
+      console.log('🔍 WEBSITE URL DEBUG: websiteUrl =', websiteUrl, 'isEmpty =', !websiteUrl);
+      
       if (websiteUrl) {
         console.log('🌐 WEBSITE ANALYSIS DEBUG: Analyzing website URL:', websiteUrl);
         analyticsPromises.push(
@@ -184,9 +188,32 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
               url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`
             }
           }).then(async result => {
-            console.log('🌐 WEBSITE ANALYSIS DEBUG: Analysis completed for:', websiteUrl, result.data ? 'SUCCESS' : 'FAILED');
-            if (result.data) {
-              await supabase
+            console.log('🌐 WEBSITE ANALYSIS DEBUG: Edge function response:', {
+              websiteUrl,
+              hasData: !!result.data,
+              hasError: !!result.error,
+              error: result.error,
+              dataKeys: result.data ? Object.keys(result.data) : [],
+              analysisKeys: result.data?.analysis ? Object.keys(result.data.analysis) : []
+            });
+            
+            if (result.error) {
+              console.error('🌐 WEBSITE ANALYSIS DEBUG: Edge function returned error:', result.error);
+              // Still try to save error response if it has the expected structure
+              if (result.data?.analysis) {
+                console.log('🌐 WEBSITE ANALYSIS DEBUG: Saving error response with analysis data');
+                await supabase
+                  .from('analytics_data')
+                  .insert({
+                    user_id: company.user_id,
+                    health_check_session_id: sessionId,
+                    analytics_type: 'website_analysis',
+                    data: result.data
+                  });
+              }
+            } else if (result.data) {
+              console.log('🌐 WEBSITE ANALYSIS DEBUG: Saving successful analysis');
+              const { error: insertError } = await supabase
                 .from('analytics_data')
                 .insert({
                   user_id: company.user_id,
@@ -194,8 +221,84 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
                   analytics_type: 'website_analysis',
                   data: result.data
                 });
+              
+              if (insertError) {
+                console.error('🌐 WEBSITE ANALYSIS DEBUG: Failed to save analysis:', insertError);
+              } else {
+                console.log('🌐 WEBSITE ANALYSIS DEBUG: Analysis saved successfully');
+              }
             }
-          }).catch(error => console.error('Website analysis failed:', error))
+          }).catch(error => {
+            console.error('🌐 WEBSITE ANALYSIS DEBUG: Edge function invocation failed:', error);
+            // Create a placeholder analysis to prevent empty state
+            const placeholderAnalysis = {
+              content: '',
+              analysis: {
+                contentSummary: 'Website analysis could not be completed at this time.',
+                aiOptimizationOpportunities: ['Unable to analyze website - please check the URL and try again'],
+                keyTopics: [],
+                contentGaps: ['Website analysis pending'],
+                recommendations: ['Ensure website URL is accessible and try running health check again']
+              },
+              fetchedAt: new Date().toISOString(),
+              error: error.message || 'Unknown error'
+            };
+            
+            // Save placeholder so UI doesn't show empty state
+            return supabase
+              .from('analytics_data')
+              .insert({
+                user_id: company.user_id,
+                health_check_session_id: sessionId,
+                analytics_type: 'website_analysis',
+                data: placeholderAnalysis
+              })
+              .then(() => console.log('🌐 WEBSITE ANALYSIS DEBUG: Saved placeholder analysis'));
+          })
+        );
+      } else {
+        console.log('🚨 NO WEBSITE URL DEBUG: No website URL provided, creating placeholder analysis');
+        
+        // Always save placeholder analysis so UI doesn't show "No Website Analysis Available"
+        analyticsPromises.push(
+          Promise.resolve().then(async () => {
+            const placeholderData = {
+              content: '',
+              analysis: {
+                contentSummary: 'No website URL configured. To enable website analysis, please generate prompts with a website URL from the Prompts page.',
+                aiOptimizationOpportunities: [
+                  'Configure a website URL by generating prompts with your website',
+                  'Ensure your website is publicly accessible',
+                  'Add clear descriptions of your services and value proposition to your website',
+                  'Include contact information and company details on your website'
+                ],
+                keyTopics: ['Website Configuration Required'],
+                contentGaps: ['Website URL not configured for analysis'],
+                recommendations: [
+                  'Go to the Prompts page and generate prompts with your website URL',
+                  'Ensure your website loads properly and is publicly accessible',
+                  'Run another health check after configuring your website URL'
+                ]
+              },
+              fetchedAt: new Date().toISOString(),
+              error: 'No website URL configured'
+            };
+
+            const { error: insertError } = await supabase
+              .from('analytics_data')
+              .insert({
+                user_id: company.user_id,
+                health_check_session_id: sessionId,
+                analytics_type: 'website_analysis',
+                data: placeholderData
+              });
+
+            if (insertError) {
+              console.error('🚨 NO WEBSITE URL DEBUG: Failed to save placeholder:', insertError);
+            } else {
+              console.log('🚨 NO WEBSITE URL DEBUG: Placeholder saved successfully');
+            }
+          })
         );
       }
 
