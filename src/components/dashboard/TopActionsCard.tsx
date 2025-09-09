@@ -77,13 +77,29 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
         </>
       )}
       
-      <div className="space-y-2 mb-4">
+      <div className="space-y-3 mb-4">
         {(actions || []).slice(0, 8).map((action, index) => (
           <div key={action.id || index} className="flex items-start">
-            <span className="text-[#3d3d38] mr-2 mt-1 flex-shrink-0">•</span>
-            <p className="text-[11px] text-[#3d3d38] leading-relaxed break-words">
-              {action.title}
-            </p>
+            <span className="text-[#3d3d38] mr-2 mt-0 flex-shrink-0 leading-[1.4]">•</span>
+            <div className="flex-1">
+              <div className="flex items-start justify-between mb-1">
+                <p className="text-[11px] text-[#3d3d38] leading-relaxed break-words flex-1 pr-2">
+                  {action.title}
+                </p>
+                <div className="flex gap-1 flex-shrink-0">
+                  <span className={`px-1.5 py-0.5 text-[9px] font-medium rounded ${getImpactColor(action.impact)}`}>
+                    {action.impact}
+                  </span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-medium rounded flex items-center gap-1 ${getOwnerColor(action.suggestedOwner)}`}>
+                    {getOwnerIcon(action.suggestedOwner)}
+                    {action.suggestedOwner}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[10px] text-[#3d3d38] opacity-75 leading-relaxed break-words">
+                {action.rationale}
+              </p>
+            </div>
           </div>
         ))}
       </div>
