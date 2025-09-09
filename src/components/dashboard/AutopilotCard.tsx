@@ -36,7 +36,7 @@ export function AutopilotCard({
         <h3 className="h3 mb-1">Ready to improve your site</h3>
         <p className="text-sm text-gray-600 mb-3">
           {!scriptConnected 
-            ? 'Install the site script to enable automatic fixes' 
+            ? 'Connect your website to enable automatic SEO improvements and technical fixes' 
             : 'Enable Autopilot to apply technical SEO improvements automatically'
           }
         </p>
