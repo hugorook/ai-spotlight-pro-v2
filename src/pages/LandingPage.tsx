@@ -368,7 +368,7 @@ const LandingPage = () => {
           </form>
 
           {/* Future of Search Section (narrow white box) */}
-          <div className={`bg-white rounded-[28px] px-8 py-10 md:px-14 md:py-14 mb-4 relative overflow-hidden max-w-5xl mx-auto ${showContent ? 'animate-fadeInUp' : 'opacity-0 translate-y-20'}`}>
+          <div className={`bg-white rounded-[28px] px-8 py-10 md:px-14 md:py-14 mb-4 relative overflow-hidden max-w-7xl mx-auto ${showContent ? 'animate-fadeInUp' : 'opacity-0 translate-y-20'}`}>
             <div className="text-center">
               <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
                 The future of search
@@ -428,6 +428,7 @@ const LandingPage = () => {
 
         {/* How it Works Section */}
         <section className={`relative z-10 pt-4 pb-14 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
+          <div className="max-w-7xl mx-auto">
           <div className="text-center mb-4">
             <Badge className="bg-[#ddff89] text-[#3d3d38] mb-6 text-sm px-4 py-2">
               How can I win?
@@ -450,6 +451,7 @@ const LandingPage = () => {
           {/* Hover-accordion list */}
           <AccordionSteps steps={processSteps} />
 
+          </div>
           <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-2 md:bottom-4">
             <Button
               onClick={() => navigate('/auth')}
@@ -525,6 +527,7 @@ const LandingPage = () => {
 
       {/* CTA Section */}
         <section className={`relative z-10 text-center py-20 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
+          <div className="max-w-7xl mx-auto">
           <h2 className="font-corben text-[#282823] text-6xl mb-8" style={{fontWeight: 400}}>
             Cheat the internet.
           </h2>
@@ -555,11 +558,12 @@ const LandingPage = () => {
           </div>
         </div>
           </form>
+          </div>
       </section>
 
       {/* Footer */}
         <footer className={`relative z-10 bg-white/80 backdrop-blur rounded-t-3xl py-12 px-8 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
               <div className="flex items-center gap-3 mb-4 md:mb-0">
                 <div className="bg-[#ddff89] px-4 py-2 rounded-lg">
