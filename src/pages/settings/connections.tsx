@@ -48,7 +48,8 @@ export default function ConnectionsSettings() {
 
   const loadProject = async () => {
     try {
-      const { data: projects } = await supabase
+      // First try the projects table
+      const { data: projects, error: projectsError } = await supabase
         .from('projects')
         .select('*')
         .eq('user_id', user?.id)
@@ -56,13 +57,41 @@ export default function ConnectionsSettings() {
 
       if (projects?.[0]) {
         setProject(projects[0])
+        return
+      }
+
+      // If projects table doesn't exist, try companies table as fallback
+      if (projectsError?.message?.includes('does not exist')) {
+        const { data: companies } = await supabase
+          .from('companies')
+          .select('*')
+          .limit(1)
+
+        if (companies?.[0]) {
+          // Convert company to project format
+          const mockProject = {
+            id: companies[0].id,
+            site_url: companies[0].website || 'https://example.com',
+            cms_provider: 'manual',
+            site_script_status: 'missing' as const,
+            autopilot_enabled: false,
+            autopilot_scopes: [] as string[]
+          }
+          setProject(mockProject)
+          
+          toast({
+            title: 'Notice',
+            description: 'Using existing company data. Create database schema for full functionality.',
+            variant: 'default'
+          })
+        }
       }
     } catch (error) {
       console.error('Error loading project:', error)
       toast({
-        title: 'Error',
-        description: 'Failed to load project settings',
-        variant: 'destructive'
+        title: 'Info',
+        description: 'Create database schema to enable full autopilot functionality',
+        variant: 'default'
       })
     } finally {
       setLoading(false)
@@ -74,6 +103,23 @@ export default function ConnectionsSettings() {
 
     setIsUpdating(true)
     try {
+      // Check if we have real projects table
+      const { error: checkError } = await supabase.from('projects').select('id').limit(1)
+      
+      if (checkError?.message?.includes('does not exist')) {
+        // Mock behavior for demo
+        setProject({
+          ...project,
+          autopilot_enabled: !project.autopilot_enabled
+        })
+
+        toast({
+          title: 'Demo Mode',
+          description: `Autopilot ${!project.autopilot_enabled ? 'enabled' : 'disabled'} (create schema for real functionality)`
+        })
+        return
+      }
+
       const { data: result, error } = await supabase.functions.invoke('toggle-autopilot', {
         body: {
           projectId: project.id,
@@ -111,6 +157,23 @@ export default function ConnectionsSettings() {
       : [...project.autopilot_scopes, scopeId]
 
     try {
+      // Check if projects table exists
+      const { error: checkError } = await supabase.from('projects').select('id').limit(1)
+      
+      if (checkError?.message?.includes('does not exist')) {
+        // Demo mode - just update local state
+        setProject({
+          ...project,
+          autopilot_scopes: newScopes
+        })
+
+        toast({
+          title: 'Demo Mode',
+          description: 'Scope updated (create schema for persistence)'
+        })
+        return
+      }
+
       const { error } = await supabase
         .from('projects')
         .update({ autopilot_scopes: newScopes })
@@ -153,30 +216,16 @@ export default function ConnectionsSettings() {
   const simulateConnection = async () => {
     if (!project) return
     
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .update({ site_script_status: 'connected' })
-        .eq('id', project.id)
+    // Always simulate connection in demo mode
+    setProject({
+      ...project,
+      site_script_status: 'connected'
+    })
 
-      if (error) throw error
-
-      setProject({
-        ...project,
-        site_script_status: 'connected'
-      })
-
-      toast({
-        title: 'Success',
-        description: 'Site script connected! (Mock simulation)'
-      })
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update connection status',
-        variant: 'destructive'
-      })
-    }
+    toast({
+      title: 'Success',
+      description: 'Site script connected! (Demo simulation)'
+    })
   }
 
   const handleCMSSetup = (cmsType: string) => {
@@ -225,6 +274,25 @@ export default function ConnectionsSettings() {
     if (!project) return
     
     try {
+      // Check if projects table exists
+      const { error: checkError } = await supabase.from('projects').select('id').limit(1)
+      
+      if (checkError?.message?.includes('does not exist')) {
+        // Demo mode - just update local state
+        setProject({
+          ...project,
+          cms_provider: cmsType
+        })
+
+        setShowCMSSetup(null)
+
+        toast({
+          title: 'Demo Connected',
+          description: `${cmsType} connected in demo mode! Create schema for real functionality.`
+        })
+        return
+      }
+
       const { error } = await supabase
         .from('projects')
         .update({ 
