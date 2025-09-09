@@ -271,7 +271,7 @@ export default function TodayDashboard() {
   return (
     <AppShell>
       <div className="min-h-screen bg-[#ece7e0]">
-        <div className="px-0 pr-6 py-6">
+        <div className="px-6 py-6">
           {/* Header */}
           <div className="mb-6">
             <h1 className="font-corben text-[#282823] text-3xl" style={{fontWeight: 400}}>Dashboard</h1>

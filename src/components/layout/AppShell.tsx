@@ -38,9 +38,9 @@ export default function AppShell({
         isRunning={isHealthCheckPage ? isRunning : false}
       />
       
-      {/* Main Content Area - align with landing sidebar (w-60 + mx-6 => 264px) */}
-      <div className="flex flex-col ml-[264px]">
-        <div className="flex-1 px-6 py-6">
+      {/* Main Content Area - align with landing page layout (12.5rem = 200px) */}
+      <div className="lg:pl-[12.5rem]">
+        <div className="px-6 py-6">
           {children}
         </div>
       </div>
