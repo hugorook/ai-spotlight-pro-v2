@@ -116,18 +116,18 @@ export default function Analytics() {
         ]
         legacyKeys.forEach(k => localStorage.removeItem(k))
 
-        // Clear old analytics data that might contain Xapien results
-        if (user) {
-          console.log('🧹 CLEANUP DEBUG: Clearing old analytics data for fresh analysis');
+        // One-time cleanup flag check
+        const cleanupDone = localStorage.getItem('analytics_cleanup_v1_done')
+        if (user && !cleanupDone) {
+          console.log('🧹 CLEANUP DEBUG: One-time clearing of old analytics data');
           const { error } = await supabase
             .from('analytics_data')
             .delete()
             .eq('user_id', user.id)
             .eq('analytics_type', 'website_analysis')
           
-          if (error) {
-            console.warn('Could not clear old website analysis data:', error)
-          } else {
+          if (!error) {
+            localStorage.setItem('analytics_cleanup_v1_done', 'true')
             console.log('🧹 CLEANUP DEBUG: Old website analysis data cleared successfully')
           }
         }
