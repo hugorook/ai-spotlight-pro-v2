@@ -70,64 +70,29 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
 
   return (
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
-      <h3 className={`${embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'} mb-1`}>Your Top 3 for the next 30 days</h3>
-      <p className={`${embedded ? 'text-[12px]' : 'text-sm'} text-gray-600 mb-4`}>Non-automatable, high-leverage actions</p>
+      {!embedded && (
+        <>
+          <h3 className="h3 mb-1">Your Top 3 for the next 30 days</h3>
+          <p className="text-sm text-gray-600 mb-4">Non-automatable, high-leverage actions</p>
+        </>
+      )}
       
-      <div className="space-y-3 mb-4">
-        {(actions || []).slice(0, 3).map((action, index) => (
-          <div key={action.id || index} className="border-l-2 border-gray-200 pl-4 relative">
-            {/* Priority indicator dot */}
-            <div className={`absolute -left-1.5 top-2 w-3 h-3 rounded-full border-2 border-white ${
-              index === 0 ? 'bg-red-500' : index === 1 ? 'bg-yellow-500' : 'bg-green-500'
-            }`}></div>
-            
-            <div className="flex items-start justify-between mb-2">
-              <h4 className={`${embedded ? 'text-[13px]' : 'text-sm'} font-medium text-gray-900 flex-1`}>
-                {action.title}
-              </h4>
-              <div className="flex gap-1 ml-3 flex-shrink-0">
-                <span className={`px-2 py-0.5 text-xs font-medium rounded ${getImpactColor(action.impact)}`}>
-                  {action.impact}
-                </span>
-                <span className={`px-2 py-0.5 text-xs font-medium rounded flex items-center gap-1 ${getOwnerColor(action.suggestedOwner)}`}>
-                  {getOwnerIcon(action.suggestedOwner)}
-                  {action.suggestedOwner}
-                </span>
-              </div>
-            </div>
-            
-            <p className={`${embedded ? 'text-[12px]' : 'text-xs'} text-gray-600 mb-3 line-clamp-2`}>
-              {action.rationale}
+      <div className="space-y-2 mb-4">
+        {(actions || []).slice(0, 8).map((action, index) => (
+          <div key={action.id || index} className="flex items-start">
+            <span className="text-[#3d3d38] mr-2 mt-1 flex-shrink-0">•</span>
+            <p className="text-[11px] text-[#3d3d38] leading-relaxed break-words">
+              {action.title}
             </p>
-            
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onActionClick?.(action)}
-                className="px-3 py-1.5 bg-[#5F209B] text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1"
-              >
-                Do it
-                <ArrowRight className="w-3 h-3" />
-              </button>
-              
-              {/* Show links if available */}
-              {action.links && action.links.length > 0 && (
-                <button
-                  onClick={() => window.open(action.links![0], '_blank')}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  title="View resource"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                </button>
-              )}
-              
-              {/* Effort indicator */}
-              <span className="text-xs text-gray-500 ml-auto">
-                {action.effort} effort
-              </span>
-            </div>
           </div>
         ))}
       </div>
+      
+      {(actions || []).length > 8 && (
+        <div className="text-[10px] text-[#3d3d38] text-center mb-3">
+          +{(actions || []).length - 8} more
+        </div>
+      )}
 
       {(actions || []).length === 0 && !isLoading && (
         <div className="text-center py-6">
@@ -140,12 +105,14 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
         </div>
       )}
 
-      <button 
-        onClick={() => navigate('/analytics?tab=results')}
-        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
-      >
-        View details →
-      </button>
+      {!embedded && (
+        <button 
+          onClick={() => navigate('/analytics?tab=results')}
+          className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
+        >
+          View details →
+        </button>
+      )}
     </div>
   )
 }

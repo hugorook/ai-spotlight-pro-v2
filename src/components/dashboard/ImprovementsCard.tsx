@@ -52,15 +52,17 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
 
   return (
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Key areas to improve</h3>
-        {(improvements || []).length > 0 && (
-          <div className="flex items-center gap-1 text-orange-600">
-            <AlertTriangle className="w-4 h-4" />
-            <span className="text-xs font-medium">{(improvements || []).length} gaps</span>
-          </div>
-        )}
-      </div>
+      {!embedded && (
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="h3">Key areas to improve</h3>
+          {(improvements || []).length > 0 && (
+            <div className="flex items-center gap-1 text-orange-600">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-xs font-medium">{(improvements || []).length} gaps</span>
+            </div>
+          )}
+        </div>
+      )}
       
       {(improvements || []).length === 0 ? (
         <div className="text-center py-6">
@@ -79,48 +81,33 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
         </div>
       ) : (
         <>
-          <div className="space-y-3 mb-4">
+          <div className="space-y-2 mb-4">
             {(improvements || []).slice(0, 8).map((improvement, index) => (
-              <div key={improvement.id} className="group">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-medium text-gray-900 line-clamp-1">
-                      "{improvement.prompt}"
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[12px] text-gray-500 truncate">
-                        {improvement.reason}
-                      </span>
-                      <span className="text-[12px] text-gray-400">
-                        · {new Date(improvement.lastChecked).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${getPriorityColor(improvement.priority)}`}>
-                      {improvement.priority}
-                    </span>
-                  </div>
-                </div>
+              <div key={improvement.id} className="flex items-start">
+                <span className="text-[#3d3d38] mr-2 mt-1 flex-shrink-0">•</span>
+                <p className="text-[11px] text-[#3d3d38] leading-relaxed break-words">
+                  {improvement.prompt}
+                </p>
               </div>
             ))}
           </div>
           
           {(improvements || []).length > 8 && (
-            <div className="text-xs text-gray-500 text-center mb-3">
-              +{(improvements || []).length - 8} more areas to improve
+            <div className="text-[10px] text-[#3d3d38] text-center mb-3">
+              +{(improvements || []).length - 8} more
             </div>
           )}
         </>
       )}
 
-      <button 
-        onClick={() => navigate('/analytics?tab=results')}
-        className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
-      >
-        View details →
-      </button>
+      {!embedded && (
+        <button 
+          onClick={() => navigate('/analytics?tab=results')}
+          className="text-sm text-gray-600 hover:text-[#5F209B] transition-colors font-medium"
+        >
+          View details →
+        </button>
+      )}
     </div>
   )
 }
