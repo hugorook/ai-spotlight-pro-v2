@@ -229,7 +229,7 @@ const LandingPage = () => {
 
   return (
     <main className="bg-[#ece7e0] min-h-screen">
-      <div className="max-w-[1920px] mx-auto px-6 relative">
+      <div className="max-w-[1920px] mx-auto px-6 lg:pl-[12.5rem] relative">
         {/* Background blur effect */}
         <div className="absolute w-full h-[1200px] top-[17px] left-0">
           <div className="w-full max-w-[1830px] h-full mx-auto bg-[#ffffff78] rounded-[50%] blur-[200px]" />
@@ -421,7 +421,7 @@ const LandingPage = () => {
                     <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
                   </Button>
                 </div>
-              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -458,7 +458,7 @@ const LandingPage = () => {
               Get started
               <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:text-[#262622]" />
             </Button>
-          </div>
+        </div>
       </section>
 
       {/* Pricing Section */}
