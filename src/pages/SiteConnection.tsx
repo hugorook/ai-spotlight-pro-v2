@@ -60,6 +60,35 @@ export default function SiteConnection() {
         return
       }
 
+      // If no project exists, try to create one
+      if (!projects?.length && user) {
+        const { data: newProject, error: createError } = await supabase
+          .from('projects')
+          .insert({
+            user_id: user.id,
+            name: 'My Website Project',
+            site_url: 'https://your-website.com',
+            cms_provider: 'manual',
+            site_script_status: 'missing',
+            autopilot_enabled: false,
+            autopilot_scopes: []
+          })
+          .select()
+          .single()
+
+        if (!createError && newProject) {
+          setProject(newProject)
+          toast({
+            title: 'Project Created',
+            description: 'Your website project has been created successfully!',
+            variant: 'default'
+          })
+          return
+        } else if (createError) {
+          console.error('Failed to create project:', createError)
+        }
+      }
+
       // If no projects found or table doesn't exist, create demo project
       if (projectsError || !projects?.length) {
         // Try companies table as fallback

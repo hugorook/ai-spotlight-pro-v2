@@ -100,10 +100,12 @@ export default function TodayDashboard() {
           .from('projects')
           .insert({
             user_id: user.id,
+            name: 'My Website Project',
             site_url: websiteUrl,
             cms_provider: 'manual',
             site_script_status: 'missing',
-            autopilot_enabled: false
+            autopilot_enabled: false,
+            autopilot_scopes: []
           })
           .select()
           .single()
