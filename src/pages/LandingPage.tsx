@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -108,6 +108,45 @@ function AccordionSteps({
         );
       })}
     </div>
+  );
+}
+
+// Count-up when element first scrolls into view
+function CountUpOnView({ value, suffix = "", duration = 1200, className = "" }: { value: number; suffix?: string; duration?: number; className?: string }) {
+  const [display, setDisplay] = useState(0);
+  const [hasRun, setHasRun] = useState(false);
+  const ref = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    if (!ref.current || hasRun) return;
+    const el = ref.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setHasRun(true);
+            const start = performance.now();
+            const animate = (now: number) => {
+              const progress = Math.min((now - start) / duration, 1);
+              setDisplay(Math.round(progress * value));
+              if (progress < 1) requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value, duration, hasRun]);
+
+  return (
+    <span ref={ref} className={className}>
+      {display}
+      {suffix}
+    </span>
   );
 }
 
@@ -415,16 +454,23 @@ const LandingPage = () => {
                 </div>
                 {/* Right: Stats */}
                 <div className="order-2 flex-1 grid grid-cols-3 gap-10 md:gap-12 w-full justify-items-center">
-                  {statisticsData.map((stat) => (
-                    <div key={stat.description} className="text-center">
-                      <div className="font-corben text-[#282823] text-4xl md:text-5xl lg:text-6xl" style={{fontWeight: 400}}>
-                        {stat.value}
+                  {statisticsData.map((stat) => {
+                    const match = String(stat.value).match(/^([0-9]+)([A-Za-z%]+)?$/);
+                    const num = match ? parseInt(match[1], 10) : 0;
+                    const suffix = match && match[2] ? match[2] : "";
+                    return (
+                      <div key={stat.description} className="text-center">
+                        <CountUpOnView
+                          value={num}
+                          suffix={suffix}
+                          className="font-corben text-[#282823] text-4xl md:text-5xl lg:text-6xl"
+                        />
+                        <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-3 md:mt-4">
+                          {stat.description}
+                        </div>
                       </div>
-                      <div className="text-[#3d3d38] text-xs md:text-sm font-medium mt-3 md:mt-4">
-                        {stat.description}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
