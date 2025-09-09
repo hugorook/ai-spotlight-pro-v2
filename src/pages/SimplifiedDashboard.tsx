@@ -13,6 +13,50 @@ import { useToast } from '@/components/ui/use-toast'
 import { useNavigate } from 'react-router-dom'
 import { Activity, ArrowRight, TrendingUp, Target, Sparkles } from 'lucide-react'
 
+// Custom hook for typewriter effect
+function useTypewriter(text: string, typingSpeed = 100, startDelay = 500, onComplete?: () => void) {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    
+    // Start typing after the initial delay
+    timeout = setTimeout(() => {
+      if (displayedText.length < text.length) {
+        const newLength = displayedText.length + 1;
+        setDisplayedText(text.substring(0, newLength));
+      } else {
+        setIsTyping(false);
+        // Trigger callback when typing is complete, with a small delay
+        if (onComplete) {
+          setTimeout(() => {
+            onComplete();
+          }, 500); // Half second delay after typing completes
+        }
+      }
+    }, displayedText.length === 0 ? startDelay : typingSpeed);
+    
+    return () => clearTimeout(timeout);
+  }, [displayedText, text, typingSpeed, startDelay, onComplete]);
+
+  return { displayedText, isTyping };
+}
+
+// Typewriter text component
+function TypewriterText({ text, typingSpeed, startDelay, onComplete }: { text: string; typingSpeed?: number; startDelay?: number; onComplete?: () => void }) {
+  const { displayedText, isTyping } = useTypewriter(text, typingSpeed, startDelay, onComplete);
+  
+  return (
+    <span className="relative font-corben" style={{fontWeight: 400}}>
+      {displayedText}
+      <span 
+        className={`inline-block w-[0.1em] h-[1.2em] bg-[#282823] align-middle ml-1 ${isTyping ? 'animate-blink' : 'opacity-0'}`}
+      />
+    </span>
+  );
+}
+
 interface Project {
   id: string
   site_url: string
@@ -53,6 +97,7 @@ export default function TodayDashboard() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [showContent, setShowContent] = useState(false)
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
@@ -324,8 +369,17 @@ export default function TodayDashboard() {
         <div className="h-full flex flex-col">
           {/* Header - Fixed height */}
           <div className="flex-shrink-0 px-6 pt-6 pb-4">
-            <h1 className="font-corben text-[#282823] text-3xl mb-1" style={{fontWeight: 400}}>Dashboard</h1>
-            <p className="text-[12px] text-[#3d3d38]">Your AI visibility at a glance</p>
+            <h1 className="font-corben text-[#282823] text-3xl mb-1">
+              <TypewriterText 
+                text="Dashboard" 
+                typingSpeed={50}
+                startDelay={200}
+                onComplete={() => setShowContent(true)}
+              />
+            </h1>
+            <p className={`text-[12px] text-[#3d3d38] ${showContent ? 'animate-fadeIn' : 'opacity-0'}`}>
+              Your AI visibility at a glance
+            </p>
           </div>
 
           {/* Health Check Loading State - Fixed height when active */}
@@ -382,7 +436,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#ddff89] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.wins && data.wins.length > 0) ? (
-                      <div className="w-full">
+                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.5s'}}>
                         <WinsCard
                           wins={data.wins}
                           isLoading={isRunningHealthCheck}
@@ -391,7 +445,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
+                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.5s'}}>
                         No results yet. Run a report to get started.
                       </p>
                     )}
@@ -420,7 +474,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.actions && data.actions.length > 0) ? (
-                      <div className="w-full">
+                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.7s'}}>
                         <TopActionsCard
                           actions={data.actions}
                           isLoading={isRunningHealthCheck}
@@ -429,7 +483,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
+                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.7s'}}>
                         No results yet. Run a report to get started.
                       </p>
                     )}
@@ -458,7 +512,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.improvements && data.improvements.length > 0) ? (
-                      <div className="w-full">
+                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.9s'}}>
                         <ImprovementsCard
                           improvements={data.improvements}
                           isLoading={isRunningHealthCheck}
@@ -467,7 +521,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
+                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.9s'}}>
                         No results yet. Run a report to get started.
                       </p>
                     )}
