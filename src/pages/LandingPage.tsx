@@ -243,7 +243,7 @@ const LandingPage = () => {
               <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
 
               {/* Main Navigation */}
-              <nav className="px-2 space-y-1 flex-1">
+              <nav className="px-2 space-y-1 flex-1 mt-4">
                 {navigationItems.map((item) => (
                   <a
                     key={item.label}
