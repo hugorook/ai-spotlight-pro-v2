@@ -81,10 +81,10 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
         </div>
       ) : (
         <>
-          <div className="space-y-2 mb-4 -ml-0">
+          <div className="space-y-2 mb-4">
             {(improvements || []).slice(0, 8).map((improvement, index) => (
               <div key={improvement.id} className="flex items-start relative">
-                <span className="text-[#3d3d38] mr-3 flex-shrink-0" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
+                <span className="text-[#3d3d38] mr-3 flex-shrink-0 ml-0" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
                 <div className="flex-1 pr-20">
                   <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
                     {improvement.prompt}
