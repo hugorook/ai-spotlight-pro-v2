@@ -240,10 +240,10 @@ const LandingPage = () => {
           <div className="h-full w-44 flex flex-col gap-3">
             {/* Nav box */}
             <div className="flex-1 bg-white rounded-2xl border border-[#d9d9d9] shadow-sm overflow-hidden flex flex-col">
-              <div className="px-3 pt-3 pb-2 text-[13px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
+              <div className="px-3 pt-3 pb-2 text-[16px] md:text-[18px] text-[#282823] font-corben" style={{fontWeight: 400}}>Dexter</div>
 
               {/* Main Navigation */}
-              <nav className="px-2 space-y-1 flex-1 mt-4">
+              <nav className="px-2 space-y-1 flex-1 mt-3">
                 {navigationItems.map((item) => (
                   <a
                     key={item.label}
