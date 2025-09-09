@@ -271,7 +271,7 @@ export default function TodayDashboard() {
   return (
     <AppShell>
       <div className="min-h-screen bg-[#ece7e0]">
-        <div className="max-w-7xl mx-auto px-0 py-6">
+        <div className="px-0 pr-6 py-6">
           {/* Header */}
           <div className="mb-6">
             <h1 className="font-corben text-[#282823] text-3xl" style={{fontWeight: 400}}>Dashboard</h1>
@@ -317,10 +317,10 @@ export default function TodayDashboard() {
 
           {/* Main dashboard grid */}
           {/* Grid with column gaps matching sidebar box spacing (using 24px) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-0 items-stretch">
             {/* Wins Card */}
-            <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 pb-10">
+            <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
+              <CardContent className="p-6 pb-10 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
                 </div>
@@ -343,8 +343,8 @@ export default function TodayDashboard() {
             </Card>
 
             {/* Actions Card */}
-            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 pb-10">
+            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
+              <CardContent className="p-6 pb-10 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
                 </div>
@@ -367,8 +367,8 @@ export default function TodayDashboard() {
             </Card>
 
             {/* Improvements Card */}
-            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 pb-10">
+            <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full">
+              <CardContent className="p-6 pb-10 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
                 </div>
