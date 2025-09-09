@@ -436,7 +436,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#ddff89] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.wins && data.wins.length > 0) ? (
-                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.5s'}}>
+                      <div className="w-full">
                         <WinsCard
                           wins={data.wins}
                           isLoading={isRunningHealthCheck}
@@ -445,7 +445,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.5s'}}>
+                      <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     )}
@@ -474,7 +474,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.actions && data.actions.length > 0) ? (
-                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.7s'}}>
+                      <div className="w-full">
                         <TopActionsCard
                           actions={data.actions}
                           isLoading={isRunningHealthCheck}
@@ -483,7 +483,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.7s'}}>
+                      <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     )}
@@ -512,7 +512,7 @@ export default function TodayDashboard() {
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-[#e7e5df] border-t-[#282823] rounded-full animate-spin"></div>
                     ) : (data.improvements && data.improvements.length > 0) ? (
-                      <div className={`w-full ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.9s'}}>
+                      <div className="w-full">
                         <ImprovementsCard
                           improvements={data.improvements}
                           isLoading={isRunningHealthCheck}
@@ -521,7 +521,7 @@ export default function TodayDashboard() {
                         />
                       </div>
                     ) : (
-                      <p className={`text-[11px] text-[#3d3d38] text-center ${showContent ? 'animate-fadeIn' : 'opacity-0'}`} style={{animationDelay: '0.9s'}}>
+                      <p className="text-[11px] text-[#3d3d38] text-center">
                         No results yet. Run a report to get started.
                       </p>
                     )}
