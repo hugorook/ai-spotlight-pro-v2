@@ -170,9 +170,8 @@ serve(async (req: Request) => {
     
     // Analyze content with AI
     const analysis = await analyzeWebsiteContent(content, {
-      companyName: body.companyName,
-      industry: body.industry,
-      description: body.description,
+      // Keep minimal context to reduce model bias
+      sourceUrl: body.url
     });
     
     const result: WebsiteAnalysisResult = {

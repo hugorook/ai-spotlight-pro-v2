@@ -176,9 +176,7 @@ export const HealthCheckProvider: React.FC<HealthCheckProviderProps> = ({ childr
         analyticsPromises.push(
           supabase.functions.invoke('analyze-website', {
             body: {
-              url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`,
-              companyName: company.company_name,
-              industry: company.industry
+              url: websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`
             }
           }).then(async result => {
             if (result.data) {
