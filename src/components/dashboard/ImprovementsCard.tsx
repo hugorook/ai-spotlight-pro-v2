@@ -51,7 +51,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
   }
 
   return (
-    <div className={`${embedded ? '' : 'bg-white rounded-lg p-4 border shadow-sm'}`} style={embedded ? {marginLeft: -16} : {}}>
+    <div className={`${embedded ? 'pl-0 pr-4 py-0' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       {!embedded && (
         <div className="flex items-center justify-between mb-3">
           <h3 className="h3">Key areas to improve</h3>

@@ -69,7 +69,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
   }
 
   return (
-    <div className={`${embedded ? '' : 'bg-white rounded-lg p-4 border shadow-sm'}`} style={embedded ? {marginLeft: -16} : {}}>
+    <div className={`${embedded ? 'pl-0 pr-4 py-0' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       {!embedded && (
         <>
           <h3 className="h3 mb-1">Your Top 3 for the next 30 days</h3>
