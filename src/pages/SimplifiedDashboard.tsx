@@ -338,12 +338,12 @@ export default function TodayDashboard() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 mt-3">
-                    <button 
+                    <span 
                       onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline"
+                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
                     >
                       View Details
-                    </button>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -363,12 +363,12 @@ export default function TodayDashboard() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 mt-3">
-                    <button 
+                    <span 
                       onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline"
+                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
                     >
                       View Details
-                    </button>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -388,12 +388,12 @@ export default function TodayDashboard() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 mt-3">
-                    <button 
+                    <span 
                       onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline"
+                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
                     >
                       View Details
-                    </button>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
