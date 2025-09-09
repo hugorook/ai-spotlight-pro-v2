@@ -42,16 +42,18 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
   }
 
   return (
-    <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Where you're winning</h3>
-        {(wins || []).length > 0 && (
-          <div className="flex items-center gap-1 text-green-600">
-            <TrendingUp className="w-4 h-4" />
-            <span className="text-xs font-medium">{(wins || []).length} live</span>
-          </div>
-        )}
-      </div>
+    <div className={`${embedded ? 'pl-0 pr-4 py-0' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
+      {!embedded && (
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="h3">Where you're winning</h3>
+          {(wins || []).length > 0 && (
+            <div className="flex items-center gap-1 text-green-600">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-xs font-medium">{(wins || []).length} live</span>
+            </div>
+          )}
+        </div>
+      )}
       
       {(wins || []).length === 0 ? (
         <div className="text-center py-6">
@@ -70,57 +72,29 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
         </div>
       ) : (
         <>
-          <div className="space-y-3 mb-4">
+          <div className="mb-4">
             {(wins || []).slice(0, 8).map((win, index) => (
-              <div key={win.id} className="group">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-medium text-gray-900 line-clamp-1">
-                      "{win.prompt}"
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[12px] text-gray-500 truncate">
-                        {new URL(win.url).pathname}
-                      </span>
-                      <span className="text-[12px] text-gray-400">
-                        · {new Date(win.lastSeen).toLocaleDateString()}
-                      </span>
-                    </div>
+              <div key={win.id} className="relative mb-2 last:mb-0">
+                <div className="flex items-start">
+                  <span className="text-[#3d3d38] flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
+                  <div className="flex-1 pr-20">
+                    <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
+                      {win.prompt}
+                    </p>
                   </div>
-                  
-                  <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500">Rank</span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                        win.rank <= 3 
-                          ? 'bg-green-100 text-green-800' 
-                          : win.rank <= 10 
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        #{win.rank}
-                      </span>
-                    </div>
-                    
-                    {/* Hover to reveal URL */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
-                        onClick={() => window.open(win.url, '_blank')}
-                        className="p-1 text-gray-400 hover:text-gray-600"
-                        title={`View: ${win.url}`}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
+                </div>
+                <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
+                  <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#282823] text-[#ddff89]">
+                    #{win.rank}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
           
           {(wins || []).length > 8 && (
-            <div className="text-xs text-gray-500 text-center mb-3">
-              +{(wins || []).length - 8} more wins
+            <div className="text-[10px] text-[#3d3d38] text-center mb-3">
+              +{(wins || []).length - 8} more
             </div>
           )}
         </>
