@@ -208,23 +208,56 @@ export default function TodayDashboard() {
       const actions: any[] = []
 
       if (failedResults.length > 0) {
-        // Create actionable recommendations from failed prompts
-        const topFailures = failedResults.slice(0, 6) // Use top 6 failures to create 3 actions
-        
-        for (let i = 0; i < Math.min(3, Math.ceil(topFailures.length / 2)); i++) {
-          const relevantPrompts = topFailures.slice(i * 2, (i + 1) * 2)
-          actions.push({
-            id: `action-${i}`,
-            title: `Create content targeting "${relevantPrompts[0]?.prompt_text.split(' ').slice(0, 4).join(' ')}..." queries`,
-            rationale: `You're not appearing for ${relevantPrompts.length} related queries. Create targeted content to capture this audience.`,
-            impact: i === 0 ? 'High' : i === 1 ? 'Medium' : 'Low',
+        // Create diverse actionable recommendations
+        const diverseActions = [
+          {
+            id: 'action-1',
+            title: `Create comprehensive FAQ page addressing common ${companyData?.industry || 'industry'} questions`,
+            rationale: `Build authority by answering the questions your prospects are asking AI tools. Include pricing, implementation, and comparison topics based on failed queries.`,
+            impact: 'High',
             effort: 'Medium',
             suggestedOwner: 'Content',
-            actionType: 'content-creation',
-            links: [`https://docs.google.com/document/create`],
-            status: 'todo'
-          })
-        }
+            actionType: 'content-creation'
+          },
+          {
+            id: 'action-2',
+            title: `Establish presence on Reddit, Stack Overflow, and Quora in relevant communities`,
+            rationale: `AI models often reference community discussions. Provide helpful answers in ${companyData?.industry || 'your industry'} subreddits and professional forums to build visibility.`,
+            impact: 'High',
+            effort: 'High',
+            suggestedOwner: 'PR',
+            actionType: 'community-engagement'
+          },
+          {
+            id: 'action-3',
+            title: `Publish detailed comparison guides against top 3-5 competitors`,
+            rationale: `When users ask for recommendations, AI models look for detailed comparisons. Create honest, feature-focused comparison content to capture "best of" queries.`,
+            impact: 'Medium',
+            effort: 'Medium',
+            suggestedOwner: 'Content',
+            actionType: 'content-creation'
+          },
+          {
+            id: 'action-4',
+            title: `Submit detailed company profile to industry directories and review sites`,
+            rationale: `Improve discoverability by ensuring consistent, detailed listings on G2, Capterra, and industry-specific directories that AI models reference.`,
+            impact: 'Medium',
+            effort: 'Low',
+            suggestedOwner: 'PR',
+            actionType: 'directory-optimization'
+          },
+          {
+            id: 'action-5',
+            title: `Create case studies showcasing specific use cases and outcomes`,
+            rationale: `AI models prefer concrete examples with metrics. Develop 3-4 detailed case studies showing how different customer types achieved specific results with your solution.`,
+            impact: 'High',
+            effort: 'Medium',
+            suggestedOwner: 'Content',
+            actionType: 'social-proof'
+          }
+        ]
+        
+        actions.push(...diverseActions.slice(0, 5))
       }
 
       // Update dashboard data with health check results atomically

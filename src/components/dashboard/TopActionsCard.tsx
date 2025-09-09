@@ -78,14 +78,16 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
       )}
       
       <div className="space-y-3 mb-4">
-        {(actions || []).slice(0, 8).map((action, index) => (
+        {(actions || []).slice(0, 5).map((action, index) => (
           <div key={action.id || index} className="flex items-start relative">
-            <span className="text-[#3d3d38] mr-2 flex-shrink-0" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
+            <div className="w-5 h-5 bg-[#282823] rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+              <span className="text-[#ddff89] text-[10px] font-bold">{index + 1}</span>
+            </div>
             <div className="flex-1 pr-20">
-              <p className="text-[11px] text-[#3d3d38] leading-[1.4] break-words mb-0.5">
+              <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words mb-1">
                 {action.title}
               </p>
-              <p className="text-[10px] text-[#3d3d38] opacity-75 leading-tight break-words">
+              <p className="text-[11px] text-[#3d3d38] opacity-75 leading-tight break-words">
                 {action.rationale}
               </p>
             </div>
@@ -102,9 +104,9 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
         ))}
       </div>
       
-      {(actions || []).length > 8 && (
+      {(actions || []).length > 5 && (
         <div className="text-[10px] text-[#3d3d38] text-center mb-3">
-          +{(actions || []).length - 8} more
+          +{(actions || []).length - 5} more
         </div>
       )}
 
