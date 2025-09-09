@@ -60,37 +60,68 @@ export default function ConnectionsSettings() {
         return
       }
 
-      // If projects table doesn't exist, try companies table as fallback
-      if (projectsError?.message?.includes('does not exist')) {
+      // If no projects found or table doesn't exist, create demo project
+      if (projectsError || !projects?.length) {
+        // Try companies table as fallback
         const { data: companies } = await supabase
           .from('companies')
           .select('*')
           .limit(1)
 
+        let mockProject
         if (companies?.[0]) {
           // Convert company to project format
-          const mockProject = {
+          mockProject = {
             id: companies[0].id,
-            site_url: companies[0].website || 'https://example.com',
+            site_url: companies[0].website || 'https://demo-site.example.com',
             cms_provider: 'manual',
             site_script_status: 'missing' as const,
             autopilot_enabled: false,
             autopilot_scopes: [] as string[]
           }
-          setProject(mockProject)
           
           toast({
-            title: 'Notice',
-            description: 'Using existing company data. Create database schema for full functionality.',
+            title: 'Demo Mode',
+            description: 'Using demo project. Create database schema for full functionality.',
+            variant: 'default'
+          })
+        } else {
+          // Create completely mock project for demo
+          mockProject = {
+            id: 'demo-project-' + Date.now(),
+            site_url: 'https://your-website.com',
+            cms_provider: 'manual',
+            site_script_status: 'missing' as const,
+            autopilot_enabled: false,
+            autopilot_scopes: [] as string[]
+          }
+          
+          toast({
+            title: 'Demo Mode Active',
+            description: 'Exploring autopilot features. Create database schema and project for real functionality.',
             variant: 'default'
           })
         }
+        
+        setProject(mockProject)
       }
     } catch (error) {
       console.error('Error loading project:', error)
+      
+      // Create demo project even on error
+      const demoProject = {
+        id: 'demo-project-' + Date.now(),
+        site_url: 'https://your-website.com',
+        cms_provider: 'manual',
+        site_script_status: 'missing' as const,
+        autopilot_enabled: false,
+        autopilot_scopes: [] as string[]
+      }
+      setProject(demoProject)
+      
       toast({
-        title: 'Info',
-        description: 'Create database schema to enable full autopilot functionality',
+        title: 'Demo Mode Active',
+        description: 'Exploring autopilot features. Create database schema to enable real functionality.',
         variant: 'default'
       })
     } finally {
