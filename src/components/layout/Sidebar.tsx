@@ -17,28 +17,28 @@ const Sidebar = () => {
 
   const navItems: NavItem[] = [
     { 
-      path: "/analytics", 
-      label: "AI Health Check", 
-      subtitle: "Test your visibility",
-      icon: <Activity className="w-5 h-5" />
-    },
-    { 
       path: "/dashboard", 
-      label: "Results Dashboard", 
+      label: "Dashboard", 
       subtitle: "Overview & metrics",
       icon: <BarChart3 className="w-5 h-5" />
     },
     { 
-      path: "/prompts", 
-      label: "Test Prompts", 
-      subtitle: "Manage search queries",
-      icon: <MessageSquare className="w-5 h-5" />
+      path: "/settings/connections", 
+      label: "Site Connection", 
+      subtitle: "Connect your site",
+      icon: <User className="w-5 h-5" />
     },
     { 
-      path: "/content", 
-      label: "Company Profile", 
-      subtitle: "Edit company info",
-      icon: <User className="w-5 h-5" />
+      path: "/analytics", 
+      label: "Analytics Hub", 
+      subtitle: "Health check & insights",
+      icon: <Activity className="w-5 h-5" />
+    },
+    { 
+      path: "/prompts", 
+      label: "Prompts", 
+      subtitle: "Manage search queries",
+      icon: <MessageSquare className="w-5 h-5" />
     },
   ];
 
