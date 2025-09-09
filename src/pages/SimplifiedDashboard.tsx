@@ -154,6 +154,7 @@ export default function TodayDashboard() {
         project,
         wins: wins.wins || [],
         actions: actionsData.recommendations || [],
+        improvements: [], // Initialize as empty array until health check runs
         recentChanges: recentChanges.length,
         lastRunAt: recentChanges[0]?.appliedAt,
         recentFixes

@@ -93,13 +93,13 @@ export function AutopilotCard({
           </div>
           
           {/* Collapsible recent changes */}
-          {recentFixes.length > 0 && (
+          {(recentFixes || []).length > 0 && (
             <details className="mb-3">
               <summary className="text-sm font-inter text-[#3d3d38] cursor-pointer hover:text-[#282823]">
                 Recent changes
               </summary>
               <div className="mt-2 space-y-1">
-                {recentFixes.slice(0, 3).map((fix, index) => (
+                {(recentFixes || []).slice(0, 3).map((fix, index) => (
                   <div key={index} className="text-xs font-inter text-[#3d3d38] flex items-center gap-1">
                     <div className="w-1 h-1 bg-[#ddff89] rounded-full"></div>
                     {fix.description}

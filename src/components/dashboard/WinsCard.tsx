@@ -45,15 +45,15 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Where you're winning</h3>
-        {wins.length > 0 && (
+        {(wins || []).length > 0 && (
           <div className="flex items-center gap-1 text-green-600">
             <TrendingUp className="w-4 h-4" />
-            <span className="text-xs font-medium">{wins.length} live</span>
+            <span className="text-xs font-medium">{(wins || []).length} live</span>
           </div>
         )}
       </div>
       
-      {wins.length === 0 ? (
+      {(wins || []).length === 0 ? (
         <div className="text-center py-6">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <TrendingUp className="w-6 h-6 text-gray-400" />
@@ -71,7 +71,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
       ) : (
         <>
           <div className="space-y-3 mb-4">
-            {wins.slice(0, 8).map((win, index) => (
+            {(wins || []).slice(0, 8).map((win, index) => (
               <div key={win.id} className="group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -118,9 +118,9 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
             ))}
           </div>
           
-          {wins.length > 8 && (
+          {(wins || []).length > 8 && (
             <div className="text-xs text-gray-500 text-center mb-3">
-              +{wins.length - 8} more wins
+              +{(wins || []).length - 8} more wins
             </div>
           )}
         </>

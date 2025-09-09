@@ -54,15 +54,15 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
     <div className={`${embedded ? 'p-4' : 'bg-white rounded-lg p-4 border shadow-sm'}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className={embedded ? 'text-[14px] font-semibold leading-6 text-gray-900' : 'h3'}>Key areas to improve</h3>
-        {improvements.length > 0 && (
+        {(improvements || []).length > 0 && (
           <div className="flex items-center gap-1 text-orange-600">
             <AlertTriangle className="w-4 h-4" />
-            <span className="text-xs font-medium">{improvements.length} gaps</span>
+            <span className="text-xs font-medium">{(improvements || []).length} gaps</span>
           </div>
         )}
       </div>
       
-      {improvements.length === 0 ? (
+      {(improvements || []).length === 0 ? (
         <div className="text-center py-6">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <AlertTriangle className="w-6 h-6 text-gray-400" />
@@ -80,7 +80,7 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
       ) : (
         <>
           <div className="space-y-3 mb-4">
-            {improvements.slice(0, 8).map((improvement, index) => (
+            {(improvements || []).slice(0, 8).map((improvement, index) => (
               <div key={improvement.id} className="group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -107,9 +107,9 @@ export function ImprovementsCard({ improvements, isLoading = false, onRefresh, e
             ))}
           </div>
           
-          {improvements.length > 8 && (
+          {(improvements || []).length > 8 && (
             <div className="text-xs text-gray-500 text-center mb-3">
-              +{improvements.length - 8} more areas to improve
+              +{(improvements || []).length - 8} more areas to improve
             </div>
           )}
         </>

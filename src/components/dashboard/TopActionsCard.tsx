@@ -74,7 +74,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
       <p className={`${embedded ? 'text-[12px]' : 'text-sm'} text-gray-600 mb-4`}>Non-automatable, high-leverage actions</p>
       
       <div className="space-y-3 mb-4">
-        {actions.slice(0, 3).map((action, index) => (
+        {(actions || []).slice(0, 3).map((action, index) => (
           <div key={action.id || index} className="border-l-2 border-gray-200 pl-4 relative">
             {/* Priority indicator dot */}
             <div className={`absolute -left-1.5 top-2 w-3 h-3 rounded-full border-2 border-white ${
@@ -129,7 +129,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
         ))}
       </div>
 
-      {actions.length === 0 && !isLoading && (
+      {(actions || []).length === 0 && !isLoading && (
         <div className="text-center py-6">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <ArrowRight className="w-6 h-6 text-gray-400" />
