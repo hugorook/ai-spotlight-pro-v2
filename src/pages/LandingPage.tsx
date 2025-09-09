@@ -429,8 +429,7 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
         {/* How it Works Section */}
         <section className={`relative z-10 pt-4 pb-14 ${showContent ? 'animate-fadeInUp' : 'opacity-0'}`}>
