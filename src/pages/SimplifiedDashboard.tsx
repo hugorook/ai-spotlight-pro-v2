@@ -174,60 +174,8 @@ export default function TodayDashboard() {
 
       const wins = winsResult.data?.wins || []
       
-      // Generate intelligent default actions based on website data
-      const websiteDomain = latestGenerated?.website_url || project.site_url || 'your website'
-      const cleanDomain = websiteDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')
-      const companyInfo = latestGenerated?.company_data || {}
-      const companyName = companyInfo.name || cleanDomain.split('.')[0]
-      const industry = companyInfo.industry || 'your industry'
-      
-      const actions = [
-        {
-          id: 'action-1',
-          title: `Run comprehensive AI visibility audit for ${companyName}`,
-          rationale: `Before taking action, understand where you stand. Run a full health check to identify which AI models know about ${cleanDomain}, what they say, and where the gaps are. This data will prioritize all other actions.`,
-          impact: 'High',
-          effort: 'Low',
-          suggestedOwner: 'Content',
-          actionType: 'analysis'
-        },
-        {
-          id: 'action-2',
-          title: `Create "${companyName} vs Alternatives" comparison hub`,
-          rationale: `AI models frequently get asked comparison questions. Build a dedicated section comparing your solution to top 3-5 alternatives with honest pros/cons, pricing tables, and use case recommendations.`,
-          impact: 'High',
-          effort: 'Medium',
-          suggestedOwner: 'Content',
-          actionType: 'content-creation'
-        },
-        {
-          id: 'action-3',
-          title: `Launch 30-day review collection sprint on G2 and Capterra`,
-          rationale: `AI models heavily weight third-party reviews. Set a goal of 25+ detailed reviews mentioning specific features and outcomes. Reach out to happy customers with templates and incentives.`,
-          impact: 'High',
-          effort: 'Low',
-          suggestedOwner: 'PR',
-          actionType: 'social-proof'
-        },
-        {
-          id: 'action-4',
-          title: `Build "How to use ${companyName} for [specific use cases]" content series`,
-          rationale: `AI tools need concrete examples. Create 5-7 detailed tutorials showing exactly how ${industry} professionals use your product to solve specific problems, with screenshots and outcomes.`,
-          impact: 'Medium',
-          effort: 'Medium',
-          suggestedOwner: 'Content',
-          actionType: 'content-creation'
-        },
-        {
-          id: 'action-5',
-          title: `Implement technical SEO for AI: structured data and API documentation`,
-          rationale: `Make it easy for AI to understand ${cleanDomain}. Add JSON-LD schema markup for your organization, products, pricing, and FAQs. Ensure all key pages have proper meta descriptions focused on capabilities.`,
-          impact: 'Medium',
-          effort: 'Low',
-          suggestedOwner: 'Dev',
-          actionType: 'technical-seo'
-        }
-      ]
+      // Don't generate any default actions - only show after health check
+      const actions = []
 
       const finalData = {
         project,
@@ -343,21 +291,38 @@ export default function TodayDashboard() {
         // Generate targeted actions based on analysis
         const smartActions = []
 
-        // Priority 1: Comparison content if many comparison queries failed
-        if (promptCategories.comparison.length > 2) {
-          const topCompetitors = promptCategories.comparison
-            .map(r => r.prompt_text.match(/(?:vs|versus|compare.*to|compared to)\s+([\w\s]+)/i)?.[1])
+        // Priority 1: Comparison content if any comparison queries failed
+        if (promptCategories.comparison.length > 0) {
+          const competitorMentions = promptCategories.comparison
+            .map(r => {
+              const match = r.prompt_text.match(/(?:vs|versus|compare.*to|compared to|better than|alternative to)\s+([\w\s]+?)(?:\?|\.|,|$|\s+for|\s+in)/i)
+              return match?.[1]?.trim()
+            })
             .filter(Boolean)
-            .slice(0, 3)
+          
+          const uniqueCompetitors = [...new Set(competitorMentions)]
+          const topCompetitors = uniqueCompetitors.slice(0, 3)
+          
+          if (topCompetitors.length > 0) {
+            smartActions.push({
+              id: 'action-comp-pages',
+              title: `Create individual comparison pages for: ${topCompetitors.map(c => `"${companyName} vs ${c}"`).join(', ')}`,
+              rationale: `${promptCategories.comparison.length} queries directly asked about these competitors. Each page needs: feature-by-feature comparison table, pricing breakdown, use case recommendations, migration guides, and honest pros/cons.`,
+              impact: 'High',
+              effort: 'Medium',
+              suggestedOwner: 'Content',
+              actionType: 'content-creation'
+            })
+          }
           
           smartActions.push({
-            id: 'action-comp',
-            title: `Create detailed comparison pages: ${companyName} vs ${topCompetitors.join(', ') || 'top competitors'}`,
-            rationale: `${promptCategories.comparison.length} comparison queries failed. Build dedicated comparison pages with feature matrices, pricing tables, and use case differentiators. Focus on honest, balanced comparisons that AI models will reference.`,
+            id: 'action-comp-hub',
+            title: `Build "Compare ${companyName}" interactive tool with side-by-side comparisons`,
+            rationale: `Create an interactive comparison tool where users can select 2-3 competitors and see real-time comparisons. Include filters for company size, use case, and budget. This becomes the go-to resource AI references.`,
             impact: 'High',
-            effort: 'Medium',
-            suggestedOwner: 'Content',
-            actionType: 'content-creation'
+            effort: 'High',
+            suggestedOwner: 'Dev',
+            actionType: 'interactive-content'
           })
         }
 
@@ -375,20 +340,38 @@ export default function TodayDashboard() {
         }
 
         // Priority 3: Use case content if how-to queries failed
-        if (promptCategories.useCases.length > 1) {
+        if (promptCategories.useCases.length > 0) {
           const specificUseCases = promptCategories.useCases
-            .map(r => r.prompt_text.match(/(?:how to|example of|use.*for)\s+([\w\s]+)/i)?.[1])
+            .map(r => {
+              const match = r.prompt_text.match(/(?:how to|how do I|how can I|example of|use.*for|using.*to)\s+(.+?)(?:\?|\.|with|$)/i)
+              return match?.[1]?.trim()
+            })
             .filter(Boolean)
-            .slice(0, 3)
-            
+          
+          const uniqueUseCases = [...new Set(specificUseCases)]
+          
+          if (uniqueUseCases.length > 0) {
+            uniqueUseCases.slice(0, 3).forEach((useCase, idx) => {
+              smartActions.push({
+                id: `action-usecase-${idx}`,
+                title: `Create step-by-step guide: "How to ${useCase} with ${companyName}"`,
+                rationale: `This specific use case appeared in failed queries. Build a 2000+ word guide with: video walkthrough, screenshots at each step, expected timeline, common pitfalls, and ROI calculator.`,
+                impact: 'High',
+                effort: 'Low',
+                suggestedOwner: 'Content',
+                actionType: 'tutorial'
+              })
+            })
+          }
+          
           smartActions.push({
-            id: 'action-usecases',
-            title: `Build use case library: "How ${companyName} helps with ${specificUseCases.join(', ') || 'common scenarios'}"`,
-            rationale: `${promptCategories.useCases.length} use case queries failed. Create detailed tutorials, video walkthroughs, and outcome-focused case studies. Include specific metrics and implementation timelines.`,
-            impact: 'High',
+            id: 'action-usecase-templates',
+            title: `Publish 10 ready-to-use templates for common ${industry} workflows`,
+            rationale: `${promptCategories.useCases.length} how-to queries failed. Create downloadable templates, automation recipes, and pre-built configurations. Each template should save users 2+ hours of setup time.`,
+            impact: 'Medium',
             effort: 'Medium',
             suggestedOwner: 'Content',
-            actionType: 'content-creation'
+            actionType: 'resources'
           })
         }
 
@@ -406,13 +389,23 @@ export default function TodayDashboard() {
         }
 
         // Priority 5: Review and social proof campaign
-        if (promptCategories.reviews.length > 0 || failedResults.length > 10) {
+        if (promptCategories.reviews.length > 0 || failedResults.length > 5) {
           smartActions.push({
-            id: 'action-reviews',
-            title: `Launch review collection campaign on G2, Capterra, and TrustRadius`,
-            rationale: `Limited third-party validation found. AI models heavily reference review platforms. Target 50+ reviews in next 90 days. Incentivize detailed reviews that mention specific use cases and outcomes.`,
+            id: 'action-reviews-campaign',
+            title: `Email top 50 customers with personalized review requests for G2/Capterra`,
+            rationale: `${promptCategories.reviews.length || 'Multiple'} review-related queries failed. Draft personal emails to power users highlighting their specific success metrics. Offer to help write the review with their actual data points.`,
             impact: 'High',
             effort: 'Low',
+            suggestedOwner: 'PR',
+            actionType: 'social-proof'
+          })
+          
+          smartActions.push({
+            id: 'action-video-testimonials',
+            title: `Record 5 customer success story videos focusing on specific outcomes`,
+            rationale: `AI models value video content with specific metrics. Target customers who achieved 50%+ improvements. Each video should be 2-3 minutes focusing on problem, solution, and measurable results.`,
+            impact: 'High',
+            effort: 'Medium',
             suggestedOwner: 'PR',
             actionType: 'social-proof'
           })
@@ -453,18 +446,54 @@ export default function TodayDashboard() {
           })
         }
 
-        // Priority 8: Technical improvements
+        // Priority 8: Technical improvements - always include these
         smartActions.push({
           id: 'action-schema',
-          title: `Implement structured data markup for products, reviews, and FAQs`,
-          rationale: `Help AI models better understand ${websiteDomain}. Add JSON-LD schema for organization, products, reviews, FAQs, and how-to content. This directly improves how AI interprets and references your site.`,
+          title: `Add JSON-LD schema markup to all product pages within 48 hours`,
+          rationale: `Critical quick win: AI models rely heavily on structured data. Add Product, Organization, FAQ, and Review schema. This one change can improve AI understanding by 40%+. Use Google's structured data testing tool to validate.`,
           impact: 'High',
           effort: 'Low',
           suggestedOwner: 'Dev',
           actionType: 'technical-seo'
         })
+        
+        smartActions.push({
+          id: 'action-sitemap-priority',
+          title: `Update sitemap.xml with priority scores based on failed AI queries`,
+          rationale: `${failedResults.length} queries failed. Reorganize sitemap to prioritize pages that answer these queries. Set comparison pages to 1.0 priority, use cases to 0.9, and update weekly to help AI crawlers.`,
+          impact: 'Medium',
+          effort: 'Low',
+          suggestedOwner: 'Dev',
+          actionType: 'technical-seo'
+        })
+        
+        // Additional specific actions based on gaps
+        if (failedResults.length > 10) {
+          smartActions.push({
+            id: 'action-ai-specific-landing',
+            title: `Create "/ai" landing page answering "What is ${companyName}?" in AI-friendly format`,
+            rationale: `Build a dedicated page optimized for AI consumption: 1-paragraph company summary, bullet-point features, structured pricing table, competitor comparison matrix, and FAQ section. This becomes AI's go-to resource.`,
+            impact: 'High',
+            effort: 'Low',
+            suggestedOwner: 'Content',
+            actionType: 'content-creation'
+          })
+        }
+        
+        // Industry-specific recommendations
+        if (industry && industry !== 'your industry') {
+          smartActions.push({
+            id: 'action-industry-glossary',
+            title: `Publish "${industry} Terminology Guide" with 50+ definitions`,
+            rationale: `Become the authoritative source for ${industry} terms. Each definition should include: plain English explanation, how ${companyName} addresses it, and links to relevant features. AI models reference glossaries heavily.`,
+            impact: 'Medium',
+            effort: 'Medium',
+            suggestedOwner: 'Content',
+            actionType: 'educational-content'
+          })
+        }
 
-        // Sort by impact and take top 5
+        // Sort by impact/effort ratio and diversity
         const sortedActions = smartActions
           .sort((a, b) => {
             const impactScore = { High: 3, Medium: 2, Low: 1 }
@@ -473,9 +502,18 @@ export default function TodayDashboard() {
             const scoreB = impactScore[b.impact] * 2 + effortScore[b.effort]
             return scoreB - scoreA
           })
-          .slice(0, 5)
+        
+        // Ensure diversity - don't take more than 2 of same type
+        const typeCount: Record<string, number> = {}
+        const diverseActions = sortedActions.filter(action => {
+          typeCount[action.actionType] = (typeCount[action.actionType] || 0) + 1
+          return typeCount[action.actionType] <= 2
+        })
+        
+        // Take top 7 diverse actions
+        const finalActions = diverseActions.slice(0, 7)
 
-        actions.push(...sortedActions)
+        actions.push(...finalActions)
       }
 
       // Update dashboard data with health check results atomically
