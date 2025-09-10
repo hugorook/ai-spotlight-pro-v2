@@ -74,9 +74,9 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
         <>
           <div className="mb-4">
             {(wins || []).slice(0, 8).map((win, index) => (
-              <div key={win.id} className="relative mb-3 last:mb-0">
+              <div key={win.id} className="relative mb-5 last:mb-0">
                 <div className="flex items-start">
-                  <span className="text-[#3d3d38] flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
+                  <span className="text-[#3d3d38] font-bold flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
                   <div className="flex-1 pr-20">
                     <p className="text-[14px] text-[#3d3d38] leading-[1.5] break-words">
                       {win.prompt}

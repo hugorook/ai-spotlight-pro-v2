@@ -79,7 +79,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
       
       <div className="mb-4">
         {(actions || []).slice(0, 5).map((action, index) => (
-          <div key={action.id || index} className="relative mb-4 last:mb-0">
+          <div key={action.id || index} className="relative mb-6 last:mb-0">
             <div className="flex items-start">
               <div className="w-6 h-6 bg-[#282823] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
                 <span className="text-white text-[12px] font-bold">{index + 1}</span>
