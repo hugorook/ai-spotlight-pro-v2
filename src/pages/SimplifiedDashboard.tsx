@@ -637,9 +637,14 @@ export default function TodayDashboard() {
             <div className="h-full flex flex-row gap-4">
               {/* Wins Card - Expanded takes 2/3 width */}
               <Card 
-                className={`bg-[#DDFB78] border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer h-full ${
-                  expandedCard === 'wins' ? 'flex-grow' : 'w-48'
+                className={`border-[#e7e5df] shadow-sm overflow-hidden cursor-pointer h-full transition-all duration-700 ease-in-out ${
+                  expandedCard === 'wins' ? 'bg-[#DDFB78]' : 'bg-white'
                 }`}
+                style={{
+                  width: expandedCard === 'wins' ? 'calc(100% - 32rem)' : '16rem',
+                  minWidth: '16rem',
+                  transition: 'width 700ms cubic-bezier(0.4, 0, 0.2, 1), background-color 700ms ease-in-out'
+                }}
                 onClick={() => setExpandedCard(expandedCard === 'wins' ? 'actions' : 'wins')}
               >
                 <CardContent className="p-6 h-full flex flex-col">
@@ -690,9 +695,14 @@ export default function TodayDashboard() {
 
               {/* Actions Card - Collapsed by default */}
               <Card 
-                className={`bg-white border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer h-full ${
-                  expandedCard === 'actions' ? 'flex-grow' : 'w-48'
+                className={`border-[#e7e5df] shadow-sm overflow-hidden cursor-pointer h-full transition-all duration-700 ease-in-out ${
+                  expandedCard === 'actions' ? 'bg-[#DDFB78]' : 'bg-white'
                 }`}
+                style={{
+                  width: expandedCard === 'actions' ? 'calc(100% - 32rem)' : '16rem',
+                  minWidth: '16rem',
+                  transition: 'width 700ms cubic-bezier(0.4, 0, 0.2, 1), background-color 700ms ease-in-out'
+                }}
                 onClick={() => setExpandedCard(expandedCard === 'actions' ? 'improvements' : 'actions')}
               >
                 <CardContent className="p-6 h-full flex flex-col">
@@ -743,9 +753,14 @@ export default function TodayDashboard() {
 
               {/* Improvements Card - Collapsed by default */}
               <Card 
-                className={`bg-white border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer h-full ${
-                  expandedCard === 'improvements' ? 'flex-grow' : 'w-48'
+                className={`border-[#e7e5df] shadow-sm overflow-hidden cursor-pointer h-full transition-all duration-700 ease-in-out ${
+                  expandedCard === 'improvements' ? 'bg-[#DDFB78]' : 'bg-white'
                 }`}
+                style={{
+                  width: expandedCard === 'improvements' ? 'calc(100% - 32rem)' : '16rem',
+                  minWidth: '16rem',
+                  transition: 'width 700ms cubic-bezier(0.4, 0, 0.2, 1), background-color 700ms ease-in-out'
+                }}
                 onClick={() => setExpandedCard(expandedCard === 'improvements' ? 'wins' : 'improvements')}
               >
                 <CardContent className="p-6 h-full flex flex-col">
