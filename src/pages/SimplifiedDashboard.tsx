@@ -130,17 +130,17 @@ export default function TodayDashboard() {
 
       let project = projects?.[0]
 
+      // Get latest generated data regardless of project status
+      const { data: latestGenerated } = await supabase
+        .from('generated_prompts')
+        .select('website_url, company_data')
+        .eq('user_id', user.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
       // Create default project if none exists
       if (!project && user) {
-        // Try to get website URL from latest generated prompts
-        const { data: latestGenerated } = await supabase
-          .from('generated_prompts')
-          .select('website_url, company_data')
-          .eq('user_id', user.id)
-          .order('generated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-
         const websiteUrl = latestGenerated?.website_url || 'https://example.com'
         
         const { data: newProject, error } = await supabase
