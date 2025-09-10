@@ -98,6 +98,7 @@ export default function TodayDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [showContent, setShowContent] = useState(false)
+  const [expandedCard, setExpandedCard] = useState<'wins' | 'actions' | 'improvements'>('wins')
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
@@ -633,112 +634,163 @@ export default function TodayDashboard() {
 
           {/* Main dashboard grid - Fill remaining space, aligned with sidebar bottom */}
           <div className="flex-1 px-6 pb-6 min-h-0">
-            <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Wins Card */}
-              <Card className="bg-[#DDFB78] border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+            <div className="h-full flex flex-col gap-4">
+              {/* Wins Card - Expanded takes 2/3 width */}
+              <Card 
+                className={`bg-[#DDFB78] border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer ${
+                  expandedCard === 'wins' ? 'flex-grow' : 'h-16'
+                }`}
+                onClick={() => setExpandedCard(expandedCard === 'wins' ? 'actions' : 'wins')}
+              >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Where you're winning</h3>
+                      <span className="text-[10px] text-[#3d3d38]">
+                        {expandedCard === 'wins' ? '−' : '+'}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
-                    {(data.wins && data.wins.length > 0) ? (
-                      <div className="w-full">
-                        <WinsCard
-                          wins={data.wins}
-                          isLoading={isRunningHealthCheck}
-                          onRefresh={handleRunHealthCheck}
-                          embedded
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
-                        No results yet. Run a report to get started.
-                      </p>
+                    {expandedCard === 'wins' && (
+                      <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                     )}
                   </div>
-                  <div className="flex-shrink-0 mt-3">
-                    <span 
-                      onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
-                    >
-                      View Details
-                    </span>
-                  </div>
+                  {expandedCard === 'wins' && (
+                    <>
+                      <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
+                        {(data.wins && data.wins.length > 0) ? (
+                          <div className="w-full">
+                            <WinsCard
+                              wins={data.wins}
+                              isLoading={isRunningHealthCheck}
+                              onRefresh={handleRunHealthCheck}
+                              embedded
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-[#3d3d38] text-center">
+                            No results yet. Run a report to get started.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 mt-3">
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/analytics?tab=results')
+                          }}
+                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                        >
+                          View Details
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Actions Card */}
-              <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+              {/* Actions Card - Collapsed by default */}
+              <Card 
+                className={`bg-white border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer ${
+                  expandedCard === 'actions' ? 'flex-grow' : 'h-16'
+                }`}
+                onClick={() => setExpandedCard(expandedCard === 'actions' ? 'improvements' : 'actions')}
+              >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Next 30 days</h3>
+                      <span className="text-[10px] text-[#3d3d38]">
+                        {expandedCard === 'actions' ? '−' : '+'}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
-                    {(data.actions && data.actions.length > 0) ? (
-                      <div className="w-full">
-                        <TopActionsCard
-                          actions={data.actions}
-                          isLoading={isRunningHealthCheck}
-                          onActionClick={handleActionClick}
-                          embedded
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
-                        No results yet. Run a report to get started.
-                      </p>
+                    {expandedCard === 'actions' && (
+                      <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                     )}
                   </div>
-                  <div className="flex-shrink-0 mt-3">
-                    <span 
-                      onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
-                    >
-                      View Details
-                    </span>
-                  </div>
+                  {expandedCard === 'actions' && (
+                    <>
+                      <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
+                        {(data.actions && data.actions.length > 0) ? (
+                          <div className="w-full">
+                            <TopActionsCard
+                              actions={data.actions}
+                              isLoading={isRunningHealthCheck}
+                              onActionClick={handleActionClick}
+                              embedded
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-[#3d3d38] text-center">
+                            No results yet. Run a report to get started.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 mt-3">
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/analytics?tab=results')
+                          }}
+                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                        >
+                          View Details
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Improvements Card */}
-              <Card className="bg-white border-[#e7e5df] shadow-sm hover:shadow-md transition-shadow h-full overflow-hidden">
+              {/* Improvements Card - Collapsed by default */}
+              <Card 
+                className={`bg-white border-[#e7e5df] shadow-sm transition-all duration-300 overflow-hidden cursor-pointer ${
+                  expandedCard === 'improvements' ? 'flex-grow' : 'h-16'
+                }`}
+                onClick={() => setExpandedCard(expandedCard === 'improvements' ? 'wins' : 'improvements')}
+              >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-sm" style={{fontWeight: 400}}>Areas to improve</h3>
+                      <span className="text-[10px] text-[#3d3d38]">
+                        {expandedCard === 'improvements' ? '−' : '+'}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
-                    {(data.improvements && data.improvements.length > 0) ? (
-                      <div className="w-full">
-                        <ImprovementsCard
-                          improvements={data.improvements}
-                          isLoading={isRunningHealthCheck}
-                          onRefresh={handleRunHealthCheck}
-                          embedded
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-[11px] text-[#3d3d38] text-center">
-                        No results yet. Run a report to get started.
-                      </p>
+                    {expandedCard === 'improvements' && (
+                      <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                     )}
                   </div>
-                  <div className="flex-shrink-0 mt-3">
-                    <span 
-                      onClick={() => navigate('/analytics?tab=results')}
-                      className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
-                    >
-                      View Details
-                    </span>
-                  </div>
+                  {expandedCard === 'improvements' && (
+                    <>
+                      <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center pt-4">
+                        {(data.improvements && data.improvements.length > 0) ? (
+                          <div className="w-full">
+                            <ImprovementsCard
+                              improvements={data.improvements}
+                              isLoading={isRunningHealthCheck}
+                              onRefresh={handleRunHealthCheck}
+                              embedded
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-[#3d3d38] text-center">
+                            No results yet. Run a report to get started.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 mt-3">
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/analytics?tab=results')
+                          }}
+                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                        >
+                          View Details
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </div>
