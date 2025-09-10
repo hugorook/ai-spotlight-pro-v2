@@ -99,45 +99,42 @@ export default function TodayDashboard() {
   const [dataLoaded, setDataLoaded] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [expandedCard, setExpandedCard] = useState<'wins' | 'actions' | 'improvements'>('wins')
-  const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
   
-  // Load cached dashboard data on mount
+  // Debug log data changes
   useEffect(() => {
-    const cachedData = localStorage.getItem('dashboardData')
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData)
-        if (parsed.wins || parsed.actions || parsed.improvements) {
-          setData(prev => ({
-            ...prev,
-            wins: parsed.wins || [],
-            actions: parsed.actions || [],
-            improvements: parsed.improvements || []
-          }))
-          setHasProcessedHealthCheck(true)
-        }
-      } catch (e) {
-        console.error('Error loading cached dashboard data:', e)
-      }
-    }
-  }, [])
+    console.log('🎯 Dashboard data updated:', {
+      winsCount: data.wins?.length || 0,
+      actionsCount: data.actions?.length || 0, 
+      improvementsCount: data.improvements?.length || 0,
+      hasProcessed: hasProcessedHealthCheck,
+      healthCheckResultsCount: healthCheckResults?.length || 0
+    })
+  }, [data, hasProcessedHealthCheck, healthCheckResults])
+  const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
     if (user) {
+      // Load base data first
       loadAllData()
-      // Also load any saved health check results
-      loadSavedResults()
     }
   }, [user])
-
-  // Only update health check data if we haven't processed it yet
+  
+  // Separate effect for loading saved health check results
   useEffect(() => {
-    if (dataLoaded && healthCheckResults.length > 0 && !hasProcessedHealthCheck) {
+    if (user && dataLoaded && !hasProcessedHealthCheck) {
+      loadSavedResults()
+    }
+  }, [user, dataLoaded, hasProcessedHealthCheck])
+
+  // Process health check results whenever they change
+  useEffect(() => {
+    if (dataLoaded && healthCheckResults.length > 0) {
+      console.log('📊 Dashboard processing', healthCheckResults.length, 'health check results')
       updateDashboardWithHealthCheckResults()
       setHasProcessedHealthCheck(true)
     }
-  }, [healthCheckResults, dataLoaded, hasProcessedHealthCheck])
+  }, [healthCheckResults, dataLoaded])
 
   const loadAllData = async () => {
     try {
@@ -202,8 +199,8 @@ export default function TodayDashboard() {
       const finalData = {
         project,
         wins: Array.isArray(wins) ? wins : (wins.wins || []),
-        actions: data.actions.length > 0 ? data.actions : [], // Keep existing actions if we have them
-        improvements: data.improvements.length > 0 ? data.improvements : [] // Keep existing improvements
+        actions: [], // Will be populated by health check results
+        improvements: [] // Will be populated by health check results
       }
       
       setData(finalData)
@@ -217,11 +214,7 @@ export default function TodayDashboard() {
       })
     } finally {
       setIsLoading(false)
-      // After initial load, check if we have saved health check results
-      if (healthCheckResults.length > 0 && !hasProcessedHealthCheck) {
-        updateDashboardWithHealthCheckResults()
-        setHasProcessedHealthCheck(true)
-      }
+      // Don't process here - let the health check effect handle it
     }
   }
 
@@ -552,8 +545,6 @@ export default function TodayDashboard() {
           actions: actions.length > 0 ? actions : (prev.actions.length > 0 ? prev.actions : []),
           improvements: improvements.length > 0 ? improvements.slice(0, 8) : prev.improvements
         }
-        // Cache the updated data
-        localStorage.setItem('dashboardData', JSON.stringify(updatedData))
         return updatedData
       })
 
@@ -565,8 +556,7 @@ export default function TodayDashboard() {
   const handleRunHealthCheck = async () => {
     try {
       const result = await runHealthCheck()
-      // Reset the flag so new results will be processed
-      setHasProcessedHealthCheck(false)
+      // Don't reset flag - let the health check results effect handle the new data
       toast({
         title: 'Health Check Complete',
         description: `Found ${(result && 'mentionRate' in result ? result.mentionRate : mentionRate)}% visibility rate with score of ${(result && 'visibilityScore' in result ? result.visibilityScore : visibilityScore)}`
