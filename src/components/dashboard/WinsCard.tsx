@@ -78,13 +78,13 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
                 <div className="flex items-start">
                   <span className="text-[#3d3d38] flex-shrink-0 mr-3" style={{lineHeight: '1.4em', marginTop: '0.1em'}}>•</span>
                   <div className="flex-1 pr-20">
-                    <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words">
+                    <p className="text-[14px] text-[#3d3d38] leading-[1.5] break-words">
                       {win.prompt}
                     </p>
                   </div>
                 </div>
                 <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
-                  <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#282823] text-white">
+                  <span className="px-2 py-1 text-[11px] font-medium rounded bg-[#282823] text-white">
                     #{win.rank}
                   </span>
                 </div>
@@ -93,7 +93,7 @@ export function WinsCard({ wins, isLoading = false, onRefresh, embedded = false 
           </div>
           
           {(wins || []).length > 8 && (
-            <div className="text-[10px] text-[#3d3d38] text-center mb-3">
+            <div className="text-[12px] text-[#3d3d38] text-center mb-3">
               +{(wins || []).length - 8} more
             </div>
           )}

@@ -81,20 +81,20 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
         {(actions || []).slice(0, 5).map((action, index) => (
           <div key={action.id || index} className="relative mb-4 last:mb-0">
             <div className="flex items-start">
-              <div className="w-5 h-5 bg-[#282823] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
-                <span className="text-white text-[10px] font-bold">{index + 1}</span>
+              <div className="w-6 h-6 bg-[#282823] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
+                <span className="text-white text-[12px] font-bold">{index + 1}</span>
               </div>
               <div className="flex-1 pr-20">
-                <p className="text-[12px] text-[#3d3d38] leading-[1.4] break-words mb-1">
+                <p className="text-[14px] text-[#3d3d38] leading-[1.5] break-words mb-1">
                   {action.title}
                 </p>
-                <p className="text-[11px] text-[#3d3d38] opacity-75 leading-tight break-words">
+                <p className="text-[13px] text-[#3d3d38] opacity-75 leading-tight break-words">
                   {action.rationale}
                 </p>
               </div>
             </div>
             <div className="absolute right-0 top-0 flex gap-1 flex-shrink-0">
-              <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[#ddff89] text-[#282823]">
+              <span className="px-2 py-1 text-[11px] font-medium rounded bg-[#ddff89] text-[#282823]">
                 {action.suggestedOwner}
               </span>
             </div>
@@ -103,7 +103,7 @@ export function TopActionsCard({ actions, isLoading = false, onActionClick, embe
       </div>
       
       {(actions || []).length > 5 && (
-        <div className="text-[10px] text-[#3d3d38] text-center mb-3">
+        <div className="text-[12px] text-[#3d3d38] text-center mb-3">
           +{(actions || []).length - 5} more
         </div>
       )}

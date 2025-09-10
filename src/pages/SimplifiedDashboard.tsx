@@ -667,7 +667,7 @@ export default function TodayDashboard() {
                             />
                           </div>
                         ) : (
-                          <p className="text-[11px] text-[#3d3d38] text-center">
+                          <p className="text-[14px] text-[#3d3d38] text-center">
                             No results yet. Run a report to get started.
                           </p>
                         )}
@@ -678,7 +678,7 @@ export default function TodayDashboard() {
                             e.stopPropagation()
                             navigate('/analytics?tab=results')
                           }}
-                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                          className="text-[14px] text-[#3d3d38] hover:underline cursor-pointer"
                         >
                           View Details
                         </span>
@@ -720,7 +720,7 @@ export default function TodayDashboard() {
                             />
                           </div>
                         ) : (
-                          <p className="text-[11px] text-[#3d3d38] text-center">
+                          <p className="text-[14px] text-[#3d3d38] text-center">
                             No results yet. Run a report to get started.
                           </p>
                         )}
@@ -731,7 +731,7 @@ export default function TodayDashboard() {
                             e.stopPropagation()
                             navigate('/analytics?tab=results')
                           }}
-                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                          className="text-[14px] text-[#3d3d38] hover:underline cursor-pointer"
                         >
                           View Details
                         </span>
@@ -773,7 +773,7 @@ export default function TodayDashboard() {
                             />
                           </div>
                         ) : (
-                          <p className="text-[11px] text-[#3d3d38] text-center">
+                          <p className="text-[14px] text-[#3d3d38] text-center">
                             No results yet. Run a report to get started.
                           </p>
                         )}
@@ -784,7 +784,7 @@ export default function TodayDashboard() {
                             e.stopPropagation()
                             navigate('/analytics?tab=results')
                           }}
-                          className="text-[12px] text-[#3d3d38] hover:underline cursor-pointer"
+                          className="text-[14px] text-[#3d3d38] hover:underline cursor-pointer"
                         >
                           View Details
                         </span>
