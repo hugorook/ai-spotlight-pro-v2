@@ -100,6 +100,37 @@ export default function TodayDashboard() {
   const [showContent, setShowContent] = useState(false)
   const [expandedCard, setExpandedCard] = useState<'wins' | 'actions' | 'improvements'>('wins')
   const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  
+  // Handle tab visibility changes - reload data when tab becomes active if data is missing
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      const isVisible = !document.hidden
+      setIsTabVisible(isVisible)
+      
+      console.log('🔄 Tab visibility changed:', { isVisible, hasData: data.wins?.length > 0 || data.actions?.length > 0 || data.improvements?.length > 0 })
+      
+      if (isVisible && user && dataLoaded) {
+        // If tab becomes visible but we have no data, reload everything
+        const hasAnyData = data.wins?.length > 0 || data.actions?.length > 0 || data.improvements?.length > 0
+        
+        if (!hasAnyData) {
+          console.log('🔄 Tab became active but no data found - reloading...')
+          // Force reload saved results
+          await loadSavedResults()
+          // Small delay then check again
+          setTimeout(() => {
+            if (healthCheckResults.length > 0) {
+              updateDashboardWithHealthCheckResults()
+            }
+          }, 500)
+        }
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [user, dataLoaded, data, healthCheckResults])
   
   // Debug log data changes
   useEffect(() => {
@@ -108,9 +139,10 @@ export default function TodayDashboard() {
       actionsCount: data.actions?.length || 0, 
       improvementsCount: data.improvements?.length || 0,
       hasProcessed: hasProcessedHealthCheck,
-      healthCheckResultsCount: healthCheckResults?.length || 0
+      healthCheckResultsCount: healthCheckResults?.length || 0,
+      isTabVisible
     })
-  }, [data, hasProcessedHealthCheck, healthCheckResults])
+  }, [data, hasProcessedHealthCheck, healthCheckResults, isTabVisible])
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
@@ -122,10 +154,23 @@ export default function TodayDashboard() {
   
   // Separate effect for loading saved health check results
   useEffect(() => {
-    if (user && dataLoaded && !hasProcessedHealthCheck) {
+    if (user && dataLoaded) {
+      console.log('💾 Loading saved health check results...')
       loadSavedResults()
     }
-  }, [user, dataLoaded, hasProcessedHealthCheck])
+  }, [user, dataLoaded])
+  
+  // Force data check on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      const forceCheck = setTimeout(() => {
+        console.log('🔍 Force checking for existing data...')
+        loadSavedResults()
+      }, 1000)
+      
+      return () => clearTimeout(forceCheck)
+    }
+  }, [user])
 
   // Process health check results whenever they change
   useEffect(() => {
@@ -135,6 +180,22 @@ export default function TodayDashboard() {
       setHasProcessedHealthCheck(true)
     }
   }, [healthCheckResults, dataLoaded])
+  
+  // Backup effect - if we're visible but have no data after a delay, force reload
+  useEffect(() => {
+    if (isTabVisible && dataLoaded && user) {
+      const checkDataTimer = setTimeout(() => {
+        const hasAnyData = data.wins?.length > 0 || data.actions?.length > 0 || data.improvements?.length > 0
+        
+        if (!hasAnyData && healthCheckResults.length === 0) {
+          console.log('🚨 Backup reload triggered - no data found after delay')
+          loadSavedResults()
+        }
+      }, 2000) // Check after 2 seconds
+      
+      return () => clearTimeout(checkDataTimer)
+    }
+  }, [isTabVisible, dataLoaded, user, data, healthCheckResults])
 
   const loadAllData = async () => {
     try {
@@ -203,6 +264,7 @@ export default function TodayDashboard() {
         improvements: [] // Will be populated by health check results
       }
       
+      console.log('💾 Setting initial dashboard data:', finalData)
       setData(finalData)
       setDataLoaded(true)
     } catch (error) {
@@ -538,13 +600,22 @@ export default function TodayDashboard() {
 
       // Update dashboard data with health check results atomically
       setData(prev => {
-        // Only update if we have new data
         const updatedData = {
           ...prev,
           wins: wins.length > 0 ? wins.sort((a, b) => a.rank - b.rank) : prev.wins,
-          actions: actions.length > 0 ? actions : (prev.actions.length > 0 ? prev.actions : []),
+          actions: actions.length > 0 ? actions : prev.actions,
           improvements: improvements.length > 0 ? improvements.slice(0, 8) : prev.improvements
         }
+        
+        console.log('🔄 Updating dashboard with health check results:', {
+          prevWins: prev.wins?.length || 0,
+          newWins: wins.length,
+          prevActions: prev.actions?.length || 0, 
+          newActions: actions.length,
+          prevImprovements: prev.improvements?.length || 0,
+          newImprovements: improvements.length
+        })
+        
         return updatedData
       })
 
