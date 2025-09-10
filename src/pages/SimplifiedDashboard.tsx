@@ -174,52 +174,58 @@ export default function TodayDashboard() {
 
       const wins = winsResult.data?.wins || []
       
-      // Generate fresh actions instead of fetching potentially stale ones
+      // Generate intelligent default actions based on website data
+      const websiteDomain = latestGenerated?.website_url || project.site_url || 'your website'
+      const cleanDomain = websiteDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')
+      const companyInfo = latestGenerated?.company_data || {}
+      const companyName = companyInfo.name || cleanDomain.split('.')[0]
+      const industry = companyInfo.industry || 'your industry'
+      
       const actions = [
         {
           id: 'action-1',
-          title: `Create comprehensive FAQ page addressing common industry questions`,
-          rationale: `Build authority by answering the questions your prospects are asking AI tools. Include pricing, implementation, and comparison topics.`,
+          title: `Run comprehensive AI visibility audit for ${companyName}`,
+          rationale: `Before taking action, understand where you stand. Run a full health check to identify which AI models know about ${cleanDomain}, what they say, and where the gaps are. This data will prioritize all other actions.`,
           impact: 'High',
-          effort: 'Medium',
+          effort: 'Low',
           suggestedOwner: 'Content',
-          actionType: 'content-creation'
+          actionType: 'analysis'
         },
         {
           id: 'action-2',
-          title: `Establish presence on Reddit, Stack Overflow, and Quora in relevant communities`,
-          rationale: `AI models often reference community discussions. Provide helpful answers in professional forums to build visibility.`,
+          title: `Create "${companyName} vs Alternatives" comparison hub`,
+          rationale: `AI models frequently get asked comparison questions. Build a dedicated section comparing your solution to top 3-5 alternatives with honest pros/cons, pricing tables, and use case recommendations.`,
           impact: 'High',
-          effort: 'High',
-          suggestedOwner: 'PR',
-          actionType: 'community-engagement'
+          effort: 'Medium',
+          suggestedOwner: 'Content',
+          actionType: 'content-creation'
         },
         {
           id: 'action-3',
-          title: `Publish detailed comparison guides against top 3-5 competitors`,
-          rationale: `When users ask for recommendations, AI models look for detailed comparisons. Create honest, feature-focused comparison content.`,
+          title: `Launch 30-day review collection sprint on G2 and Capterra`,
+          rationale: `AI models heavily weight third-party reviews. Set a goal of 25+ detailed reviews mentioning specific features and outcomes. Reach out to happy customers with templates and incentives.`,
+          impact: 'High',
+          effort: 'Low',
+          suggestedOwner: 'PR',
+          actionType: 'social-proof'
+        },
+        {
+          id: 'action-4',
+          title: `Build "How to use ${companyName} for [specific use cases]" content series`,
+          rationale: `AI tools need concrete examples. Create 5-7 detailed tutorials showing exactly how ${industry} professionals use your product to solve specific problems, with screenshots and outcomes.`,
           impact: 'Medium',
           effort: 'Medium',
           suggestedOwner: 'Content',
           actionType: 'content-creation'
         },
         {
-          id: 'action-4',
-          title: `Submit detailed company profile to industry directories and review sites`,
-          rationale: `Improve discoverability by ensuring consistent, detailed listings on G2, Capterra, and industry-specific directories.`,
+          id: 'action-5',
+          title: `Implement technical SEO for AI: structured data and API documentation`,
+          rationale: `Make it easy for AI to understand ${cleanDomain}. Add JSON-LD schema markup for your organization, products, pricing, and FAQs. Ensure all key pages have proper meta descriptions focused on capabilities.`,
           impact: 'Medium',
           effort: 'Low',
-          suggestedOwner: 'PR',
-          actionType: 'directory-optimization'
-        },
-        {
-          id: 'action-5',
-          title: `Create case studies showcasing specific use cases and outcomes`,
-          rationale: `AI models prefer concrete examples with metrics. Develop detailed case studies showing how customers achieved results.`,
-          impact: 'High',
-          effort: 'Medium',
-          suggestedOwner: 'Content',
-          actionType: 'social-proof'
+          suggestedOwner: 'Dev',
+          actionType: 'technical-seo'
         }
       ]
 
@@ -293,61 +299,183 @@ export default function TodayDashboard() {
         }
       })
 
-      // Generate actions from failed prompts
+      // Generate smart actions from failed prompts
       const failedResults = healthCheckResults.filter(r => !r.company_mentioned)
       const actions: any[] = []
 
       if (failedResults.length > 0) {
-        // Create diverse actionable recommendations
-        const diverseActions = [
-          {
-            id: 'action-1',
-            title: `Create comprehensive FAQ page addressing common industry questions`,
-            rationale: `Build authority by answering the questions your prospects are asking AI tools. Include pricing, implementation, and comparison topics based on failed queries.`,
+        // Analyze failed prompts to identify patterns
+        const promptCategories = {
+          comparison: [] as any[],
+          features: [] as any[],
+          pricing: [] as any[],
+          useCases: [] as any[],
+          alternatives: [] as any[],
+          reviews: [] as any[],
+          general: [] as any[]
+        }
+
+        // Categorize failed prompts
+        failedResults.forEach(result => {
+          const prompt = result.prompt_text.toLowerCase()
+          if (prompt.includes('compare') || prompt.includes('vs') || prompt.includes('versus') || prompt.includes('better than')) {
+            promptCategories.comparison.push(result)
+          } else if (prompt.includes('feature') || prompt.includes('capability') || prompt.includes('can it')) {
+            promptCategories.features.push(result)
+          } else if (prompt.includes('price') || prompt.includes('cost') || prompt.includes('pricing') || prompt.includes('expensive')) {
+            promptCategories.pricing.push(result)
+          } else if (prompt.includes('use case') || prompt.includes('example') || prompt.includes('how to')) {
+            promptCategories.useCases.push(result)
+          } else if (prompt.includes('alternative') || prompt.includes('similar') || prompt.includes('like')) {
+            promptCategories.alternatives.push(result)
+          } else if (prompt.includes('review') || prompt.includes('experience') || prompt.includes('feedback')) {
+            promptCategories.reviews.push(result)
+          } else {
+            promptCategories.general.push(result)
+          }
+        })
+
+        // Get company info for personalized recommendations
+        const companyName = latestGenerated?.company_data?.name || companyData?.name || 'your company'
+        const industry = latestGenerated?.company_data?.industry || companyData?.industry || 'your industry'
+        const websiteDomain = websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
+
+        // Generate targeted actions based on analysis
+        const smartActions = []
+
+        // Priority 1: Comparison content if many comparison queries failed
+        if (promptCategories.comparison.length > 2) {
+          const topCompetitors = promptCategories.comparison
+            .map(r => r.prompt_text.match(/(?:vs|versus|compare.*to|compared to)\s+([\w\s]+)/i)?.[1])
+            .filter(Boolean)
+            .slice(0, 3)
+          
+          smartActions.push({
+            id: 'action-comp',
+            title: `Create detailed comparison pages: ${companyName} vs ${topCompetitors.join(', ') || 'top competitors'}`,
+            rationale: `${promptCategories.comparison.length} comparison queries failed. Build dedicated comparison pages with feature matrices, pricing tables, and use case differentiators. Focus on honest, balanced comparisons that AI models will reference.`,
             impact: 'High',
             effort: 'Medium',
             suggestedOwner: 'Content',
             actionType: 'content-creation'
-          },
-          {
-            id: 'action-2',
-            title: `Establish presence on Reddit, Stack Overflow, and Quora in relevant communities`,
-            rationale: `AI models often reference community discussions. Provide helpful answers in professional subreddits and forums to build visibility.`,
+          })
+        }
+
+        // Priority 2: Pricing transparency if pricing queries failed
+        if (promptCategories.pricing.length > 0) {
+          smartActions.push({
+            id: 'action-pricing',
+            title: `Publish transparent pricing page with calculator and ROI examples`,
+            rationale: `${promptCategories.pricing.length} pricing-related queries failed. AI models need clear pricing data. Include pricing tiers, feature breakdowns, ROI calculator, and case studies showing value at each price point.`,
             impact: 'High',
+            effort: 'Low',
+            suggestedOwner: 'Content',
+            actionType: 'content-creation'
+          })
+        }
+
+        // Priority 3: Use case content if how-to queries failed
+        if (promptCategories.useCases.length > 1) {
+          const specificUseCases = promptCategories.useCases
+            .map(r => r.prompt_text.match(/(?:how to|example of|use.*for)\s+([\w\s]+)/i)?.[1])
+            .filter(Boolean)
+            .slice(0, 3)
+            
+          smartActions.push({
+            id: 'action-usecases',
+            title: `Build use case library: "How ${companyName} helps with ${specificUseCases.join(', ') || 'common scenarios'}"`,
+            rationale: `${promptCategories.useCases.length} use case queries failed. Create detailed tutorials, video walkthroughs, and outcome-focused case studies. Include specific metrics and implementation timelines.`,
+            impact: 'High',
+            effort: 'Medium',
+            suggestedOwner: 'Content',
+            actionType: 'content-creation'
+          })
+        }
+
+        // Priority 4: Feature documentation if capability queries failed
+        if (promptCategories.features.length > 1) {
+          smartActions.push({
+            id: 'action-features',
+            title: `Create comprehensive feature documentation with API references and integrations`,
+            rationale: `${promptCategories.features.length} feature/capability queries failed. Build detailed feature pages, API documentation, integration guides, and capability matrices that AI can easily parse and reference.`,
+            impact: 'Medium',
+            effort: 'Medium',
+            suggestedOwner: 'Dev',
+            actionType: 'documentation'
+          })
+        }
+
+        // Priority 5: Review and social proof campaign
+        if (promptCategories.reviews.length > 0 || failedResults.length > 10) {
+          smartActions.push({
+            id: 'action-reviews',
+            title: `Launch review collection campaign on G2, Capterra, and TrustRadius`,
+            rationale: `Limited third-party validation found. AI models heavily reference review platforms. Target 50+ reviews in next 90 days. Incentivize detailed reviews that mention specific use cases and outcomes.`,
+            impact: 'High',
+            effort: 'Low',
+            suggestedOwner: 'PR',
+            actionType: 'social-proof'
+          })
+        }
+
+        // Priority 6: Community presence
+        if (failedResults.length > 5) {
+          const relevantForums = industry.toLowerCase().includes('saas') ? 'r/SaaS, Indie Hackers' : 
+                                industry.toLowerCase().includes('ecommerce') ? 'r/ecommerce, Shopify Community' :
+                                'relevant industry forums'
+          
+          smartActions.push({
+            id: 'action-community',
+            title: `Establish thought leadership in ${relevantForums} and Stack Overflow`,
+            rationale: `Low community presence detected. AI models learn from community discussions. Share insights, answer questions, and build reputation as ${industry} expert. Target 2-3 high-quality posts/answers per week.`,
+            impact: 'Medium',
             effort: 'High',
             suggestedOwner: 'PR',
             actionType: 'community-engagement'
-          },
-          {
-            id: 'action-3',
-            title: `Publish detailed comparison guides against top 3-5 competitors`,
-            rationale: `When users ask for recommendations, AI models look for detailed comparisons. Create honest, feature-focused comparison content to capture "best of" queries.`,
+          })
+        }
+
+        // Priority 7: SEO and content gaps
+        if (promptCategories.general.length > 3) {
+          const topKeywords = promptCategories.general
+            .map(r => r.prompt_text.match(/(?:what is|how does|explain)\s+([\w\s]+)/i)?.[1])
+            .filter(Boolean)
+            .slice(0, 3)
+            
+          smartActions.push({
+            id: 'action-seo',
+            title: `Create pillar content for "${topKeywords.join('", "') || 'key industry terms'}"`,
+            rationale: `${promptCategories.general.length} general queries failed. Build comprehensive guides, glossaries, and educational content. Focus on long-form content (2000+ words) that thoroughly explains concepts AI users are searching for.`,
             impact: 'Medium',
             effort: 'Medium',
             suggestedOwner: 'Content',
             actionType: 'content-creation'
-          },
-          {
-            id: 'action-4',
-            title: `Submit detailed company profile to industry directories and review sites`,
-            rationale: `Improve discoverability by ensuring consistent, detailed listings on G2, Capterra, and industry-specific directories that AI models reference.`,
-            impact: 'Medium',
-            effort: 'Low',
-            suggestedOwner: 'PR',
-            actionType: 'directory-optimization'
-          },
-          {
-            id: 'action-5',
-            title: `Create case studies showcasing specific use cases and outcomes`,
-            rationale: `AI models prefer concrete examples with metrics. Develop 3-4 detailed case studies showing how different customer types achieved specific results with your solution.`,
-            impact: 'High',
-            effort: 'Medium',
-            suggestedOwner: 'Content',
-            actionType: 'social-proof'
-          }
-        ]
-        
-        actions.push(...diverseActions.slice(0, 5))
+          })
+        }
+
+        // Priority 8: Technical improvements
+        smartActions.push({
+          id: 'action-schema',
+          title: `Implement structured data markup for products, reviews, and FAQs`,
+          rationale: `Help AI models better understand ${websiteDomain}. Add JSON-LD schema for organization, products, reviews, FAQs, and how-to content. This directly improves how AI interprets and references your site.`,
+          impact: 'High',
+          effort: 'Low',
+          suggestedOwner: 'Dev',
+          actionType: 'technical-seo'
+        })
+
+        // Sort by impact and take top 5
+        const sortedActions = smartActions
+          .sort((a, b) => {
+            const impactScore = { High: 3, Medium: 2, Low: 1 }
+            const effortScore = { Low: 3, Medium: 2, High: 1 }
+            const scoreA = impactScore[a.impact] * 2 + effortScore[a.effort]
+            const scoreB = impactScore[b.impact] * 2 + effortScore[b.effort]
+            return scoreB - scoreA
+          })
+          .slice(0, 5)
+
+        actions.push(...sortedActions)
       }
 
       // Update dashboard data with health check results atomically
