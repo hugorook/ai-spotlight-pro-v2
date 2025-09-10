@@ -99,24 +99,45 @@ export default function TodayDashboard() {
   const [dataLoaded, setDataLoaded] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [expandedCard, setExpandedCard] = useState<'wins' | 'actions' | 'improvements'>('wins')
+  const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
+  
+  // Load cached dashboard data on mount
+  useEffect(() => {
+    const cachedData = localStorage.getItem('dashboardData')
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData)
+        if (parsed.wins || parsed.actions || parsed.improvements) {
+          setData(prev => ({
+            ...prev,
+            wins: parsed.wins || [],
+            actions: parsed.actions || [],
+            improvements: parsed.improvements || []
+          }))
+          setHasProcessedHealthCheck(true)
+        }
+      } catch (e) {
+        console.error('Error loading cached dashboard data:', e)
+      }
+    }
+  }, [])
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
     if (user) {
       loadAllData()
+      // Also load any saved health check results
+      loadSavedResults()
     }
   }, [user])
 
-  // Only update health check data after initial load, and debounce it
+  // Only update health check data if we haven't processed it yet
   useEffect(() => {
-    if (dataLoaded && healthCheckResults.length > 0) {
-      const timeoutId = setTimeout(() => {
-        updateDashboardWithHealthCheckResults()
-      }, 100) // Small delay to prevent race conditions
-      
-      return () => clearTimeout(timeoutId)
+    if (dataLoaded && healthCheckResults.length > 0 && !hasProcessedHealthCheck) {
+      updateDashboardWithHealthCheckResults()
+      setHasProcessedHealthCheck(true)
     }
-  }, [healthCheckResults, dataLoaded])
+  }, [healthCheckResults, dataLoaded, hasProcessedHealthCheck])
 
   const loadAllData = async () => {
     try {
@@ -181,8 +202,8 @@ export default function TodayDashboard() {
       const finalData = {
         project,
         wins: Array.isArray(wins) ? wins : (wins.wins || []),
-        actions: Array.isArray(actions) ? actions : [],
-        improvements: [] // Initialize as empty array until health check runs
+        actions: data.actions.length > 0 ? data.actions : [], // Keep existing actions if we have them
+        improvements: data.improvements.length > 0 ? data.improvements : [] // Keep existing improvements
       }
       
       setData(finalData)
@@ -196,6 +217,11 @@ export default function TodayDashboard() {
       })
     } finally {
       setIsLoading(false)
+      // After initial load, check if we have saved health check results
+      if (healthCheckResults.length > 0 && !hasProcessedHealthCheck) {
+        updateDashboardWithHealthCheckResults()
+        setHasProcessedHealthCheck(true)
+      }
     }
   }
 
@@ -519,12 +545,15 @@ export default function TodayDashboard() {
 
       // Update dashboard data with health check results atomically
       setData(prev => {
+        // Only update if we have new data
         const updatedData = {
           ...prev,
           wins: wins.length > 0 ? wins.sort((a, b) => a.rank - b.rank) : prev.wins,
-          actions: actions.length > 0 ? actions : prev.actions,
+          actions: actions.length > 0 ? actions : (prev.actions.length > 0 ? prev.actions : []),
           improvements: improvements.length > 0 ? improvements.slice(0, 8) : prev.improvements
         }
+        // Cache the updated data
+        localStorage.setItem('dashboardData', JSON.stringify(updatedData))
         return updatedData
       })
 
@@ -536,6 +565,8 @@ export default function TodayDashboard() {
   const handleRunHealthCheck = async () => {
     try {
       const result = await runHealthCheck()
+      // Reset the flag so new results will be processed
+      setHasProcessedHealthCheck(false)
       toast({
         title: 'Health Check Complete',
         description: `Found ${(result && 'mentionRate' in result ? result.mentionRate : mentionRate)}% visibility rate with score of ${(result && 'visibilityScore' in result ? result.visibilityScore : visibilityScore)}`
