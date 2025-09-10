@@ -651,9 +651,11 @@ export default function TodayDashboard() {
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Where you're winning</h3>
-                      <span className="text-[12px] text-[#3d3d38]">
-                        {expandedCard === 'wins' ? '−' : '+'}
-                      </span>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                        <span className="text-[14px] text-[#3d3d38] leading-none">
+                          {expandedCard === 'wins' ? '−' : '+'}
+                        </span>
+                      </div>
                     </div>
                     {expandedCard === 'wins' && (
                       <p className="text-[13px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
@@ -709,9 +711,11 @@ export default function TodayDashboard() {
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Next 30 days</h3>
-                      <span className="text-[12px] text-[#3d3d38]">
-                        {expandedCard === 'actions' ? '−' : '+'}
-                      </span>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                        <span className="text-[14px] text-[#3d3d38] leading-none">
+                          {expandedCard === 'actions' ? '−' : '+'}
+                        </span>
+                      </div>
                     </div>
                     {expandedCard === 'actions' && (
                       <p className="text-[13px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
@@ -767,9 +771,11 @@ export default function TodayDashboard() {
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Areas to improve</h3>
-                      <span className="text-[12px] text-[#3d3d38]">
-                        {expandedCard === 'improvements' ? '−' : '+'}
-                      </span>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                        <span className="text-[14px] text-[#3d3d38] leading-none">
+                          {expandedCard === 'improvements' ? '−' : '+'}
+                        </span>
+                      </div>
                     </div>
                     {expandedCard === 'improvements' && (
                       <p className="text-[13px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
