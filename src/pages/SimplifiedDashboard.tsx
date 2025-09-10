@@ -403,7 +403,7 @@ export default function TodayDashboard() {
           smartActions.push({
             id: 'action-video-testimonials',
             title: `Record 5 customer success story videos focusing on specific outcomes`,
-            rationale: `AI models value video content with specific metrics. Target customers who achieved 50%+ improvements. Each video should be 2-3 minutes focusing on problem, solution, and measurable results.`,
+            rationale: `AI models value video content with specific metrics. Target customers who achieved 50%+ improvements. Each video should focus on problem, solution, and measurable results.`,
             impact: 'High',
             effort: 'Medium',
             suggestedOwner: 'PR',
@@ -449,7 +449,7 @@ export default function TodayDashboard() {
         // Priority 8: Technical improvements - always include these
         smartActions.push({
           id: 'action-schema',
-          title: `Add JSON-LD schema markup to all product pages within 48 hours`,
+          title: `Add JSON-LD schema markup to all product pages`,
           rationale: `Critical quick win: AI models rely heavily on structured data. Add Product, Organization, FAQ, and Review schema. This one change can improve AI understanding by 40%+. Use Google's structured data testing tool to validate.`,
           impact: 'High',
           effort: 'Low',
