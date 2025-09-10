@@ -649,9 +649,9 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Where you're winning</h3>
-                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl flex-1 pr-2" style={{fontWeight: 400}}>Where you're winning</h3>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center flex-shrink-0">
                         <span className="text-[14px] text-[#3d3d38] leading-none">
                           {expandedCard === 'wins' ? '−' : '+'}
                         </span>
@@ -709,9 +709,9 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Next 30 days</h3>
-                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl flex-1 pr-2" style={{fontWeight: 400}}>Next 30 days</h3>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center flex-shrink-0">
                         <span className="text-[14px] text-[#3d3d38] leading-none">
                           {expandedCard === 'actions' ? '−' : '+'}
                         </span>
@@ -769,9 +769,9 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Areas to improve</h3>
-                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center">
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl flex-1 pr-2" style={{fontWeight: 400}}>Areas to improve</h3>
+                      <div className="w-6 h-6 rounded-full border border-[#3d3d38]/20 flex items-center justify-center flex-shrink-0">
                         <span className="text-[14px] text-[#3d3d38] leading-none">
                           {expandedCard === 'improvements' ? '−' : '+'}
                         </span>
