@@ -99,6 +99,7 @@ export default function TodayDashboard() {
   const [dataLoaded, setDataLoaded] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [expandedCard, setExpandedCard] = useState<'wins' | 'actions' | 'improvements'>('wins')
+  const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
   
   // Debug log data changes
   useEffect(() => {
@@ -110,7 +111,6 @@ export default function TodayDashboard() {
       healthCheckResultsCount: healthCheckResults?.length || 0
     })
   }, [data, hasProcessedHealthCheck, healthCheckResults])
-  const [hasProcessedHealthCheck, setHasProcessedHealthCheck] = useState(false)
 
   // Single effect to handle all data loading consistently
   useEffect(() => {
