@@ -649,14 +649,14 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className={`flex items-center justify-between mb-1 ${expandedCard !== 'wins' ? 'writing-mode-vertical' : ''}`}>
-                      <h3 className={`font-corben text-[#282823] text-sm ${expandedCard !== 'wins' ? 'transform rotate-180' : ''}`} style={{fontWeight: 400, writingMode: expandedCard !== 'wins' ? 'vertical-rl' : 'horizontal-tb'}}>Where you're winning</h3>
-                      {expandedCard === 'wins' && (
-                        <span className="text-[10px] text-[#3d3d38]">−</span>
-                      )}
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Where you're winning</h3>
+                      <span className="text-[12px] text-[#3d3d38]">
+                        {expandedCard === 'wins' ? '−' : '+'}
+                      </span>
                     </div>
                     {expandedCard === 'wins' && (
-                      <p className="text-[11px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
+                      <p className="text-[13px] text-[#3d3d38] mb-3">Install the site script to enable automatic fixes</p>
                     )}
                   </div>
                   {expandedCard === 'wins' && (
@@ -707,14 +707,14 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className={`flex items-center justify-between mb-1 ${expandedCard !== 'actions' ? 'writing-mode-vertical' : ''}`}>
-                      <h3 className={`font-corben text-[#282823] text-sm ${expandedCard !== 'actions' ? 'transform rotate-180' : ''}`} style={{fontWeight: 400, writingMode: expandedCard !== 'actions' ? 'vertical-rl' : 'horizontal-tb'}}>Next 30 days</h3>
-                      {expandedCard === 'actions' && (
-                        <span className="text-[10px] text-[#3d3d38]">−</span>
-                      )}
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Next 30 days</h3>
+                      <span className="text-[12px] text-[#3d3d38]">
+                        {expandedCard === 'actions' ? '−' : '+'}
+                      </span>
                     </div>
                     {expandedCard === 'actions' && (
-                      <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
+                      <p className="text-[13px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                     )}
                   </div>
                   {expandedCard === 'actions' && (
@@ -765,14 +765,14 @@ export default function TodayDashboard() {
               >
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex-shrink-0">
-                    <div className={`flex items-center justify-between mb-1 ${expandedCard !== 'improvements' ? 'writing-mode-vertical' : ''}`}>
-                      <h3 className={`font-corben text-[#282823] text-sm ${expandedCard !== 'improvements' ? 'transform rotate-180' : ''}`} style={{fontWeight: 400, writingMode: expandedCard !== 'improvements' ? 'vertical-rl' : 'horizontal-tb'}}>Areas to improve</h3>
-                      {expandedCard === 'improvements' && (
-                        <span className="text-[10px] text-[#3d3d38]">−</span>
-                      )}
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-corben text-[#282823] text-2xl" style={{fontWeight: 400}}>Areas to improve</h3>
+                      <span className="text-[12px] text-[#3d3d38]">
+                        {expandedCard === 'improvements' ? '−' : '+'}
+                      </span>
                     </div>
                     {expandedCard === 'improvements' && (
-                      <p className="text-[11px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
+                      <p className="text-[13px] text-[#3d3d38] mb-3">Non-automatable, high-leverage actions</p>
                     )}
                   </div>
                   {expandedCard === 'improvements' && (
